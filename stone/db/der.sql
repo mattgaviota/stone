@@ -90,13 +90,13 @@ CREATE TABLE `menu` (
 );
 
 -- ---
--- Table 'operaciones'
+-- Table 'log_operaciones'
 -- 
 -- ---
 
-DROP TABLE IF EXISTS `operaciones`;
+DROP TABLE IF EXISTS `log_operaciones`;
 		
-CREATE TABLE `operaciones` (
+CREATE TABLE `log_operaciones` (
   `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
   `fecha` DATETIME NOT NULL DEFAULT 'NULL',
   `id_tipos_operaciones` INTEGER NULL DEFAULT NULL,
@@ -223,21 +223,54 @@ CREATE TABLE `categorias` (
 );
 
 -- ---
+-- Table 'acciones'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `acciones`;
+		
+CREATE TABLE `acciones` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `nombre` VARCHAR(50) NOT NULL DEFAULT 'NULL',
+  `created` DATETIME NULL DEFAULT NULL,
+  `updated` DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'log_usuarios'
+-- 
+-- ---
+
+DROP TABLE IF EXISTS `log_usuarios`;
+		
+CREATE TABLE `log_usuarios` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `fecha` DATETIME NULL DEFAULT NULL,
+  `lugar` INTEGER NULL DEFAULT NULL,
+  `id_acciones` INTEGER NULL DEFAULT NULL,
+  `dni_usuarios` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
 -- Foreign Keys 
 -- ---
 
 ALTER TABLE `dias` ADD FOREIGN KEY (id_calendarios) REFERENCES `calendarios` (`id`);
-ALTER TABLE `operaciones` ADD FOREIGN KEY (id_tipos_operaciones) REFERENCES `tipos_operaciones` (`id`);
-ALTER TABLE `operaciones` ADD FOREIGN KEY (dni_usuarios) REFERENCES `usuarios` (`dni`);
+ALTER TABLE `log_operaciones` ADD FOREIGN KEY (id_tipos_operaciones) REFERENCES `tipos_operaciones` (`id`);
+ALTER TABLE `log_operaciones` ADD FOREIGN KEY (dni_usuarios) REFERENCES `usuarios` (`dni`);
 ALTER TABLE `perfiles_tipos_operaciones` ADD FOREIGN KEY (id_perfiles) REFERENCES `perfiles` (`id`);
 ALTER TABLE `perfiles_tipos_operaciones` ADD FOREIGN KEY (id_tipos_operaciones) REFERENCES `tipos_operaciones` (`id`);
 ALTER TABLE `tickets` ADD FOREIGN KEY (fecha_dias) REFERENCES `dias` (`fecha`);
-ALTER TABLE `tickets` ADD FOREIGN KEY (id_operaciones) REFERENCES `operaciones` (`id`);
+ALTER TABLE `tickets` ADD FOREIGN KEY (id_operaciones) REFERENCES `log_operaciones` (`id`);
 ALTER TABLE `tipos_operaciones` ADD FOREIGN KEY (id_menu) REFERENCES `menu` (`id`);
 ALTER TABLE `usuarios` ADD FOREIGN KEY (id_provincias) REFERENCES `provincias` (`id`);
 ALTER TABLE `usuarios` ADD FOREIGN KEY (id_facultades) REFERENCES `facultades` (`id`);
 ALTER TABLE `usuarios` ADD FOREIGN KEY (id_categorias) REFERENCES `categorias` (`id`);
 ALTER TABLE `usuarios` ADD FOREIGN KEY (id_perfiles) REFERENCES `perfiles` (`id`);
+ALTER TABLE `log_usuarios` ADD FOREIGN KEY (id_acciones) REFERENCES `acciones` (`id`);
+ALTER TABLE `log_usuarios` ADD FOREIGN KEY (dni_usuarios) REFERENCES `usuarios` (`dni`);
 
 -- ---
 -- Table Properties
@@ -248,7 +281,7 @@ ALTER TABLE `usuarios` ADD FOREIGN KEY (id_perfiles) REFERENCES `perfiles` (`id`
 -- ALTER TABLE `facultades` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `feriados` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `menu` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `operaciones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `log_operaciones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `perfiles` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `perfiles_tipos_operaciones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `provincias` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -256,6 +289,8 @@ ALTER TABLE `usuarios` ADD FOREIGN KEY (id_perfiles) REFERENCES `perfiles` (`id`
 -- ALTER TABLE `tipos_operaciones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `usuarios` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 -- ALTER TABLE `categorias` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `acciones` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE `log_usuarios` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ---
 -- Test Data
@@ -271,7 +306,7 @@ ALTER TABLE `usuarios` ADD FOREIGN KEY (id_perfiles) REFERENCES `perfiles` (`id`
 -- ('','','','','','');
 -- INSERT INTO `menu` (`id`,`nombre`,`created`,`updated`,`orden`) VALUES
 -- ('','','','','');
--- INSERT INTO `operaciones` (`id`,`fecha`,`id_tipos_operaciones`,`dni_usuarios`) VALUES
+-- INSERT INTO `log_operaciones` (`id`,`fecha`,`id_tipos_operaciones`,`dni_usuarios`) VALUES
 -- ('','','','');
 -- INSERT INTO `perfiles` (`id`,`nombre`,`created`,`updated`) VALUES
 -- ('','','','');
@@ -287,4 +322,7 @@ ALTER TABLE `usuarios` ADD FOREIGN KEY (id_perfiles) REFERENCES `perfiles` (`id`
 -- ('','','','','','','','','');
 -- INSERT INTO `categorias` (`id`,`nombre`,`created`,`updated`) VALUES
 -- ('','','','');
-
+-- INSERT INTO `acciones` (`id`,`nombre`,`created`,`updated`) VALUES
+-- ('','','','');
+-- INSERT INTO `log_usuarios` (`id`,`fecha`,`lugar`,`id_acciones`,`dni_usuarios`) VALUES
+-- ('','','','','');

@@ -37,7 +37,7 @@
 		<type label="SET" length="1" sql="SET" quote=""/>
 		<type label="Bit" length="0" sql="bit" quote=""/>
 	</group>
-</datatypes><table x="233" y="147" name="calendarios">
+</datatypes><table x="237" y="68" name="calendarios">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -78,7 +78,7 @@
 <part>fecha</part>
 </key>
 </table>
-<table x="19" y="459" name="facultades">
+<table x="14" y="402" name="facultades">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -118,7 +118,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="461" y="413" name="menu">
+<table x="429" y="353" name="menu">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -138,7 +138,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="435" y="267" name="operaciones">
+<table x="427" y="218" name="log_operaciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -157,7 +157,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="425" y="589" name="perfiles">
+<table x="428" y="515" name="perfiles">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -174,7 +174,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="638" y="571" name="perfiles_tipos_operaciones">
+<table x="561" y="511" name="perfiles_tipos_operaciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -196,7 +196,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="20" y="326" name="provincias">
+<table x="17" y="270" name="provincias">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -213,7 +213,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="698" y="105" name="tickets">
+<table x="618" y="53" name="tickets">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -235,13 +235,13 @@
 <default>'NULL'</default></row>
 <row name="id_operaciones" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
-<default>NULL</default><relation table="operaciones" row="id" />
+<default>NULL</default><relation table="log_operaciones" row="id" />
 </row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
 </table>
-<table x="704" y="311" name="tipos_operaciones">
+<table x="605" y="269" name="tipos_operaciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -271,7 +271,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="201" y="363" name="usuarios">
+<table x="227" y="289" name="usuarios">
 <row name="dni" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -307,7 +307,7 @@
 <part>dni</part>
 </key>
 </table>
-<table x="18" y="588" name="categorias">
+<table x="16" y="540" name="categorias">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -320,6 +320,45 @@
 <row name="updated" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="562" y="685" name="acciones">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="nombre" null="0" autoincrement="0">
+<datatype>VARCHAR(50)</datatype>
+<default>'NULL'</default></row>
+<row name="created" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<row name="updated" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="405" y="667" name="log_usuarios">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="fecha" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<row name="lugar" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="id_acciones" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="acciones" row="id" />
+</row>
+<row name="dni_usuarios" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="usuarios" row="dni" />
+</row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
