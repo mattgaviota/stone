@@ -1,0 +1,447 @@
+#:kivy 1.0
+
+<LabelU@Label>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    font_size: '30sp'
+
+<WarningPopup>:
+    title: "Advertencia"
+    size_hint: None, None
+    size: 400, 400
+    auto_dismiss: False
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba: 0.98, 0.76, 0.23, 1
+            Rectangle:
+                # self here refers to the widget i.e BoxLayout
+                pos: self.pos
+                size: self.size
+        orientation: 'vertical'
+        LabelU:
+            font_size: '20sp'
+            text: app.root.current_screen.mensaje
+            size_hint: 1, 0.8
+        ButtonU:
+            text: 'Aceptar'
+            size_hint: 1, 0.2
+            on_press: root.dismiss()
+
+<ButtonU@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+
+
+<ButtonUok@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtnok.png'
+    background_down: 'images/buttons/downbtnok.png'
+    border: 20, 20, 20, 20
+    Image:
+        source: 'images/buttons/accept.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+
+<ButtonUcancel@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtncancel.png'
+    background_down: 'images/buttons/downbtncancel.png'
+    border: 20, 20, 20, 20
+    Image:
+        source: 'images/buttons/cancel.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+
+<SplashScreen>:
+    canvas.before:
+        Color:
+            rgba: 0.98, 0.76, 0.23, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Sistema de Tickets del Comedor Universitario'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1 
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 200
+            spacing: 10
+            ButtonU:
+                on_press: root.manager.current = 'login'
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/home/entrar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Ingresar'
+            ButtonU:
+                on_press: root.manager.current = 'formulario'
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/home/registrar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Registrarse'
+            ButtonU:
+                on_press: app.stop()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/home/ayuda.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Ayuda'
+
+
+<Input@TextInput>:
+    multiline: False
+    font_name: 'fonts/Ubuntu-R.ttf'
+
+<FormScreen>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 10
+        AsyncImage:
+            source: 'images/misc/comedor.jpg'
+            size_hint: 0.2, 1
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.8, 1
+            padding: 20
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.98, 0.76, 0.23, 1
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 80
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'Formulario de Registro'
+                    valign: 'top'
+                    font_size: '40sp'
+                    size_hint: 1, 0.1
+                    padding: (40, 30)
+                GridLayout:
+                    cols: 4
+                    rows: 3
+                    padding: 10
+                    spacing: 10
+                    size_hint: 1, 0.7
+                    LabelU:
+                        text: 'Nombre'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: nombre
+                        hint_text: 'Nombre y Apellido'
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'Facultad'
+                        size_hint: 0.2, 1
+                    Spinner:
+                        id: facultad
+                        values: root.facultades_nombre
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'DNI'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: dni
+                        hint_text: 'DNI sin puntos'
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'Provincia'
+                        size_hint: 0.2, 1
+                    Spinner:
+                        id: provincia
+                        values: root.provincias_nombre
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'LU'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: lu
+                        hint_text: 'Libreta Universitaria'
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'Email'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: mail
+                        hint_text: 'Correo Electronico'
+                        size_hint: 0.4, 1
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Aceptar'
+                        font_size: 20
+                        on_press: root.validar()
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel()
+            AsyncImage:
+                source: 'images/misc/comedor.jpg'
+                size_hint: 1, 0.4
+
+
+<LoginScreen>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 10
+        AsyncImage:
+            source: 'images/misc/comedor.jpg'
+            size_hint: 0.2, 1
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.8, 1
+            padding: 20   
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.98, 0.76, 0.23, 1
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 80
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'Ingresar'
+                    valign: 'top'
+                    font_size: '40sp'
+                    size_hint: 1, 0.1
+                    padding: (40, 30)
+                GridLayout:
+                    cols: 2
+                    rows: 2
+                    padding: 40
+                    spacing: 10
+                    size_hint: 1, 0.7
+                    LabelU:
+                        text: 'DNI'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: dni
+                        hint_text: 'DNI sin puntos'
+                    LabelU:
+                        text: 'Password'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: passw
+                        hint_text: 'Tu password'
+                        password: True
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Aceptar'
+                        font_size: 20
+                        on_press: root.validar()
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel()
+            AsyncImage:
+                source: 'images/misc/comedor.jpg'
+                size_hint: 1, 0.4
+
+
+<PasswordScreen>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 10
+        AsyncImage:
+            source: 'images/misc/comedor.jpg'
+            size_hint: 0.2, 1
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.8, 1
+            padding: 20   
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.98, 0.76, 0.23, 1
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 80
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'Cambiar Password'
+                    valign: 'top'
+                    font_size: '40sp'
+                    size_hint: 1, 0.1
+                    padding: (40, 30)
+                GridLayout:
+                    cols: 2
+                    rows: 3
+                    padding: 20
+                    spacing: 10
+                    size_hint: 1, 0.7
+                    LabelU:
+                        text: 'Password actual'
+                        size_hint: 0.2, 0.4
+                    Input:
+                        id: old_pass
+                        hint_text: 'Password Actual'
+                        password: True
+                        size_hint: 0.2, 0.6
+                    LabelU:
+                        text: 'Password Nuevo'
+                        size_hint: 0.2, 0.4
+                    Input:
+                        id: new_pass
+                        hint_text: 'Tu nuevo password'
+                        password: True
+                        size_hint: 0.2, 0.6
+                    LabelU:
+                        text: 'Password Nuevo'
+                        size_hint: 0.2, 0.4
+                    Input:
+                        id: re_new_pass
+                        hint_text: 'Repite tu nuevo password'
+                        password: True
+                        size_hint: 0.2, 0.6
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Aceptar'
+                        font_size: 20
+                        on_press: root.validar();
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel();
+            AsyncImage:
+                source: 'images/misc/comedor.jpg'
+                size_hint: 1, 0.4
+
+<MenuScreen>:
+    canvas.before:
+        Color:
+            rgba: 0.98, 0.76, 0.23, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    GridLayout:
+        cols: 2
+        spacing: 10
+        padding: 10
+        ButtonU:
+            text: 'Comprar'
+            font_size: 30
+            Image:
+                source: 'images/menu/comprar.png'
+                y: self.parent.y + self.parent.height - 170
+                x: self.parent.x + self.parent.width - 170
+                size: 100, 100
+                allow_stretch: True
+        ButtonU:
+            text: 'Anular'
+            font_size: 30
+            Image:
+                source: 'images/menu/anular.png'
+                y: self.parent.y + self.parent.height - 170
+                x: self.parent.x + self.parent.width - 170
+                size: 100, 100
+                allow_stretch: True
+        ButtonU:
+            text: 'Cargar Monedero'
+            font_size: 30
+            Image:
+                source: 'images/menu/cargar.png'
+                y: self.parent.y + self.parent.height - 170
+                x: self.parent.x + self.parent.width - 170
+                size: 100, 100
+                allow_stretch: True
+        ButtonU:
+            text: 'Imprimir'
+            font_size: 30
+            Image:
+                source: 'images/menu/printer.png'
+                y: self.parent.y + self.parent.height - 170
+                x: self.parent.x + self.parent.width - 170
+                size: 100, 100
+                allow_stretch: True
+        ButtonU:
+            text: 'Perfil'
+            font_size: 30
+            Image:
+                source: 'images/menu/perfil.png'
+                y: self.parent.y + self.parent.height - 170
+                x: self.parent.x + self.parent.width - 170
+                size: 100, 100
+                allow_stretch: True
+        ButtonU:
+            text: 'Salir'
+            font_size: 30
+            on_press: root.logout()
+            Image:
+                source: 'images/menu/salir.png'
+                y: self.parent.y + self.parent.height - 170
+                x: self.parent.x + self.parent.width - 170
+                size: 100, 100
+                allow_stretch: True
