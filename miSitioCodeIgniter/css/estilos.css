@@ -1,0 +1,88 @@
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+
+
+table.calendario{
+	margin: auto;
+	border-collapse: collapse;
+}
+
+.botones a{
+	background-color: #AAA;
+	padding: 2em;
+	margin: 1em;
+}
+
+.sidebar-nav {
+	padding: 10px auto;
+}
+
+.calendario {
+	font-family: Arial;
+	font-size: 1.4em;
+}
+
+.calendario .dias td{
+	width: 80px;
+	height: 70px;
+	padding: 4px;
+	border: 1px solid #999;
+	vertical-align: top;
+	background-color: #DEF;
+}
+
+.calendario .dias td:hover{
+	background-color: #FFF;
+}
+
+.calendario .highlight{
+	font-weight: bold;
+	color: #00F;
+}
+
+.calendario .dias td:nth-child(6){
+	background-color: #F3D4DA;
+}
+
+.calendario .dias td:nth-child(7){
+	background-color: #FFB9C4;	
+}
+
+
+
+/* Large desktop */
+@media (min-width: 1200px) {
+	body {
+		padding-top: 50px;
+		padding-bottom: 40px;
+	}
+}
+
+/* Portrait tablet to landscape and desktop */
+@media (min-width: 768px) and (max-width: 979px) {
+	body {
+		padding-top: 20px;
+		padding-bottom: 0;
+	}
+	.jumbotron h1 { font-size: 2em; }
+}
+ 
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+	body {
+		padding-top: 20px;
+		padding-bottom: 0;
+	}
+	.jumbotron h1 { font-size: 2em; }
+}
+ 
+/* Landscape phones and down */
+@media (max-width: 480px) {
+	body {
+		padding-top: 20px;
+		padding-bottom: 0;
+	}
+	.jumbotron h1 { font-size: 2em; }
+}
