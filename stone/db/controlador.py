@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-from db.modelo import db
+from modelo import db
 
 
 def get_all_facultades():
@@ -47,3 +47,7 @@ def update_estado(user, valor):
 def update_pass(user, new_pass):
     db(db.usuarios.dni == user['dni']).update(password = new_pass)
     db.commit()
+
+def get_configuracion():
+    row = db().select(db.configuraciones.ALL).first()
+    return row

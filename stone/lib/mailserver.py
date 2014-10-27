@@ -2,29 +2,30 @@
 
 import smtplib
 import json
+from db import controlador
 from os import path
 from email.MIMEText import MIMEText
 from email.Encoders import encode_base64
 
 
 def send_mail(name, mail_to, code):
-    # Cargamos el archivo de configuración
-    file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
-                'conf/mail.json')
-    with open(file_path) as data_file:    
-        data = json.load(data_file)
-
-    mail_from = data['mail_from']
-    mail_pass = data['pass']
+    data = controlador.get_configuracion()
+    print data
+    
+    mail_from = data['email']
+    mail_pass = data['password']
     
     # Construimos el mensaje simple
-    mensaje = MIMEText(data['message'] % (name, code), 'html', 'utf-8')
+    mensaje_crudo = data['mensaje_email']
+    mensaje_crudo = mensaje_crudo.replace('<nombre>', name)
+    mensaje_crudo = mensaje_crudo.replace('<password>', code)
+    mensaje = MIMEText(mensaje_crudo, data['email_type'], data['charset'])
     mensaje['From'] = mail_from
     mensaje['To'] = mail_to
-    mensaje['Subject'] = data['subject']
+    mensaje['Subject'] = data['asunto']
     # Establecemos conexion con el servidor smtp de gmail y enviamos el mensaje
     try:
-        smtpserver = smtplib.SMTP(data['google_smtp'], data['port'])
+        smtpserver = smtplib.SMTP(data['smtp'], data['puerto'])
         smtpserver.ehlo()
         smtpserver.starttls()
         smtpserver.ehlo()

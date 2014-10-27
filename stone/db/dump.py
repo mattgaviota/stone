@@ -23,6 +23,18 @@ db.define_table('categorias',
     Field('updated', type='datetime'),
     migrate=migrate)
 
+db.define_table('configuraciones',
+    Field('id', type='id'),
+    Field('email', type='string', length=50),
+    Field('password', type='string', length=50),
+    Field('puerto', type='integer'),
+    Field('mensaje_email', type='string', length=300),
+    Field('smtp', type='string', length=50),
+    Field('asunto', type='string', length=100),
+    Field('charset', type='string', length=20),
+    Field('email_type', type='string', length=10),
+    migrate=migrate)
+
 db.define_table('dias',
     Field('fecha', type='datetime'),
     Field('tickets_disponibles', type='integer'),
@@ -128,4 +140,3 @@ db.define_table('usuarios',
     Field('id_categoria', type='reference categorias', ondelete='SET DEFAULT'),
     primarykey=['dni'],
     migrate=migrate)
-

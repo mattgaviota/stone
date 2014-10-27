@@ -177,11 +177,12 @@ class FormScreen(Screen):
         data['estado'] = 2
         data['id_perfil'] = controlador.get_perfil('Alumno')
         data['id_categoria'] = controlador.get_categoria('Regular')
+        # insertamos el usuario en la db
+        db_thread = Thread(target=controlador.insert_usuario, args=(data,))
+        db_thread.start()
         # Enviamos el mail de confirmación
         mail_thread = Thread(target=mailserver.send_mail, args=(data['nombre'], data['email'], password))
         mail_thread.start()
-        db_thread = Thread(target=controlador.insert_usuario, args=(data,))
-        db_thread.start()
         self.mensaje = "Gracias por registrarte!!\r\n\r\n Comprueba tu mail\r\n para completar el registro"
         WarningPopup().open()
 
