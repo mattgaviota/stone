@@ -37,7 +37,7 @@
 		<type label="SET" length="1" sql="SET" quote=""/>
 		<type label="Bit" length="0" sql="bit" quote=""/>
 	</group>
-</datatypes><table x="237" y="68" name="calendarios">
+</datatypes><table x="201" y="188" name="calendarios">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -54,7 +54,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="429" y="41" name="dias">
+<table x="370" y="10" name="dias">
 <row name="fecha" null="0" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>'NULL'</default></row>
@@ -78,7 +78,7 @@
 <part>fecha</part>
 </key>
 </table>
-<table x="14" y="402" name="facultades">
+<table x="13" y="370" name="facultades">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -95,7 +95,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="49" y="24" name="feriados">
+<table x="199" y="11" name="feriados">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -118,7 +118,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="429" y="353" name="menu">
+<table x="901" y="321" name="menu">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -138,7 +138,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="427" y="218" name="log_operaciones">
+<table x="371" y="191" name="log_operaciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -157,7 +157,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="428" y="515" name="perfiles">
+<table x="375" y="493" name="perfiles">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -174,7 +174,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="561" y="511" name="perfiles_tipos_operaciones">
+<table x="573" y="488" name="perfiles_tipos_operaciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -196,7 +196,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="17" y="270" name="provincias">
+<table x="12" y="248" name="provincias">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -213,7 +213,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="618" y="53" name="tickets">
+<table x="573" y="11" name="tickets">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -241,7 +241,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="605" y="269" name="tipos_operaciones">
+<table x="700" y="198" name="tipos_operaciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -271,7 +271,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="227" y="289" name="usuarios">
+<table x="201" y="324" name="usuarios">
 <row name="dni" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -307,7 +307,7 @@
 <part>dni</part>
 </key>
 </table>
-<table x="16" y="540" name="categorias">
+<table x="14" y="496" name="categorias">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -324,7 +324,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="562" y="685" name="acciones">
+<table x="573" y="321" name="acciones">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -341,7 +341,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="405" y="667" name="log_usuarios">
+<table x="372" y="325" name="log_usuarios">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -359,6 +359,38 @@
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="usuarios" row="dni" />
 </row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="10" y="12" name="configuraciones">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="puerto" null="1" autoincrement="0">
+<datatype>SMALLINT</datatype>
+<default>NULL</default></row>
+<row name="email" null="1" autoincrement="0">
+<datatype>VARCHAR(50)</datatype>
+<default>NULL</default></row>
+<row name="asunto" null="1" autoincrement="0">
+<datatype>VARCHAR(100)</datatype>
+<default>NULL</default></row>
+<row name="mensaje_email" null="1" autoincrement="0">
+<datatype>VARCHAR(300)</datatype>
+<default>NULL</default></row>
+<row name="password" null="1" autoincrement="0">
+<datatype>VARCHAR(50)</datatype>
+<default>NULL</default></row>
+<row name="charset" null="1" autoincrement="0">
+<datatype>VARCHAR(20)</datatype>
+<default>NULL</default></row>
+<row name="email_type" null="1" autoincrement="0">
+<datatype>VARCHAR(10)</datatype>
+<default>NULL</default></row>
+<row name="smtp" null="1" autoincrement="0">
+<datatype>VARCHAR(50)</datatype>
+<default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>

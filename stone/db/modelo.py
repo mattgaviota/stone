@@ -4,7 +4,6 @@ from dal import DAL, Field
 
 # Modelo de las tablas de la base de datos
 
-db = DAL("postgres://postgres:losperros@170.210.201.139:5432/comedorDB", pool_size=10)
 
 migrate = False
 
