@@ -56,3 +56,4 @@ target/
 conf/
 .json
 .sql
+dump.py
