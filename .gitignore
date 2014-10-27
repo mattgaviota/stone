@@ -55,3 +55,4 @@ target/
 # conf
 conf/
 .json
+.sql
