@@ -62,10 +62,8 @@
 
 <SplashScreen>:
     canvas.before:
-        Color:
-            rgba: 0.98, 0.76, 0.23, 1
-        Rectangle:
-            # self here refers to the widget i.e BoxLayout
+        BorderImage:
+            source: 'images/misc/background.png'
             pos: self.pos
             size: self.size
     BoxLayout:
@@ -135,7 +133,7 @@
 <FormScreen>:
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: 0.92, 0.93, 0.94, 1
         Rectangle:
             # self here refers to the widget i.e BoxLayout
             pos: self.pos
@@ -151,10 +149,8 @@
             padding: 20
             BoxLayout:
                 canvas.before:
-                    Color:
-                        rgba: 0.98, 0.76, 0.23, 1
-                    Rectangle:
-                        # self here refers to the widget i.e BoxLayout
+                    BorderImage:
+                        source: 'images/misc/background.png'
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
@@ -233,7 +229,7 @@
 <LoginScreen>:
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: 0.92, 0.93, 0.94, 1
         Rectangle:
             # self here refers to the widget i.e BoxLayout
             pos: self.pos
@@ -249,10 +245,8 @@
             padding: 20   
             BoxLayout:
                 canvas.before:
-                    Color:
-                        rgba: 0.98, 0.76, 0.23, 1
-                    Rectangle:
-                        # self here refers to the widget i.e BoxLayout
+                    BorderImage:
+                        source: 'images/misc/background.png'
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
@@ -302,7 +296,7 @@
 <PasswordScreen>:
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: 0.92, 0.93, 0.94, 1
         Rectangle:
             # self here refers to the widget i.e BoxLayout
             pos: self.pos
@@ -318,10 +312,8 @@
             padding: 20   
             BoxLayout:
                 canvas.before:
-                    Color:
-                        rgba: 0.98, 0.76, 0.23, 1
-                    Rectangle:
-                        # self here refers to the widget i.e BoxLayout
+                    BorderImage:
+                        source: 'images/misc/background.png'
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
@@ -380,10 +372,8 @@
 
 <MenuScreen>:
     canvas.before:
-        Color:
-            rgba: 0.98, 0.76, 0.23, 1
-        Rectangle:
-            # self here refers to the widget i.e BoxLayout
+        BorderImage:
+            source: 'images/misc/background.png'
             pos: self.pos
             size: self.size
     GridLayout:
@@ -429,6 +419,7 @@
         ButtonU:
             text: 'Perfil'
             font_size: 30
+            on_press: root.profile()
             Image:
                 source: 'images/menu/perfil.png'
                 y: self.parent.y + self.parent.height - 170
@@ -445,3 +436,84 @@
                 x: self.parent.x + self.parent.width - 170
                 size: 100, 100
                 allow_stretch: True
+
+<ProfileScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        spacing: 10
+        padding: 10
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 50
+            size_hint: 0.3, 1
+            AsyncImage:
+                source: 'images/misc/comedor.jpg'
+                size_hint: 1, 0.4
+            GridLayout:
+                cols: 2
+                rows: 3
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'DNI'
+                    size_hint: 0.5, 0.3
+                LabelU:
+                    text: root.data['dni']
+                    size_hint: 0.5, 0.3
+                LabelU:
+                    text: 'Categoria'
+                    size_hint: 0.5, 0.3
+                LabelU:
+                    text: root.data['categoria']
+                    size_hint: 0.5, 0.3
+                LabelU:
+                    text: 'Saldo'
+                    size_hint: 0.5, 0.3
+                LabelU:
+                    text: str(root.data['saldo'])
+                    size_hint: 0.2, 0.5
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 50
+            size_hint: 0.7, 1
+            LabelU:
+                text: 'Perfil'
+                valign: 'top'
+                font_size: '40sp'
+                size_hint: 1, 0.1
+                padding: (40, 30)
+            GridLayout:
+                cols: 2
+                rows: 7
+                size_hint: 1, 0.9
+                LabelU:
+                    text: 'Nombre'
+                    size_hint: 0.2, 0.2
+                Input:
+                    text: root.data['nombre']
+                    size_hint: 0.8, 0.2
+                LabelU:
+                    text: 'LU'
+                    size_hint: 0.2, 0.2
+                Input:
+                    text: root.data['lu']
+                    size_hint: 0.8, 0.2
+                LabelU:
+                    text: 'Email'
+                    size_hint: 0.2, 0.2
+                Input:
+                    text: root.data['email']
+                    size_hint: 0.8, 0.2
+                ButtonUok:
+                    text: 'Actualizar'
+                    font_size: 20
+                    size_hint: 0.5, 0.3
+                    on_press: root.validar();
+                ButtonUcancel:
+                    text: 'Cancelar'
+                    font_size: 20
+                    size_hint: 0.5, 0.3
+                    on_press: root.cancel();

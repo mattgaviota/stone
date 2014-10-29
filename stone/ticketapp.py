@@ -89,10 +89,40 @@ class PasswordScreen(Screen):
 
 class MenuScreen(Screen):
 
+    def profile(self):
+        self.manager.add_widget(ProfileScreen(name='profile'))
+        self.manager.current = 'profile'
+
     def logout(self):
         user_session.close()
+        self.manager.remove_screen('profile')
         self.manager.current = 'splash'
 
+class ProfileScreen(Screen):
+
+    def __init__(self, name=''):
+        self.data = {}
+        self.name = name
+        self.user = user_session.get_user()
+        self.cargar_datos()
+        Screen.__init__(self)
+
+    def cargar_datos(self):
+        self.data['dni'] = self.user['dni']
+        self.data['saldo'] = str(self.user['saldo'])
+        self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
+        self.data['nombre'] = self.user['nombre']
+        self.data['lu'] = self.user['lu']
+        self.data['email'] = self.user['email']
+
+    def cancel(self):
+        self.manager.current = 'menu'
+
+    def validar(self):
+        self.mensaje = "Perfil actualizado correctamente"
+        WarningPopup().open()
+        self.manager.current = 'menu'
+        
 
 class SplashScreen(Screen):
     pass
@@ -176,7 +206,7 @@ class FormScreen(Screen):
         data['password'] = utils.ofuscar_pass(password)
         data['estado'] = 2
         data['id_perfil'] = controlador.get_perfil('Alumno')
-        data['id_categoria'] = controlador.get_categoria('Regular')
+        data['id_categoria'] = controlador.get_categoria_id('Regular')
         # insertamos el usuario en la db
         db_thread = Thread(target=controlador.insert_usuario, args=(data,))
         db_thread.start()

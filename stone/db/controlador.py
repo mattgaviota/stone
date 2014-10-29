@@ -23,10 +23,13 @@ def get_perfil(nombre):
     return row.id
 
 
-def get_categoria(nombre):
+def get_categoria_id(nombre):
     row = db(db.categorias.nombre == nombre).select(db.categorias.id, db.categorias.nombre).first()
     return row.id
 
+def get_categoria_nombre(id_categoria):
+    row = db(db.categorias.id == id_categoria).select(db.categorias.id, db.categorias.nombre).first()
+    return row.nombre
 
 def insert_usuario(data):
     if not get_usuario(data['dni']):

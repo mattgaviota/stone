@@ -6,7 +6,7 @@ from os import path
 
 # Cargamos el archivo de configuración
 file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
-                'conf/db.json')
+                'config/db.json')
 with open(file_path) as data_file:    
     data = json.load(data_file)
 
@@ -153,5 +153,6 @@ db.define_table('usuarios',
     Field('id_facultad', type='reference facultades', ondelete='SET DEFAULT'),
     Field('id_perfil', type='reference perfiles', ondelete='SET DEFAULT'),
     Field('id_categoria', type='reference categorias', ondelete='SET DEFAULT'),
+    Field('saldo', type='double', default=0),
     primarykey=['dni'],
     migrate=migrate)
