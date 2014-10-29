@@ -493,20 +493,46 @@
                     text: 'Nombre'
                     size_hint: 0.2, 0.2
                 Input:
+                    id: nombre
                     text: root.data['nombre']
                     size_hint: 0.8, 0.2
                 LabelU:
                     text: 'LU'
                     size_hint: 0.2, 0.2
                 Input:
+                    id: lu
                     text: root.data['lu']
                     size_hint: 0.8, 0.2
                 LabelU:
                     text: 'Email'
                     size_hint: 0.2, 0.2
                 Input:
+                    id: email
                     text: root.data['email']
                     size_hint: 0.8, 0.2
+                LabelU:
+                    text: 'Facultad'
+                    size_hint: 0.2, 0.2
+                Spinner:
+                    id: facultad
+                    text: root.data['facultad']
+                    values: root.facultades_nombre
+                    size_hint: 0.8, 0.2
+                LabelU:
+                    text: 'Provincia'
+                    size_hint: 0.2, 0.2
+                Spinner:
+                    id: provincia
+                    text: root.data['provincia']
+                    values: root.provincias_nombre
+                    size_hint: 0.8, 0.2
+                LabelU:
+                    text: 'Password'
+                    size_hint: 0.2, 0.2
+                ButtonU:
+                    text: 'Cambiar'
+                    size_hint: 0.5, 0.2
+                    on_press: root.cambiar_pass()
                 ButtonUok:
                     text: 'Actualizar'
                     font_size: 20

@@ -9,6 +9,8 @@ from email.Encoders import encode_base64
 
 
 def send_mail(name, mail_to, code):
+    '''Envia un email a la direccion mail_to con el name y el code de acuerdo
+    un mensaje almacenado en la DB usando smtplib'''
     data = controlador.get_configuracion()
     print data
     
@@ -23,7 +25,7 @@ def send_mail(name, mail_to, code):
     mensaje['From'] = mail_from
     mensaje['To'] = mail_to
     mensaje['Subject'] = data['asunto']
-    # Establecemos conexion con el servidor smtp de gmail y enviamos el mensaje
+    # Establecemos conexion con el servidor smtp y enviamos el mensaje
     try:
         smtpserver = smtplib.SMTP(data['smtp'], data['puerto'])
         smtpserver.ehlo()
