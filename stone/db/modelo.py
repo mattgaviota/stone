@@ -1,13 +1,21 @@
 #-*- coding: utf-8 -*-
 
 from dal import DAL, Field
+import json
+from os import path
 
-# Modelo de las tablas de la base de datos
+# Cargamos el archivo de configuración
+file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
+                'config/db.json')
+with open(file_path) as data_file:    
+    data = json.load(data_file)
 
-db = DAL("postgres://postgres:losperros@170.210.201.139:5432/comedorDB", pool_size=10)
+db = DAL("postgres://%s:%s@%s:%s/%s" % (data['user'], data['pass'], 
+                data['host'], data['port'], data['db']), pool_size=0)
 
 migrate = False
 
+# Modelo de las tablas de la base de datos
 
 db.define_table('acciones',
     Field('id', type='id'),
@@ -28,6 +36,18 @@ db.define_table('categorias',
     Field('nombre', type='string', length=100),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
+    migrate=migrate)
+
+db.define_table('configuraciones',
+    Field('id', type='id'),
+    Field('email', type='string', length=50),
+    Field('password', type='string', length=50),
+    Field('puerto', type='integer'),
+    Field('mensaje_email', type='string', length=300),
+    Field('smtp', type='string', length=50),
+    Field('asunto', type='string', length=100),
+    Field('charset', type='string', length=20),
+    Field('email_type', type='string', length=10),
     migrate=migrate)
 
 db.define_table('dias',
@@ -133,5 +153,6 @@ db.define_table('usuarios',
     Field('id_facultad', type='reference facultades', ondelete='SET DEFAULT'),
     Field('id_perfil', type='reference perfiles', ondelete='SET DEFAULT'),
     Field('id_categoria', type='reference categorias', ondelete='SET DEFAULT'),
+    Field('saldo', type='double', default=0),
     primarykey=['dni'],
     migrate=migrate)
