@@ -7,7 +7,6 @@ class Usuarios extends CI_Controller {
 		parent::__construct();
 		$this->load->model('Model_Usuarios');
 		$this->load->library('usuarioLib');
-
 		$this->form_validation->set_message('required', 'Debe ingresar un valor para %s');
 		$this->form_validation->set_message('valid_email', '%s no es un email válido');
 		$this->form_validation->set_message('my_validation', 'Existe otro registro con el mismo nombre');
@@ -86,9 +85,23 @@ class Usuarios extends CI_Controller {
 		redirect('usuarios/index');
 	}
 
-	public function comprar_tickets(){
+	public function comprar_tickets($year = null, $month = null){
+		$dni = $this->session->userdata('dni_usuario');
+		$data['registro'] = $this->Model_Usuarios->find($dni);
 		$data['contenido'] = 'usuarios/comprar_tickets';
-		$this->load->view('template', $data);
+		$data['calendario'] = $this->Model_Usuarios->generate($year, $month);
+		$this->load->view('template_usuario', $data);
+	}
+
+	public function get_dias_calendario(){
+		$year = $this->input->post('year');
+		$month = $this->input->post('month');
+		$dia = $this->input->post('dia');
+		
+		$fecha = date('Y-m-d', strtotime($year.'-'.$month.'-'.$dia));
+		$query = $this->Model_Usuarios->get_dias($fecha);
+
+		echo json_encode($query);
 	}
 
 	public function perfil_usuario(){

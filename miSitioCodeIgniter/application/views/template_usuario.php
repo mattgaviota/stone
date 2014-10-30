@@ -11,11 +11,9 @@
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
     <script src="<?= base_url('js/jquery.js'); ?>"></script>
     <script src="<?= base_url('js/bootstrap.min.js'); ?>"></script>
-    <script src="<?= base_url('js/funciones.js'); ?>"></script>
    
 </head>
 <body>
-
 	<div class="navbar navbar-default navbar-fixed-top">
 	    <div class="container">
 	        <div class="navbar-header">

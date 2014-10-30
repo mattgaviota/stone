@@ -7,6 +7,7 @@ class Home extends CI_Controller {
 		parent::__construct();
 		$this->load->library('usuarioLib');
 		$this->load->model('Model_Usuarios');
+		$this->load->model('Model_Configuraciones');
 		$this->form_validation->set_message('required', 'Debe ingresar un valor para %s');
 		$this->form_validation->set_message('loginok', 'Usuario o password incorrecto');
 		$this->form_validation->set_message('valid_email', 'El email %s no es válido');
@@ -15,14 +16,16 @@ class Home extends CI_Controller {
 		$this->form_validation->set_message('numeric', '%s debe ser un valor numérico');
 		$this->form_validation->set_message('my_validation', 'Existe otro registro con el mismo nombre');
 		
+		$query = $this->Model_Configuraciones->find(0);
+
 		$config = Array(
 		    'protocol' => 'smtp',
-		    'smtp_host' => 'ssl://smtp.googlemail.com',
+		    'smtp_host' => 'ssl://'.$query->smtp,
 		    'smtp_port' => 465,
-		    'smtp_user' => 'ferroxido@gmail.com',
-		    'smtp_pass' => 'valarmorgulis',
-		    'mailtype'  => 'html', 
-		    'charset'   => 'utf-8'
+		    'smtp_user' => $query->email,
+		    'smtp_pass' => $query->password,
+		    'mailtype'  => $query->email_type, 
+		    'charset'   => $query->charset
 		);
 		$this->load->library('email', $config);
 		$this->email->set_newline("\r\n");//La papucha

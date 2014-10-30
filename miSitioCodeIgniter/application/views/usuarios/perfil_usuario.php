@@ -11,7 +11,7 @@
 					<label>Nombre: </label>
 					<label class="mostrar-info"><?= $registro->nombre; ?></label>
 				</div>
-				<div class="form-group">				
+				<div class="form-group">
 					<label>DNI: </label>
 					<label class="mostrar-info"><?= $registro->dni; ?></label>
 				</div>
@@ -43,13 +43,23 @@
 					<?php endforeach; ?>
 				</tbody>
 			</table>
-
 		</div>
 	</div>
 </div>
 
 <div class="col-md-6">
-	<div id="operaciones-menu" class="jumbotron">
-			
+	<div id="botonera" class="jumbotron">
+		<div class="par-botones">
+			<input type="button" value="Comprar" style="background-image: url('../img/ticket.png')" onclick="location.href='<?php echo base_url();?>usuarios/comprar_tickets'">
+			<input type="button" value="Anular" style="background-image: url('../img/anular.png')">
+		</div>
+		<div class="par-botones">
+			<input type="button" value="Imprimir" style="background-image: url('../img/printer.png')">
+			<input type="button" value="Editar Perfil" style="background-image: url('../img/editar.png')">
+		</div>
+		<div class="par-botones">
+			<input type="button" value="Imprimir" style="background-image: url('../img/printer.png')">
+			<input type="button" value="Editar Perfil" style="background-image: url('../img/editar.png')">
+		</div>
 	</div>
-</div>
+</div> 
