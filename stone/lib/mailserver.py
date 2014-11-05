@@ -12,7 +12,6 @@ def send_mail(name, mail_to, code):
     '''Envia un email a la direccion mail_to con el name y el code de acuerdo
     un mensaje almacenado en la DB usando smtplib'''
     data = controlador.get_configuracion()
-    print data
     
     mail_from = data['email']
     mail_pass = data['password']

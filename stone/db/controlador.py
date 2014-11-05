@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 
 from modelo import db
+from time import strftime, localtime
 
 
 ####################
@@ -63,9 +64,8 @@ def get_categoria_nombre(id_categoria):
 ##################
 def insert_usuario(data):
     '''Inserta un nuevo usuario con los datos de la variable data'''
-    if not get_usuario(data['dni']):
-        db.usuarios.insert(**data)
-        db.commit()
+    db.usuarios.insert(**data)
+    db.commit()
 
 def get_usuario(dni):
     '''Retorna una fila de usuario en base a un dni dado'''
@@ -83,6 +83,53 @@ def update_estado(user, valor):
 def update_pass(user, new_pass):
     '''Actualiza el password de un usuario(user) con el new_pass dado'''
     db(db.usuarios.dni == user['dni']).update(password = new_pass)
+    db.commit()
+
+def update_usuario(user, data):
+    '''Actualiza los datos de un usuario con un diccionario de valores'''
+    db(db.usuarios.dni == user['dni']).update(**data)
+    db.commit()
+
+##################
+# Tabla acciones #
+##################
+def get_id_accion(accion):
+    '''Retorna el id de una acción dada por su nombre'''
+    row = db(db.acciones.nombre_canonico == accion).select().first()
+    return row.id
+
+#######################
+# Tabla log_usuarios  #
+#######################
+def insert_log(user, accion):
+    '''inserta una entrada en el log, de acuerdo a la acción realizada'''
+    data = {}
+    data['id_accion'] = get_id_accion(accion)
+    data['fecha'] = strftime('%Y-%m-%d %H:%M:%S', localtime())
+    data['dni'] = user['dni']
+    data['lugar'] = 2
+    db.log_usuarios.insert(**data)
+    db.commit()
+
+#################
+# Tabla tickets #
+#################
+def get_tickets(user, cant=5):
+    '''Obtiene cant tickets de un usuario a partir de la fecha actual
+    inclusive, siempre que estos estén activos'''
+    date = strftime('%Y-%m-%d', localtime())
+    query = '''SELECT tickets.fecha, importe, tickets.estado, tickets.id
+               FROM tickets JOIN log_usuarios
+                ON id_log_usuario=log_usuarios.id JOIN usuarios
+                ON log_usuarios.dni = usuarios.dni
+               WHERE tickets.fecha >= '%s' AND usuarios.dni='%s'
+                AND tickets.estado = 1 LIMIT %d
+            ''' % (date, user['dni'], cant)
+    return db.executesql(query, as_dict=True)
+
+def anular_ticket(id_ticket):
+    '''Anula el ticket a traves de su id'''
+    db(db.tickets.id == id_ticket).update(estado = 0)
     db.commit()
 
 #########################

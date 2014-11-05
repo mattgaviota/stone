@@ -4,6 +4,13 @@
     font_name: 'fonts/Ubuntu-R.ttf'
     font_size: '30sp'
 
+<LabelUA@Label>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    font_size: '15sp'
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1]
+
 <WarningPopup>:
     title: "Advertencia"
     size_hint: None, None
@@ -58,6 +65,12 @@
         x: self.parent.x + self.parent.width - 100
         size: 32, 32
         allow_stretch: True
+
+<ButtonUanular@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtncancel.png'
+    background_down: 'images/buttons/downbtncancel.png'
+    border: 20, 20, 20, 20
 
 
 <SplashScreen>:
@@ -392,6 +405,7 @@
         ButtonU:
             text: 'Anular'
             font_size: 30
+            on_press: root.anular()
             Image:
                 source: 'images/menu/anular.png'
                 y: self.parent.y + self.parent.height - 170
@@ -444,102 +458,255 @@
             pos: self.pos
             size: self.size
     BoxLayout:
-        spacing: 10
-        padding: 10
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Perfil'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
         BoxLayout:
-            orientation: 'vertical'
-            padding: 50
-            size_hint: 0.3, 1
-            AsyncImage:
-                source: 'images/misc/comedor.jpg'
-                size_hint: 1, 0.4
-            GridLayout:
-                cols: 2
-                rows: 3
-                size_hint: 1, 0.6
-                LabelU:
-                    text: 'DNI'
-                    size_hint: 0.5, 0.3
-                LabelU:
-                    text: root.data['dni']
-                    size_hint: 0.5, 0.3
-                LabelU:
-                    text: 'Categoria'
-                    size_hint: 0.5, 0.3
-                LabelU:
-                    text: root.data['categoria']
-                    size_hint: 0.5, 0.3
-                LabelU:
-                    text: 'Saldo'
-                    size_hint: 0.5, 0.3
-                LabelU:
-                    text: str(root.data['saldo'])
-                    size_hint: 0.2, 0.5
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: 'images/menu/perfil.png'
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 3
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1
+                GridLayout:
+                    cols: 2
+                    rows: 7
+                    padding: 20
+                    spacing: 15
+                    size_hint: 1, 0.8
+                    LabelU:
+                        text: 'Nombre'
+                    Input:
+                        id: nombre
+                        text: root.data['nombre']
+                    LabelU:
+                        text: 'LU'
+                    Input:
+                        id: lu
+                        text: root.data['lu']
+                    LabelU:
+                        text: 'Email'
+                    Input:
+                        id: email
+                        text: root.data['email']
+                    LabelU:
+                        text: 'Facultad'
+                    Spinner:
+                        id: facultad
+                        text: root.data['facultad']
+                        values: root.facultades_nombre
+                    LabelU:
+                        text: 'Provincia'
+                    Spinner:
+                        id: provincia
+                        text: root.data['provincia']
+                        values: root.provincias_nombre
+                    LabelU:
+                        text: 'Password'
+                    ButtonU:
+                        text: 'Cambiar'
+                        on_press: root.cambiar_pass()
+                BoxLayout:
+                    size_hint: 1, 0.1
+                BoxLayout:
+                    size_hint: 1, 0.1
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Actualizar'
+                        font_size: 20
+                        on_press: root.validar();
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel();
+
+
+<AnularScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Anulación de Tickets'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
         BoxLayout:
-            orientation: 'vertical'
-            padding: 50
-            size_hint: 0.7, 1
-            LabelU:
-                text: 'Perfil'
-                valign: 'top'
-                font_size: '40sp'
-                size_hint: 1, 0.1
-                padding: (40, 30)
-            GridLayout:
-                cols: 2
-                rows: 7
-                size_hint: 1, 0.9
-                LabelU:
-                    text: 'Nombre'
-                    size_hint: 0.2, 0.2
-                Input:
-                    id: nombre
-                    text: root.data['nombre']
-                    size_hint: 0.8, 0.2
-                LabelU:
-                    text: 'LU'
-                    size_hint: 0.2, 0.2
-                Input:
-                    id: lu
-                    text: root.data['lu']
-                    size_hint: 0.8, 0.2
-                LabelU:
-                    text: 'Email'
-                    size_hint: 0.2, 0.2
-                Input:
-                    id: email
-                    text: root.data['email']
-                    size_hint: 0.8, 0.2
-                LabelU:
-                    text: 'Facultad'
-                    size_hint: 0.2, 0.2
-                Spinner:
-                    id: facultad
-                    text: root.data['facultad']
-                    values: root.facultades_nombre
-                    size_hint: 0.8, 0.2
-                LabelU:
-                    text: 'Provincia'
-                    size_hint: 0.2, 0.2
-                Spinner:
-                    id: provincia
-                    text: root.data['provincia']
-                    values: root.provincias_nombre
-                    size_hint: 0.8, 0.2
-                LabelU:
-                    text: 'Password'
-                    size_hint: 0.2, 0.2
-                ButtonU:
-                    text: 'Cambiar'
-                    size_hint: 0.5, 0.2
-                    on_press: root.cambiar_pass()
-                ButtonUok:
-                    text: 'Actualizar'
-                    font_size: 20
-                    size_hint: 0.5, 0.3
-                    on_press: root.validar();
-                ButtonUcancel:
-                    text: 'Cancelar'
-                    font_size: 20
-                    size_hint: 0.5, 0.3
-                    on_press: root.cancel();
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: 'images/menu/perfil.png'
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 3
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1
+                GridLayout:
+                    cols: 4
+                    rows: 6
+                    padding: 20
+                    spacing: 15
+                    size_hint: 1, 0.8
+                    LabelU:
+                        text: 'Fecha'
+                    LabelU:
+                        text: 'Importe'
+                    LabelU:
+                        text: 'Estado'
+                    LabelU:
+                        text: 'Anular'
+                    # fila 1
+                    LabelU:
+                        text: root.data['rows0']['fecha']
+                    LabelU:
+                        text: root.data['rows0']['importe']
+                    LabelU:
+                        id: estado0
+                        text: root.data['rows0']['estado']
+                    ButtonUanular:
+                        text: 'Anular'
+                        on_press: root.anular_ticket('rows0')
+                    # fila 2
+                    LabelU:
+                        text: root.data['rows1']['fecha']
+                    LabelU:
+                        text: root.data['rows1']['importe']
+                    LabelU:
+                        id: estado1
+                        text: root.data['rows1']['estado']
+                    ButtonUanular:
+                        text: 'Anular'
+                        on_press: root.anular_ticket('rows1')
+                    # fila 3
+                    LabelU:
+                        text: root.data['rows2']['fecha']
+                    LabelU:
+                        text: root.data['rows2']['importe']
+                    LabelU:
+                        id: estado2
+                        text: root.data['rows2']['estado']
+                    ButtonUanular:
+                        text: 'Anular'
+                        on_press: root.anular_ticket('rows2')
+                    # fila 4
+                    LabelU:
+                        text: root.data['rows3']['fecha']
+                    LabelU:
+                        text: root.data['rows3']['importe']
+                    LabelU:
+                        id: estado3
+                        text: root.data['rows3']['estado']
+                    ButtonUanular:
+                        text: 'Anular'
+                        on_press: root.anular_ticket('rows3')
+                    # fila 5
+                    LabelU:
+                        text: root.data['rows4']['fecha']
+                    LabelU:
+                        text: root.data['rows4']['importe']
+                    LabelU:
+                        id: estado4
+                        text: root.data['rows4']['estado']
+                    ButtonUanular:
+                        text: 'Anular'
+                        on_press: root.anular_ticket('rows4')
+                BoxLayout:
+                    size_hint: 1, 0.1
+                BoxLayout:
+                    size_hint: 0.4, 0.1
+                    spacing: 150
+                    ButtonU:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel();

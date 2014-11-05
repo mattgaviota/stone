@@ -27,14 +27,14 @@ class WarningPopup(Popup):
 class PasswordScreen(Screen):
     
     def __init__(self, screen_accept, screen_cancel, name):
-    '''Pantalla para cambiar el password actual'''
+        '''Pantalla para cambiar el password actual'''
         self.scr_accept = screen_accept
         self.scr_cancel = screen_cancel
         self.mensaje = StringProperty("")
         self.name = name
         Screen.__init__(self)
 
-    def validar(self, screen):
+    def validar(self):
         '''Valida las entradas y llama al metodo que cambia el password'''
         if not self.ids.old_pass.text:
             self.mensaje = u"Debe ingresar el password actual"
@@ -56,6 +56,9 @@ class PasswordScreen(Screen):
                 WarningPopup().open()
                 self.clear()
                 self.manager.current = self.scr_accept
+                controlador.insert_log(user, 'perfil')
+                user_session.close()
+                self.manager.remove_widget(self.manager.get_screen('pass'))
             elif response == 2:
                 self.mensaje = u"EL password actual\r\n no coincide con el almacenado"
                 WarningPopup().open()
@@ -102,18 +105,104 @@ class PasswordScreen(Screen):
 class MenuScreen(Screen):
     '''Pantalla de menu de usuario'''
 
+    def anular(self):
+        '''Crea y accede a la pantalla de anulación de tickets'''
+        if not self.manager.has_screen('anular'):
+            self.manager.add_widget(AnularScreen(name='anular'))
+        self.manager.current = 'anular'
+
     def profile(self):
         '''Crea y accede a la pantalla de perfil'''
-        self.manager.add_widget(ProfileScreen(name='profile'))
+        if not self.manager.has_screen('profile'):
+            self.manager.add_widget(ProfileScreen(name='profile'))
         self.manager.current = 'profile'
 
     def logout(self):
         '''Cierra la sesion, libera las pantallas que no se van a usar y
         vuelve a la pantalla principal'''
         user_session.close()
-        self.manager.remove_widget(self.manager.get_screen('profile'))
-        self.manager.remove_widget(self.manager.get_screen('pass'))
+        try:
+            self.manager.remove_widget(self.manager.get_screen('anular'))
+            self.manager.remove_widget(self.manager.get_screen('profile'))
+            self.manager.remove_widget(self.manager.get_screen('pass'))
+        except:
+            pass
         self.manager.current = 'splash'
+
+
+class AnularScreen(Screen):
+
+    def __init__(self, name=''):
+        '''Pantalla para anular los tickets del usuario'''
+        self.data = {}
+        self.name = name
+        self.cargar_datos()
+        Screen.__init__(self)
+
+    def anular_ticket(self, row):
+        id_ticket = self.data[row]['id']
+        estado = self.data[row]['estado']
+        if id_ticket and estado == 'Activo':
+            controlador.anular_ticket(id_ticket)
+            controlador.insert_log(self.user, 'anular')
+            self.cargar_tickets()
+            if row == 'rows0':
+                self.ids.estado0.text = 'Anulado'
+            elif row == 'rows1':
+                self.ids.estado1.text = 'Anulado'
+            elif row == 'rows2':
+                self.ids.estado2.text = 'Anulado'
+            elif row == 'rows3':
+                self.ids.estado3.text = 'Anulado'
+            else:
+                self.ids.estado4.text = 'Anulado'
+        
+    def cargar_datos(self):
+        '''Carga los datos del usuario dentro de la pantalla de anulación'''
+        self.user = user_session.get_user()
+        self.data['dni'] = self.user['dni']
+        self.data['saldo'] = str(self.user['saldo'])
+        self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
+        self.cargar_tickets()
+        
+    def cargar_tickets(self):    
+        self.tickets = controlador.get_tickets(self.user)
+        ticket_vacio = {'fecha': '', 'importe': '', 'estado': '', 'id': 0}
+        i = 0
+        for ticket in self.tickets:
+            if ticket['estado']:
+                ticket['estado'] = 'Activo'
+            else:
+                ticket['estado'] = 'Anulado'
+            ticket['importe'] = '$%.2f' %(ticket['importe'])
+            ticket['fecha'] = ticket['fecha'].strftime('%Y-%m-%d')
+            self.data['rows%s' % (i)] = ticket
+            i += 1
+        faltantes = 5 - len(self.tickets)
+        if faltantes:
+            if faltantes == 1:
+                self.data['rows4'] = ticket_vacio
+            elif faltantes == 2:
+                self.data['rows3'] = ticket_vacio
+                self.data['rows4'] = ticket_vacio
+            elif faltantes == 3:
+                self.data['rows2'] = ticket_vacio
+                self.data['rows3'] = ticket_vacio
+                self.data['rows4'] = ticket_vacio
+            elif faltantes == 4:
+                self.data['rows1'] = ticket_vacio
+                self.data['rows2'] = ticket_vacio
+                self.data['rows3'] = ticket_vacio
+                self.data['rows4'] = ticket_vacio
+            else:
+                self.data['rows0'] = ticket_vacio
+                self.data['rows1'] = ticket_vacio
+                self.data['rows2'] = ticket_vacio
+                self.data['rows3'] = ticket_vacio
+                self.data['rows4'] = ticket_vacio
+            
+    def cancel(self):
+        self.manager.current = 'menu'
 
 
 class ProfileScreen(Screen):
@@ -122,16 +211,23 @@ class ProfileScreen(Screen):
         '''Pantalla para ver/modificar el perfil del usuario'''
         self.data = {}
         self.name = name
-        self.user = user_session.get_user()
+        self.facultades = controlador.get_all_facultades()
+        self.provincias = controlador.get_all_provincias()
         self.cargar_datos()
         Screen.__init__(self)
 
     def cambiar_pass(self):
         '''Llama a la pantalla de cambiar password'''
-        self.manager.add_widget(PasswordScreen('profile', 'profile', 'pass'))
+        if not self.manager.has_screen('pass'):
+            self.manager.add_widget(PasswordScreen('profile', 'profile', 'pass'))
+        self.manager.current = 'pass'
+        self.update_datos()
 
     def cargar_datos(self):
         '''Carga los datos del usuario dentro de la pantalla de perfil'''
+        self.user = user_session.get_user()
+        self.facultades_nombre = sorted(self.facultades.keys())
+        self.provincias_nombre = sorted(self.provincias.keys())
         self.data['dni'] = self.user['dni']
         self.data['saldo'] = str(self.user['saldo'])
         self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
@@ -141,7 +237,27 @@ class ProfileScreen(Screen):
         self.data['provincia'] = controlador.get_provincia(self.user['id_provincia'])
         self.data['facultad'] = controlador.get_facultad(self.user['id_facultad'])
 
+    def update_datos(self):
+        self.ids.nombre.text = self.data['nombre']
+        self.ids.lu.text = self.data['lu']
+        self.ids.email.text = self.data['email']
+        self.ids.facultad.text = self.data['facultad']
+        self.ids.provincia.text = self.data['provincia']
+
+    def update_profile(self):
+        self.updata = {}
+        self.updata['nombre'] = self.ids.nombre.text
+        self.updata['lu'] = self.ids.lu.text
+        self.updata['email'] = self.ids.email.text
+        self.updata['id_provincia'] = self.provincias[self.ids.provincia.text]
+        self.updata['id_facultad'] = self.facultades[self.ids.facultad.text]
+        controlador.update_usuario(self.user, self.updata)
+        controlador.insert_log(self.user, 'perfil')
+        user_session.update(controlador.get_usuario(self.data['dni']))
+        self.cargar_datos()
+
     def cancel(self):
+        self.update_datos()
         self.manager.current = 'menu'
 
     def mailvalidator(self, email):
@@ -166,14 +282,14 @@ class ProfileScreen(Screen):
             self.ids.lu.text = ""
             self.ids.lu.focus = True
             WarningPopup().open()
-        elif not self.ids.mail.text:
+        elif not self.ids.email.text:
             self.mensaje = u"Su EMAIL no puede estar vacío"
-            self.ids.mail.focus = True
+            self.ids.email.focus = True
             WarningPopup().open()
-        elif not self.mailvalidator(self.ids.mail.text):
+        elif not self.mailvalidator(self.ids.email.text):
             self.mensaje = u"Su EMAIL está mal formado.\r\n\r\n Recuerde que este mail se usa\r\n para confirmaciones."
-            self.ids.mail.text = ""
-            self.ids.mail.focus = True
+            self.ids.email.text = ""
+            self.ids.email.focus = True
             WarningPopup().open()
         elif not self.ids.facultad.text:
             self.mensaje = u"Debe especificar una FACULTAD"
@@ -184,6 +300,8 @@ class ProfileScreen(Screen):
         else:
             self.mensaje = "Perfil actualizado correctamente"
             WarningPopup().open()
+            update_thread = Thread(target=self.update_profile())
+            update_thread.start()
             self.manager.current = 'menu'
         
 
@@ -265,26 +383,31 @@ class FormScreen(Screen):
     def registrar_usuario(self):
         '''Registra los usuarios de acuerdo a lo ingresado en el formulario.
         Llamando a los metodos insert_usuario y a send_mail'''
-        data = {}
-        data['dni'] = self.ids.dni.text
-        data['nombre'] = self.ids.nombre.text
-        data['lu'] = self.ids.lu.text
-        data['email'] = self.ids.mail.text
-        data['id_facultad'] = self.facultades[self.ids.facultad.text]
-        data['id_provincia'] = self.provincias[self.ids.provincia.text]
-        password = utils.generar_pass()
-        data['password'] = utils.ofuscar_pass(password)
-        data['estado'] = 2
-        data['id_perfil'] = controlador.get_perfil('Alumno')
-        data['id_categoria'] = controlador.get_categoria_id('Regular')
-        # insertamos el usuario en la db
-        db_thread = Thread(target=controlador.insert_usuario, args=(data,))
-        db_thread.start()
-        # Enviamos el mail de confirmación
-        mail_thread = Thread(target=mailserver.send_mail, args=(data['nombre'], data['email'], password))
-        mail_thread.start()
-        self.mensaje = "Gracias por registrarte!!\r\n\r\n Comprueba tu mail\r\n para completar el registro"
-        WarningPopup().open()
+        user = controlador.get_usuario(self.ids.dni.text)
+        if not user:
+            data = {}
+            data['dni'] = self.ids.dni.text
+            data['nombre'] = self.ids.nombre.text
+            data['lu'] = self.ids.lu.text
+            data['email'] = self.ids.mail.text
+            data['id_facultad'] = self.facultades[self.ids.facultad.text]
+            data['id_provincia'] = self.provincias[self.ids.provincia.text]
+            password = utils.generar_pass()
+            data['password'] = utils.ofuscar_pass(password)
+            data['estado'] = 2
+            data['id_perfil'] = controlador.get_perfil('Alumno')
+            data['id_categoria'] = controlador.get_categoria_id('Regular')
+            # insertamos el usuario en la db
+            db_thread = Thread(target=controlador.insert_usuario, args=(data,))
+            db_thread.start()
+            # Enviamos el mail de confirmación
+            mail_thread = Thread(target=mailserver.send_mail, args=(data['nombre'], data['email'], password))
+            mail_thread.start()
+            self.mensaje = "Gracias por registrarte!!\r\n\r\n Comprueba tu mail\r\n para completar el registro"
+            WarningPopup().open()
+        else:
+            self.mensaje = "Ya existe un usario con ese DNI"
+            WarningPopup().open()
 
     def cancel(self):
         self.clear()
@@ -319,7 +442,8 @@ class LoginScreen(Screen):
                     elif login == 2:
                         self.clear()
                         user_session.init(controlador.get_usuario(dni))
-                        self.manager.add_widget(PasswordScreen('menu', 'splash', 'pass'))
+                        self.manager.add_widget(PasswordScreen('splash', 'splash', 'pass'))
+                        self.manager.current = 'pass'
                     else:
                         self.clear()
                         self.mensaje = u"Su cuenta esta inactiva\r\n Contacte a un administrador"
@@ -376,9 +500,6 @@ class LoginScreen(Screen):
 class TicketApp(App):
 
     def build(self):
-        # Limpiamos la pantalla y le ponemos color blanco
-        Window.clearcolor = (1, 1, 1, 1)
-        Window.clear()
         # Creamos el screen manager con la WipeTransition
         sm = ScreenManager(transition=WipeTransition())
         # Agregamos las pantallas fijas del sistema

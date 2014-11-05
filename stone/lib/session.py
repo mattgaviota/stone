@@ -8,8 +8,12 @@ class Session():
         self.user = user
 
     def get_user(self):
-        '''devuelve el usuario actual'''
+        '''Retorna el usuario logueado actual'''
         return self.user
+
+    def update(self, user):
+        '''Actualiza el usuario logueado actual'''
+        self.user = user
 
     def close(self):
         '''cierra la sesion'''

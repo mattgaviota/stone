@@ -22,6 +22,7 @@ db.define_table('acciones',
     Field('nombre', type='string', length=50),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
+    Field('nombre_canonico', type='string', length=15),
     migrate=migrate)
 
 db.define_table('calendario',
@@ -36,6 +37,7 @@ db.define_table('categorias',
     Field('nombre', type='string', length=100),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
+    Field('importe', type='double'),
     migrate=migrate)
 
 db.define_table('configuraciones',
@@ -55,7 +57,6 @@ db.define_table('dias',
     Field('tickets_disponibles', type='integer'),
     Field('tickets_vendidos', type='integer'),
     Field('evento', type='string', length=200),
-    Field('estado', type='integer'),
     Field('id_calendario', type='integer'),
     primarykey=['fecha'],
     migrate=migrate)
@@ -124,11 +125,10 @@ db.define_table('provincias',
 db.define_table('tickets',
     Field('id', type='id'),
     Field('unidad', type='integer'),
-    Field('importe', type='integer'),
-    Field('fecha_alta', type='datetime'),
-    Field('id_operacion', type='reference log_operaciones', ondelete='SET NULL'),
-    Field('estado', type='string', length=50),
+    Field('importe', type='double'),
+    Field('id_log_usuario', type='reference log_usuarios'),
     Field('fecha', type='reference dias'),
+    Field('estado', type='integer'),
     migrate=migrate)
 
 db.define_table('tipos_operaciones',
