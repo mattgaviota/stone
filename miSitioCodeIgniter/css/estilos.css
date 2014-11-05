@@ -3,6 +3,36 @@ body {
 	padding-bottom: 40px;
 }
 
+div.par-botones{
+	margin: 1em 0;
+	text-align: center;
+}
+
+div.par-botones input[type="button"]{
+	padding: 2em 2em;
+	margin: 0 .5em;
+	display: inline-block;
+	width: 42%;
+	font-size: 1.8em;
+	border-radius: .5em;
+	background-color: #DD4814;
+	background-repeat: no-repeat;
+	background-position: center;
+	color: #FFF;
+}
+
+div.par-botones input[type="button"]:hover{
+	padding: 2em 2em;
+	margin: 0 .5em;
+	display: inline-block;
+	width: 42%;
+	font-size: 1.8em;
+	border-radius: .5em;
+	background-color: #FFF;
+	background-repeat: no-repeat;
+	background-position: center;
+	color: #DD4814;
+}
 
 table.calendario{
 	margin: auto;

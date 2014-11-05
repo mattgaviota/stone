@@ -37,11 +37,7 @@ if( ! function_exists('my_menu_principal'))
 	function my_menu_principal()
 	{
 		$opciones = '<li>'.anchor('home/index', 'Inicio').'</li>';
-		if(get_instance()->session->userdata('dni_usuario')){
-			$opciones = $opciones.'<li>'.anchor('usuarios/comprar_tickets', 'Comprar Tickets').'</li>';
-		}else{
-			$opciones = $opciones.'<li>'.anchor('home/ingreso', 'Ingreso').'</li>';
-		}
+		
 		$opciones = $opciones.'<li>'.anchor('home/acerca_de', 'Acerca de').'</li>';
 		return $opciones;
 	}
