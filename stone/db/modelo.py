@@ -53,12 +53,12 @@ db.define_table('configuraciones',
     migrate=migrate)
 
 db.define_table('dias',
-    Field('fecha', type='datetime'),
-    Field('tickets_disponibles', type='integer'),
+    Field('id', type='id'),
+    Field('fecha', type='datetime', unique=True),
+    Field('tickets_totales', type='integer'),
     Field('tickets_vendidos', type='integer'),
     Field('evento', type='string', length=200),
-    Field('id_calendario', type='integer'),
-    primarykey=['fecha'],
+    Field('id_calendario', type='reference calendario', ondelete='SET DEFAULT'),
     migrate=migrate)
 
 db.define_table('facultades',
@@ -124,11 +124,11 @@ db.define_table('provincias',
 
 db.define_table('tickets',
     Field('id', type='id'),
-    Field('unidad', type='integer'),
+    Field('id_dia', type='reference dias', ondelete='SET DEFAULT', unique=True),
     Field('importe', type='double'),
-    Field('id_log_usuario', type='reference log_usuarios'),
-    Field('fecha', type='reference dias'),
+    Field('unidad', type='integer'),
     Field('estado', type='integer'),
+    Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT', unique=True),
     migrate=migrate)
 
 db.define_table('tipos_operaciones',

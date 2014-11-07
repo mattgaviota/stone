@@ -18,7 +18,8 @@ def get_all_facultades():
 
 def get_facultad(id_facultad):
     '''Retorna el nombre de una facultad en base a un id dado'''
-    row = db(db.facultades.id == id_facultad).select(db.facultades.id, db.facultades.nombre).first()
+    row = db(db.facultades.id == id_facultad).select(db.facultades.id,
+                                                db.facultades.nombre).first()
     return row.nombre
 
 ####################
@@ -35,7 +36,8 @@ def get_all_provincias():
 
 def get_provincia(id_provincia):
     '''Retorna el nombre de una provincia en base a un id dado'''
-    row = db(db.provincias.id == id_provincia).select(db.provincias.id, db.provincias.nombre).first()
+    row = db(db.provincias.id == id_provincia).select(db.provincias.id,
+                                                db.provincias.nombre).first()
     return row.nombre
 
 ##################
@@ -43,7 +45,8 @@ def get_provincia(id_provincia):
 ##################
 def get_perfil(nombre):
     '''Retorna el id del perfil en base a un nombre dado'''
-    row = db(db.perfiles.nombre == nombre).select(db.perfiles.id, db.perfiles.nombre).first()
+    row = db(db.perfiles.nombre == nombre).select(db.perfiles.id,
+                                                db.perfiles.nombre).first()
     return row.id
 
 ####################
@@ -51,12 +54,14 @@ def get_perfil(nombre):
 ####################
 def get_categoria_id(nombre):
     '''Retorna el id de la categoria en base a un nombre dado'''
-    row = db(db.categorias.nombre == nombre).select(db.categorias.id, db.categorias.nombre).first()
+    row = db(db.categorias.nombre == nombre).select(db.categorias.id,
+                                                db.categorias.nombre).first()
     return row.id
 
 def get_categoria_nombre(id_categoria):
     '''Retorna el nombre de la categoria en base a un id dado'''
-    row = db(db.categorias.id == id_categoria).select(db.categorias.id, db.categorias.nombre).first()
+    row = db(db.categorias.id == id_categoria).select(db.categorias.id,
+                                                db.categorias.nombre).first()
     return row.nombre
 
 ##################
@@ -83,6 +88,21 @@ def update_estado(user, valor):
 def update_pass(user, new_pass):
     '''Actualiza el password de un usuario(user) con el new_pass dado'''
     db(db.usuarios.dni == user['dni']).update(password = new_pass)
+    db.commit()
+
+def update_saldo(user, id_ticket, band):
+    '''
+    Actualiza el saldo del user de acuerdo al importe del ticket.
+    Si band = 1 lo suma / anulación
+    Si band = 2 lo resta / compra
+    '''
+    importe = get_importe_ticket(id_ticket)
+    if band:
+        db(db.usuarios.dni == user['dni']).update(saldo =
+                                            db.usuarios.saldo + importe)
+    else:
+        db(db.usuarios.dni == user['dni']).update(saldo =
+                                            db.usuarios.saldo - importe)
     db.commit()
 
 def update_usuario(user, data):
@@ -115,20 +135,47 @@ def insert_log(user, accion):
 # Tabla tickets #
 #################
 def get_tickets(user, cant=5):
-    '''Obtiene cant tickets de un usuario a partir de la fecha actual
-    inclusive, siempre que estos estén activos'''
+    '''
+    Obtiene cant números de tickets de un usuario a partir de la fecha actual
+    inclusive, siempre que estos estén activos(estado = 1)
+    '''
     date = strftime('%Y-%m-%d', localtime())
-    query = '''SELECT tickets.fecha, importe, tickets.estado, tickets.id
-               FROM tickets JOIN log_usuarios
-                ON id_log_usuario=log_usuarios.id JOIN usuarios
-                ON log_usuarios.dni = usuarios.dni
-               WHERE tickets.fecha >= '%s' AND usuarios.dni='%s'
-                AND tickets.estado = 1 LIMIT %d
-            ''' % (date, user['dni'], cant)
-    return db.executesql(query, as_dict=True)
+    tickets = db((db.tickets.id_dia == db.dias.id) &
+                    (db.tickets.id_log_usuario == db.log_usuarios.id) &
+                    (db.log_usuarios.dni == db.usuarios.dni))
+    rows = tickets((db.usuarios.dni == user['dni']) &
+                    (db.dias.fecha >= date) &
+                    (db.tickets.estado == 1)).select(db.dias.fecha,
+                    db.tickets.importe, db.tickets.estado, db.tickets.id,
+                    limitby=(0, cant), orderby=db.dias.fecha)
+    fila = {}
+    lista = []
+    for row in rows:
+        fila['fecha'] = row['dias']['fecha']
+        fila['importe'] = row['tickets']['importe']
+        fila['estado'] = row['tickets']['estado']
+        fila['id'] = row['tickets']['id']
+        lista.append(fila)
+        fila = {}
+    return lista
+
+def get_importe_ticket(id_ticket):
+    '''
+    Retorna el importe del ticket con el id = id_ticket, en caso de no
+    encontrar ninguno retorna 0
+    '''
+    row = db(db.tickets.id == id_ticket).select().first()
+    if row:
+        return row.importe
+    else:
+        return 0
 
 def anular_ticket(id_ticket):
-    '''Anula el ticket a traves de su id'''
+    '''
+    Anula el ticket a traves de su id actualizando el estado.
+    estado = 1 -> activo
+    estado = 0 -> anulado
+    '''
     db(db.tickets.id == id_ticket).update(estado = 0)
     db.commit()
 

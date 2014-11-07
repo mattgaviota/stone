@@ -11,6 +11,26 @@
     text_size: self.width, None
     height: self.texture_size[1]
 
+<ConfirmPopup>:
+    canvas.before:
+        Color:
+            rgba: 0.98, 0.76, 0.23, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    cols:1
+	Label:
+		text: root.text
+	GridLayout:
+        cols: 2
+		size_hint_y: None
+		height: '44sp'
+		ButtonUok:
+			on_release: root.dispatch('on_answer', True)
+		ButtonUcancel:
+			on_release: root.dispatch('on_answer', False)
+
 <WarningPopup>:
     title: "Advertencia"
     size_hint: None, None
@@ -424,6 +444,7 @@
         ButtonU:
             text: 'Imprimir'
             font_size: 30
+            on_press: root.imprimir()
             Image:
                 source: 'images/menu/printer.png'
                 y: self.parent.y + self.parent.height - 170
@@ -433,7 +454,7 @@
         ButtonU:
             text: 'Perfil'
             font_size: 30
-            on_press: root.profile()
+            on_press: root.perfil()
             Image:
                 source: 'images/menu/perfil.png'
                 y: self.parent.y + self.parent.height - 170
@@ -452,6 +473,7 @@
                 allow_stretch: True
 
 <ProfileScreen>:
+    on_enter: root.update_datos()
     canvas.before:
         BorderImage:
             source: 'images/misc/background.png'
@@ -500,6 +522,7 @@
                     LabelUA:
                         text: 'Saldo'
                     LabelUA:
+                        id: saldo
                         text: root.data['saldo']
                 BoxLayout:
                     size_hint: 1, 0.4
@@ -569,6 +592,7 @@
 
 
 <AnularScreen>:
+    on_enter: root.update_datos()
     canvas.before:
         BorderImage:
             source: 'images/misc/background.png'
@@ -602,10 +626,15 @@
                     size_hint: 1, 0.4
                 GridLayout:
                     cols: 2
-                    rows: 3
+                    rows: 4
                     padding: 40
                     spacing: 20
                     size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'Nombre'
+                    LabelUA:
+                        id: nombre
+                        text: root.data['nombre']
                     LabelUA:
                         text: 'DNI'
                     LabelUA:
@@ -617,6 +646,7 @@
                     LabelUA:
                         text: 'Saldo'
                     LabelUA:
+                        id: saldo
                         text: root.data['saldo']
                 BoxLayout:
                     size_hint: 1, 0.4
@@ -645,7 +675,7 @@
                     LabelU:
                         text: 'Estado'
                     LabelU:
-                        text: 'Anular'
+                        text: ''
                     # fila 1
                     LabelU:
                         text: root.data['rows0']['fecha']
@@ -656,7 +686,7 @@
                         text: root.data['rows0']['estado']
                     ButtonUanular:
                         text: 'Anular'
-                        on_press: root.anular_ticket('rows0')
+                        on_press: root.confirmacion('rows0')
                     # fila 2
                     LabelU:
                         text: root.data['rows1']['fecha']
@@ -667,7 +697,7 @@
                         text: root.data['rows1']['estado']
                     ButtonUanular:
                         text: 'Anular'
-                        on_press: root.anular_ticket('rows1')
+                        on_press: root.confirmacion('rows1')
                     # fila 3
                     LabelU:
                         text: root.data['rows2']['fecha']
@@ -678,7 +708,7 @@
                         text: root.data['rows2']['estado']
                     ButtonUanular:
                         text: 'Anular'
-                        on_press: root.anular_ticket('rows2')
+                        on_press: root.confirmacion('rows2')
                     # fila 4
                     LabelU:
                         text: root.data['rows3']['fecha']
@@ -689,7 +719,7 @@
                         text: root.data['rows3']['estado']
                     ButtonUanular:
                         text: 'Anular'
-                        on_press: root.anular_ticket('rows3')
+                        on_press: root.confirmacion('rows3')
                     # fila 5
                     LabelU:
                         text: root.data['rows4']['fecha']
@@ -700,9 +730,126 @@
                         text: root.data['rows4']['estado']
                     ButtonUanular:
                         text: 'Anular'
-                        on_press: root.anular_ticket('rows4')
+                        on_press: root.confirmacion('rows4')
                 BoxLayout:
                     size_hint: 1, 0.1
+                BoxLayout:
+                    size_hint: 0.4, 0.1
+                    spacing: 150
+                    ButtonU:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel();
+
+<ImprimirScreen>:
+    on_enter: root.update_datos()
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Anulación de Tickets'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: 'images/menu/perfil.png'
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 4
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'Nombre'
+                    LabelUA:
+                        id: nombre
+                        text: root.data['nombre']
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        id: saldo
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1
+                GridLayout:
+                    cols: 4
+                    rows: 3
+                    padding: 20
+                    spacing: 15
+                    size_hint: 1, 0.5
+                    LabelU:
+                        text: 'Fecha'
+                    LabelU:
+                        text: 'Importe'
+                    LabelU:
+                        text: 'Estado'
+                    LabelU:
+                        text: ''
+                    # fila 1
+                    LabelU:
+                        text: root.data['rows0']['fecha']
+                    LabelU:
+                        text: root.data['rows0']['importe']
+                    LabelU:
+                        id: estado0
+                        text: root.data['rows0']['estado']
+                    ButtonUanular:
+                        text: 'Imprimir'
+                        on_press: root.confirmacion('rows0')
+                    # fila 2
+                    LabelU:
+                        text: root.data['rows1']['fecha']
+                    LabelU:
+                        text: root.data['rows1']['importe']
+                    LabelU:
+                        id: estado1
+                        text: root.data['rows1']['estado']
+                    ButtonUanular:
+                        text: 'Imprimir'
+                        on_press: root.confirmacion('rows1')
+                BoxLayout:
+                    size_hint: 1, 0.4
                 BoxLayout:
                     size_hint: 0.4, 0.1
                     spacing: 150

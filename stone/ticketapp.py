@@ -4,9 +4,11 @@
 # Utility import
 import re
 from threading import Thread
+from datetime import datetime
+from time import mktime, localtime
 # intra-packages imports
 from db import controlador
-from lib import mailserver, session, utils
+from lib import mailserver, session, utils, impresora
 # Kivy related imports
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -14,9 +16,22 @@ from kivy.uix.screenmanager import ScreenManager, Screen, WipeTransition
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.properties import StringProperty
+from kivy.uix.gridlayout import GridLayout
+
 
 #session
 user_session = session.Session()
+
+
+class ConfirmPopup(GridLayout):
+	text = StringProperty()
+	
+	def __init__(self,**kwargs):
+		self.register_event_type('on_answer')
+		super(ConfirmPopup,self).__init__(**kwargs)
+		
+	def on_answer(self, *args):
+		pass
 
 
 class WarningPopup(Popup):
@@ -56,7 +71,8 @@ class PasswordScreen(Screen):
                 WarningPopup().open()
                 self.clear()
                 self.manager.current = self.scr_accept
-                controlador.insert_log(user, 'perfil')
+                if self.scr_accept == 'profile':
+                    controlador.insert_log(user, 'perfil')
                 user_session.close()
                 self.manager.remove_widget(self.manager.get_screen('pass'))
             elif response == 2:
@@ -111,7 +127,13 @@ class MenuScreen(Screen):
             self.manager.add_widget(AnularScreen(name='anular'))
         self.manager.current = 'anular'
 
-    def profile(self):
+    def imprimir(self):
+        '''Crea y accede a la pantalla de anulación de tickets'''
+        if not self.manager.has_screen('imprimir'):
+            self.manager.add_widget(ImprimirScreen(name='imprimir'))
+        self.manager.current = 'imprimir'
+
+    def perfil(self):
         '''Crea y accede a la pantalla de perfil'''
         if not self.manager.has_screen('profile'):
             self.manager.add_widget(ProfileScreen(name='profile'))
@@ -122,12 +144,129 @@ class MenuScreen(Screen):
         vuelve a la pantalla principal'''
         user_session.close()
         try:
+            self.manager.remove_widget(self.manager.get_screen('imprimir'))
             self.manager.remove_widget(self.manager.get_screen('anular'))
             self.manager.remove_widget(self.manager.get_screen('profile'))
             self.manager.remove_widget(self.manager.get_screen('pass'))
         except:
             pass
         self.manager.current = 'splash'
+
+
+class ImprimirScreen(Screen):
+
+    def __init__(self, name=''):
+        '''Pantalla para imprimir los tickets del usuario'''
+        self.data = {}
+        self.name = name
+        self.cargar_datos()
+        self.mensaje = StringProperty("")
+        Screen.__init__(self)
+
+    def confirmacion(self, row):
+        if self.data[row]['estado'] == 'Activo':
+            content = ConfirmPopup(text='Seguro deseas imprimir?')
+            content.bind(on_answer=self._on_answer)
+            self.popup = Popup(title="Advertencia",
+                                    content=content,
+                                    size_hint=(None, None),
+                                    size=(400,400),
+                                    auto_dismiss= False)
+            self.row = row
+            self.popup.open()
+
+    def _on_answer(self, instance, answer):
+        if answer:
+            self.imprimir_ticket()
+        self.popup.dismiss()
+
+    def check_hora(self, fecha, hora=11):
+        '''Verifica que no se pueda anular un ticket despues de la hora'''
+        ahora = datetime.now()
+        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        if fecha.year == ahora.year:
+            if fecha.month == ahora.month and fecha.day == ahora.day:
+                if ahora.hour >= hora:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        else:
+            return True
+
+    def imprimir_ticket(self):
+        '''Imprime el ticket de la fila row.'''
+        row = self.row
+        id_ticket = self.data[row]['id']
+        estado = self.data[row]['estado']
+        fecha = self.data[row]['fecha']
+        id_ticket = self.data[row]['id']
+        band = self.check_hora(fecha, 14)
+        if id_ticket and band:
+            nom = self.data['nombre']
+            dni = self.data['dni']
+            cat = self.data['categoria']
+            fac = self.data['facultad']
+            unit = '03'
+            ticket = str(id_ticket)
+            dia = int(mktime(localtime()))
+            code_ticket = '0' * (10 - len(ticket)) + ticket
+            code = '%d%s' % (dia, code_ticket)
+            printer_thread = Thread(target=impresora.imprimir_ticket_alumno,
+                                args=(nom, dni, fac, cat, code, unit, ticket))
+            printer_thread.start()
+        else:
+            if not id_ticket:
+                self.mensaje = "No puede imprimir un ticket despues\r\n de las 14 hs. del día de servicio."
+            elif not band:
+                self.mensaje = "No puede imprimir un ticket anulado."
+            WarningPopup().open()
+
+    def update_datos(self):
+        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        user_session.update(controlador.get_usuario(self.data['dni']))
+        self.cargar_datos()
+        self.ids.saldo.text = self.data['saldo']
+        self.ids.nombre.text = self.data['nombre']
+
+    def cargar_datos(self):
+        '''Carga los datos del usuario dentro de la pantalla de imresión'''
+        self.user = user_session.get_user()
+        self.data['nombre'] = self.user['nombre']
+        self.data['dni'] = self.user['dni']
+        self.data['saldo'] = '$%.2f' % (self.user['saldo'])
+        self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
+        self.data['facultad'] = controlador.get_facultad(self.user['id_facultad'])
+        self.cargar_tickets()
+        
+    def cargar_tickets(self): 
+        '''
+        Carga los próximos 2 tickets en la pantalla, solo se actualiza
+        en caso salir y volver a entrar'''   
+        self.tickets = controlador.get_tickets(self.user, 2)
+        ticket_vacio = {'fecha': '', 'importe': '', 'estado': '', 'id': 0}
+        i = 0
+        for ticket in self.tickets:
+            if ticket['estado']:
+                ticket['estado'] = 'Activo'
+            else:
+                ticket['estado'] = 'Anulado'
+            ticket['importe'] = '$%.2f' %(ticket['importe'])
+            ticket['fecha'] = ticket['fecha'].strftime('%Y-%m-%d')
+            self.data['rows%s' % (i)] = ticket
+            i += 1
+        faltantes = 2 - len(self.tickets)
+        if faltantes:
+            if faltantes == 1:
+                self.data['rows1'] = ticket_vacio
+            else:
+                self.data['rows0'] = ticket_vacio
+                self.data['rows1'] = ticket_vacio
+            
+    def cancel(self):
+        '''Vuelve a una pantalla anterior'''
+        self.manager.current = 'menu'
 
 
 class AnularScreen(Screen):
@@ -137,14 +276,44 @@ class AnularScreen(Screen):
         self.data = {}
         self.name = name
         self.cargar_datos()
+        self.mensaje = StringProperty("")
         Screen.__init__(self)
 
-    def anular_ticket(self, row):
+    def confirmacion(self, row):
+        if self.data[row]['estado'] == 'Activo':
+            content = ConfirmPopup(text='Seguro deseas anular?')
+            content.bind(on_answer=self._on_answer)
+            self.popup = Popup(title="Advertencia",
+                                    content=content,
+                                    size_hint=(None, None),
+                                    size=(400,400),
+                                    auto_dismiss= False)
+            self.row = row
+            self.popup.open()
+
+    def _on_answer(self, instance, answer):
+        if answer:
+            self.anular_ticket()
+        self.popup.dismiss()
+
+    def anular_ticket(self):
+        '''
+        Anula el ticket de la fila row y llama a las funciones para
+        actualizar el saldo y los datos.
+        El ticket anulado se le cambia el estado pero no desaparece hasta
+        salir y volver a entrar.
+        '''
+        row = self.row
         id_ticket = self.data[row]['id']
         estado = self.data[row]['estado']
-        if id_ticket and estado == 'Activo':
+        fecha = self.data[row]['fecha']
+        id_ticket = self.data[row]['id']
+        band = self.check_hora(fecha)
+        if id_ticket and band:
             controlador.anular_ticket(id_ticket)
+            controlador.update_saldo(self.user, id_ticket, 1)
             controlador.insert_log(self.user, 'anular')
+            self.update_datos()
             self.cargar_tickets()
             if row == 'rows0':
                 self.ids.estado0.text = 'Anulado'
@@ -156,16 +325,46 @@ class AnularScreen(Screen):
                 self.ids.estado3.text = 'Anulado'
             else:
                 self.ids.estado4.text = 'Anulado'
-        
+        else:
+            if not band:
+                self.mensaje = "No puede anular un ticket despues\r\n de las 11 hs. del día de servicio."
+                WarningPopup().open()
+
+    def update_datos(self):
+        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        user_session.update(controlador.get_usuario(self.data['dni']))
+        self.cargar_datos()
+        self.ids.saldo.text = self.data['saldo']
+        self.ids.nombre.text = self.data['nombre']
+
+    def check_hora(self, fecha, hora=11):
+        '''Verifica que no se pueda anular un ticket despues de la hora'''
+        ahora = datetime.now()
+        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        if fecha.year == ahora.year:
+            if fecha.month == ahora.month and fecha.day == ahora.day:
+                if ahora.hour >= hora:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        else:
+            return True
+
     def cargar_datos(self):
         '''Carga los datos del usuario dentro de la pantalla de anulación'''
         self.user = user_session.get_user()
+        self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
-        self.data['saldo'] = str(self.user['saldo'])
+        self.data['saldo'] = '$%.2f' % (self.user['saldo'])
         self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
         self.cargar_tickets()
         
-    def cargar_tickets(self):    
+    def cargar_tickets(self): 
+        '''
+        Carga los próximos 5 tickets en la pantalla, solo se actualiza
+        en caso salir y volver a entrar'''   
         self.tickets = controlador.get_tickets(self.user)
         ticket_vacio = {'fecha': '', 'importe': '', 'estado': '', 'id': 0}
         i = 0
@@ -202,6 +401,7 @@ class AnularScreen(Screen):
                 self.data['rows4'] = ticket_vacio
             
     def cancel(self):
+        '''Vuelve a una pantalla anterior'''
         self.manager.current = 'menu'
 
 
@@ -221,15 +421,18 @@ class ProfileScreen(Screen):
         if not self.manager.has_screen('pass'):
             self.manager.add_widget(PasswordScreen('profile', 'profile', 'pass'))
         self.manager.current = 'pass'
-        self.update_datos()
 
     def cargar_datos(self):
         '''Carga los datos del usuario dentro de la pantalla de perfil'''
-        self.user = user_session.get_user()
+        try:
+            user_session.update(controlador.get_usuario(self.data['dni']))
+            self.user = user_session.get_user()
+        except KeyError:
+            self.user = user_session.get_user()
         self.facultades_nombre = sorted(self.facultades.keys())
         self.provincias_nombre = sorted(self.provincias.keys())
         self.data['dni'] = self.user['dni']
-        self.data['saldo'] = str(self.user['saldo'])
+        self.data['saldo'] = '$ %.2f' % (self.user['saldo'])
         self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
         self.data['nombre'] = self.user['nombre']
         self.data['lu'] = self.user['lu']
@@ -238,13 +441,17 @@ class ProfileScreen(Screen):
         self.data['facultad'] = controlador.get_facultad(self.user['id_facultad'])
 
     def update_datos(self):
+        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        self.cargar_datos()
         self.ids.nombre.text = self.data['nombre']
         self.ids.lu.text = self.data['lu']
         self.ids.email.text = self.data['email']
         self.ids.facultad.text = self.data['facultad']
         self.ids.provincia.text = self.data['provincia']
+        self.ids.saldo.text = self.data['saldo']
 
     def update_profile(self):
+        '''Actualiza el perfil con los cambios realizados por el usuario'''
         self.updata = {}
         self.updata['nombre'] = self.ids.nombre.text
         self.updata['lu'] = self.ids.lu.text
@@ -257,7 +464,7 @@ class ProfileScreen(Screen):
         self.cargar_datos()
 
     def cancel(self):
-        self.update_datos()
+        '''Vuelve a la pantalla anterior'''
         self.manager.current = 'menu'
 
     def mailvalidator(self, email):

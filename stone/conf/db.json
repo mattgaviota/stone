@@ -1,0 +1,7 @@
+{
+    "user": "postgres",
+    "pass": "losperros",
+    "host": "170.210.201.139",
+    "db": "comedorDB",
+    "port": "5432"
+}
