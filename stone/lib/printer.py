@@ -118,7 +118,7 @@ class Printer():
     
     
     def print_ticket_alumno(self, alumno, dni, facultad, categoria,
-                                code, unit, id_ticket, mensaje):
+                                code, unit, id_ticket, fecha, mensaje):
         unidad = unit
         ticket = id_ticket
         # Header
@@ -137,7 +137,7 @@ class Printer():
         self.tup.send(bytearray("---------------------------------------------\r\n\r\n"))
         # end Header
         # Body
-        self.tup.send(bytearray("\x1b\x34Fecha de Servicio: 02/10/2014\x1b\x35\r\n\r\n"))
+        self.tup.send(bytearray("\x1b\x34Fecha de Servicio: %s\x1b\x35\r\n\r\n" %(fecha)))
         self.tup.send(bytearray(self.to_int(['1b', '45']))) # Set emphasys
         self.tup.send(bytearray(u"Alumno: %s\r\n" %(alumno), 'cp850'))
         self.tup.send(bytearray(u"DNI: %s\r\n" %(dni), 'cp850'))

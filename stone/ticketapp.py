@@ -183,7 +183,7 @@ class ImprimirScreen(Screen):
     def check_hora(self, fecha, hora=11):
         '''Verifica que no se pueda anular un ticket despues de la hora'''
         ahora = datetime.now()
-        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        fecha = datetime.strptime(fecha, '%d/%m/%Y')
         if fecha.year == ahora.year:
             if fecha.month == ahora.month and fecha.day == ahora.day:
                 if ahora.hour >= hora:
@@ -214,13 +214,13 @@ class ImprimirScreen(Screen):
             code_ticket = '0' * (10 - len(ticket)) + ticket
             code = '%d%s' % (dia, code_ticket)
             printer_thread = Thread(target=impresora.imprimir_ticket_alumno,
-                                args=(nom, dni, fac, cat, code, unit, ticket))
+                        args=(nom, dni, fac, cat, code, unit, ticket, fecha))
             printer_thread.start()
         else:
             if not id_ticket:
-                self.mensaje = "No puede imprimir un ticket despues\r\n de las 14 hs. del día de servicio."
-            elif not band:
                 self.mensaje = "No puede imprimir un ticket anulado."
+            elif not band:
+                self.mensaje = "No puede imprimir un ticket despues\r\n de las 14 hs. del día de servicio."
             WarningPopup().open()
 
     def update_datos(self):
@@ -253,7 +253,7 @@ class ImprimirScreen(Screen):
             else:
                 ticket['estado'] = 'Anulado'
             ticket['importe'] = '$%.2f' %(ticket['importe'])
-            ticket['fecha'] = ticket['fecha'].strftime('%Y-%m-%d')
+            ticket['fecha'] = ticket['fecha'].strftime('%d/%m/%Y')
             self.data['rows%s' % (i)] = ticket
             i += 1
         faltantes = 2 - len(self.tickets)
