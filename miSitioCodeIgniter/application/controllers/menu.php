@@ -16,7 +16,7 @@ class Menu extends CI_Controller {
 		$data['contenido'] = 'menu/index';
 		$data['titulo'] = 'Menú';
 		$data['registros'] = $this->Model_Menu->all();
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function search(){
@@ -24,7 +24,7 @@ class Menu extends CI_Controller {
 		$data['titulo'] = 'Menú';
 		$valor = $this->input->post('buscar');
 		$data['registros'] = $this->Model_Menu->allFilter('nombre', $valor);
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function my_validation(){
@@ -36,7 +36,7 @@ class Menu extends CI_Controller {
 		$data['contenido'] = 'menu/edit';
 		$data['titulo'] = 'Editar Menú';
 		$data['registro'] = $this->Model_Menu->find($id);
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function update(){
@@ -57,7 +57,7 @@ class Menu extends CI_Controller {
 	public function create(){
 		$data['contenido'] = 'menu/create';
 		$data['titulo'] = 'Crear Menú';
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function insert(){

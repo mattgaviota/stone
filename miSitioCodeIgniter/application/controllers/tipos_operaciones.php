@@ -17,7 +17,7 @@ class Tipos_Operaciones extends CI_Controller {
 		$data['titulo'] = 'Tipos de Operaciones';
 		$data['registros'] = $this->Model_Tipos_Operaciones->all();
 		$data['menu'] = $this->Model_Tipos_Operaciones->get_menu();
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function search(){
@@ -25,7 +25,7 @@ class Tipos_Operaciones extends CI_Controller {
 		$data['titulo'] = 'Tipos de Operaciones';
 		$valor = $this->input->post('buscar');
 		$data['registros'] = $this->Model_Tipos_Operaciones->allFilter('nombre', $valor);
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function my_validation(){
@@ -37,7 +37,7 @@ class Tipos_Operaciones extends CI_Controller {
 		$data['contenido'] = 'tipos_operaciones/edit';
 		$data['titulo'] = 'Editar Tipos de Operaciones';
 		$data['registro'] = $this->Model_Tipos_Operaciones->find($id);
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function update(){
@@ -59,7 +59,7 @@ class Tipos_Operaciones extends CI_Controller {
 		$data['contenido'] = 'tipos_operaciones/create';
 		$data['titulo'] = 'Crear Operación';
 		$data['menu'] = $this->Model_Tipos_Operaciones->get_menu();
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function insert(){

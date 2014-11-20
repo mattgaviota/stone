@@ -16,14 +16,14 @@ class Calendario extends CI_Controller{
 		$data['contenido'] = 'calendario/index';
 		$data['titulo'] = 'Calendarios';
 		$data['registros'] = $this->Model_Calendario->all();
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function mostrar_calendario($year = null, $month = null, $id = null){
 		$data['contenido'] = 'calendario/mostrar_calendario';
 		$data['titulo'] = 'Calendario';
 		$data['calendario'] = $this->Model_Calendario->generate($year, $month);
-		$this->load->view('template', $data);			
+		$this->load->view('template-admin', $data);			
 	}
 
 	public function mostrar_info_dia($year = null, $month = null, $id = null){
@@ -52,7 +52,7 @@ class Calendario extends CI_Controller{
 	public function create(){
 		$data['contenido'] = 'calendario/create';
 		$data['titulo'] = 'Agregando un calendario';
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function insert(){

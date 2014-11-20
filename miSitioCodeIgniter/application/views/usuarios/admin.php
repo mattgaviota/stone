@@ -6,6 +6,6 @@
 	quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 	consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
 	</p>
-	<hr>
-	<?= my_botonera_home();?>
+	<br>
+	<h4>Mi sabiduría viene de esta tierra</h4>
 </div>

@@ -76,7 +76,7 @@
 			</div>
 			<?= form_hidden('id_categoria', $categoria->id); ?>
 		</div>
-	</div>	
+	</div>
 
 	<hr>
 

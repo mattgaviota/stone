@@ -15,7 +15,7 @@ class Perfiles extends CI_Controller {
 		$data['contenido'] = 'perfiles/index';
 		$data['titulo'] = 'Perfiles';
 		$data['registros'] = $this->Model_Perfiles->all();
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function search(){
@@ -23,7 +23,7 @@ class Perfiles extends CI_Controller {
 		$data['titulo'] = 'Perfiles';
 		$valor = $this->input->post('buscar');
 		$data['registros'] = $this->Model_Perfiles->allFilter('nombre', $valor);
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function norepeat(){
@@ -35,7 +35,7 @@ class Perfiles extends CI_Controller {
 		$data['contenido'] = 'perfiles/edit';
 		$data['titulo'] = 'Editar Perfiles';
 		$data['registro'] = $this->Model_Perfiles->find($id);
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function update(){
@@ -55,7 +55,7 @@ class Perfiles extends CI_Controller {
 	public function create(){
 		$data['contenido'] = 'perfiles/create';
 		$data['titulo'] = 'Crear Perfil';
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function insert(){
@@ -85,7 +85,7 @@ class Perfiles extends CI_Controller {
 		$operaciones = $this->perfileslib->get_operaciones($id);
 		$data['query_izq'] = $operaciones[0];
 		$data['query_der'] = $operaciones[1];
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function pto_asignados(){

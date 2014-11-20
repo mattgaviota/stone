@@ -93,7 +93,7 @@ class Model_Usuarios extends CI_Model {
     }
 
     function find($dni){
-        $this->db->select('usuarios.*, perfiles.nombre as perfil_nombre, provincias.nombre as provincia_nombre, facultades.nombre as facultad_nombre, categorias.nombre as categoria_nombre');
+        $this->db->select('usuarios.*, perfiles.nombre as perfil_nombre, provincias.nombre as provincia_nombre, facultades.nombre as facultad_nombre, categorias.nombre as categoria_nombre, categorias.importe as importe');
         $this->db->from('usuarios');
         $this->db->join('perfiles', 'usuarios.id_perfil = perfiles.id', 'left');
         $this->db->join('provincias', 'usuarios.id_provincia = provincias.id', 'left');
@@ -102,6 +102,11 @@ class Model_Usuarios extends CI_Model {
 
     	$this->db->where('usuarios.dni',$dni);
     	return $this->db->get()->row();//Equivale a SELECT * FROM usuarios WHERE id='$id'
+    }
+
+    function find_simple($dni){
+        $this->db->where('dni', $dni);
+        return $this->db->get('usuarios');
     }
 
     function insert($registro){
@@ -175,9 +180,14 @@ class Model_Usuarios extends CI_Model {
         return $query = $this->db->get()->row();
     }
 
-    public function generate($year, $month){
+    function generate($year, $month){
         $this->load->library('calendar', $this->conf);
-
         return $this->calendar->generate($year, $month);
     }
-}
+
+    function total_usuarios(){
+        $query = $this->db->query("SELECT COUNT(*) AS total_usuarios, COUNT(CASE WHEN id_categoria = 1 THEN 1 END) AS becados, COUNT(CASE WHEN id_categoria = 2 THEN 1 END) AS regulares, COUNT(CASE WHEN id_categoria = 3 THEN 1 END) AS gratuitos FROM usuarios");
+        return $query->row();
+    }
+
+}   

@@ -25,7 +25,7 @@ $(document).ready(function() {
 		$.ajax({
 			type: "POST",
 			
-			url: "http://localhost/miSitioCodeIgniter/index.php/calendario/mostrar_info_dia/" + year + '/' + month + '/' + id_calendario,
+			url: base_url + "index.php/calendario/mostrar_info_dia/" + year + '/' + month + '/' + id_calendario,
 			cache: false,				
 			data: {
 				dia:dia_num
@@ -43,8 +43,8 @@ $(document).ready(function() {
 							cadena = cadena + "<input name='fecha' type='hidden' class='form-control' value='" + val.fecha + "'>";
 							cadena = cadena + '</br>';
 
-							cadena = cadena + '<label>Tickets Disponibles:</label>';
-							cadena = cadena + '<input name="tickets_disponibles" class="form-control" value="' + val.tickets_disponibles + '">';
+							cadena = cadena + '<label>Tickets Totales:</label>';
+							cadena = cadena + '<input name="tickets_totales" class="form-control" value="' + val.tickets_totales + '">';
 							cadena = cadena + '</br>';
 
 							cadena = cadena + '<label>Tickets Vendidos:</label>';
@@ -74,7 +74,7 @@ $(document).ready(function() {
 	});
 	
 	$("#resultadoCalendario").submit(function(event){
-		$("#mensaje").fadeIn(2000);
+		$("#mensaje").fadeIn(1500);
 	  	$("#mensaje").css({"background-color":"yellow","padding":"0.5em"}); 
 		$.ajax({
 			type: "POST",
@@ -82,7 +82,7 @@ $(document).ready(function() {
 			data: $(this).serializeArray(),
 			success: function(data){
 				$("#mensaje").html(data);
-				$("#mensaje").fadeOut(3000);
+				$("#mensaje").fadeOut(2000);
 			},
 			error: function(){						
 				alert('Error en la respuesta');
