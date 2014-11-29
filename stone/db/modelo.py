@@ -61,6 +61,22 @@ db.define_table('dias',
     Field('id_calendario', type='reference calendario', ondelete='SET DEFAULT'),
     migrate=migrate)
 
+db.define_table('estados_tickets',
+    Field('id', type='integer'),
+    Field('nombre', type='string', length=30),
+    Field('created', type='datetime'),
+    Field('updated', type='datetime'),
+    primarykey=['id'],
+    migrate=migrate)
+
+db.define_table('estados_usuarios',
+    Field('id', type='integer'),
+    Field('nombre', type='string', length=30),
+    Field('created', type='datetime'),
+    Field('updated', type='datetime'),
+    primarykey=['id'],
+    migrate=migrate)
+
 db.define_table('facultades',
     Field('id', type='id'),
     Field('nombre', type='string', length=50),
@@ -75,13 +91,6 @@ db.define_table('feriados',
     Field('tipo', type='integer'),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
-    migrate=migrate)
-
-db.define_table('log_operaciones',
-    Field('id', type='id'),
-    Field('id_tipo_operacion', type='integer'),
-    Field('fecha', type='datetime'),
-    Field('dni', type='reference usuarios', ondelete='SET DEFAULT'),
     migrate=migrate)
 
 db.define_table('log_usuarios',
@@ -127,8 +136,9 @@ db.define_table('tickets',
     Field('id_dia', type='reference dias', ondelete='SET DEFAULT', unique=True),
     Field('importe', type='double'),
     Field('unidad', type='integer'),
-    Field('estado', type='integer'),
+    Field('estado', type='reference estados_tickets', ondelete='SET DEFAULT'),
     Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT', unique=True),
+    Field('barcode', type='string', length=20),
     migrate=migrate)
 
 db.define_table('tipos_operaciones',
@@ -148,11 +158,12 @@ db.define_table('usuarios',
     Field('password', type='string', length=40),
     Field('email', type='string', length=200),
     Field('lu', type='string', length=7),
-    Field('estado', type='integer'),
+    Field('estado', type='reference estados_usuarios', ondelete='SET DEFAULT'),
     Field('id_provincia', type='reference provincias', ondelete='SET DEFAULT'),
     Field('id_facultad', type='reference facultades', ondelete='SET DEFAULT'),
     Field('id_perfil', type='reference perfiles', ondelete='SET DEFAULT'),
     Field('id_categoria', type='reference categorias', ondelete='SET DEFAULT'),
     Field('saldo', type='double', default=0),
+    Field('ruta_foto', type='string', length=300),
     primarykey=['dni'],
     migrate=migrate)

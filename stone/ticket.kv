@@ -74,6 +74,53 @@
         size: 32, 32
         allow_stretch: True
 
+<ButtonUcash@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+    Image:
+        source: 'images/buttons/cash.png'
+        y: self.parent.y + self.parent.height - 60
+        x: self.parent.x + self.parent.width - 100
+        size: 48, 48
+        allow_stretch: True
+
+<ButtonUcredito@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+    Image:
+        source: 'images/menu/cargar.png'
+        y: self.parent.y + self.parent.height - 60
+        x: self.parent.x + self.parent.width - 100
+        size: 48, 48
+        allow_stretch: True
+
+<ButtonUnext@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtnok.png'
+    background_down: 'images/buttons/downbtnok.png'
+    border: 20, 20, 20, 20
+    Image:
+        source: 'images/buttons/next.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+<ButtonUback@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+    Image:
+        source: 'images/buttons/back.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
 
 <ButtonUcancel@Button>:
     font_name: 'fonts/Ubuntu-R.ttf'
@@ -410,69 +457,146 @@
             source: 'images/misc/background.png'
             pos: self.pos
             size: self.size
-    GridLayout:
-        cols: 2
-        spacing: 10
-        padding: 10
-        ButtonU:
-            text: 'Comprar'
-            font_size: 30
-            Image:
-                source: 'images/menu/comprar.png'
-                y: self.parent.y + self.parent.height - 170
-                x: self.parent.x + self.parent.width - 170
-                size: 100, 100
-                allow_stretch: True
-        ButtonU:
-            text: 'Anular'
-            font_size: 30
-            on_press: root.anular()
-            Image:
-                source: 'images/menu/anular.png'
-                y: self.parent.y + self.parent.height - 170
-                x: self.parent.x + self.parent.width - 170
-                size: 100, 100
-                allow_stretch: True
-        ButtonU:
-            text: 'Cargar Monedero'
-            font_size: 30
-            Image:
-                source: 'images/menu/cargar.png'
-                y: self.parent.y + self.parent.height - 170
-                x: self.parent.x + self.parent.width - 170
-                size: 100, 100
-                allow_stretch: True
-        ButtonU:
-            text: 'Imprimir'
-            font_size: 30
-            on_press: root.imprimir()
-            Image:
-                source: 'images/menu/printer.png'
-                y: self.parent.y + self.parent.height - 170
-                x: self.parent.x + self.parent.width - 170
-                size: 100, 100
-                allow_stretch: True
-        ButtonU:
-            text: 'Perfil'
-            font_size: 30
-            on_press: root.perfil()
-            Image:
-                source: 'images/menu/perfil.png'
-                y: self.parent.y + self.parent.height - 170
-                x: self.parent.x + self.parent.width - 170
-                size: 100, 100
-                allow_stretch: True
-        ButtonU:
-            text: 'Salir'
-            font_size: 30
-            on_press: root.logout()
-            Image:
-                source: 'images/menu/salir.png'
-                y: self.parent.y + self.parent.height - 170
-                x: self.parent.x + self.parent.width - 170
-                size: 100, 100
-                allow_stretch: True
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Menu Principal de Usuario'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1 
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 200
+            spacing: 10
+            ButtonU:
+                on_press: root.comprar()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/comprar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Comprar'
+            ButtonU:
+                on_press: root.options()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/opciones.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Opciones'
+            ButtonU:
+                on_press: root.logout()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/salir.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Salir'
 
+<OptionScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Opciones'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1 
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 175
+            spacing: 10
+            size_hint: 1, 0.8
+            ButtonU:
+                on_press: root.anular()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/anular.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Anular tickets'
+            ButtonU:
+                #on_press: root.options()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/cargar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Cargar Monedero'
+            ButtonU:
+                on_press: root.perfil()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/perfil.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Perfil'
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True
 <ProfileScreen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -504,11 +628,11 @@
                 padding: 20
                 size_hint: 0.3, 1
                 AsyncImage:
-                    source: 'images/menu/perfil.png'
+                    source: root.data['ruta_foto']
                     size_hint: 1, 0.4
                 GridLayout:
                     cols: 2
-                    rows: 3
+                    rows: 4
                     padding: 40
                     spacing: 20
                     size_hint: 1, 0.2
@@ -516,6 +640,10 @@
                         text: 'DNI'
                     LabelUA:
                         text: root.data['dni']
+                    LabelUA:
+                        text: 'Facultad'
+                    LabelUA:
+                        text: root.data['facultad']
                     LabelUA:
                         text: 'Categoria'
                     LabelUA:
@@ -541,10 +669,10 @@
                 size_hint: 0.7, 1
                 GridLayout:
                     cols: 2
-                    rows: 7
+                    rows: 6
                     padding: 20
                     spacing: 15
-                    size_hint: 1, 0.8
+                    size_hint: 1, 0.7
                     LabelU:
                         text: 'Nombre'
                     Input:
@@ -561,12 +689,6 @@
                         id: email
                         text: root.data['email']
                     LabelU:
-                        text: 'Facultad'
-                    Spinner:
-                        id: facultad
-                        text: root.data['facultad']
-                        values: root.facultades_nombre
-                    LabelU:
                         text: 'Provincia'
                     Spinner:
                         id: provincia
@@ -578,7 +700,7 @@
                         text: 'Cambiar'
                         on_press: root.cambiar_pass()
                 BoxLayout:
-                    size_hint: 1, 0.1
+                    size_hint: 1, 0.2
                 BoxLayout:
                     size_hint: 1, 0.1
                     spacing: 150
@@ -623,7 +745,7 @@
                 padding: 20
                 size_hint: 0.3, 1
                 AsyncImage:
-                    source: 'images/menu/perfil.png'
+                    source: root.data['ruta_foto']
                     size_hint: 1, 0.4
                 GridLayout:
                     cols: 2
@@ -664,85 +786,32 @@
                 spacing: 30
                 size_hint: 0.7, 1
                 GridLayout:
-                    cols: 4
-                    rows: 6
-                    padding: 20
+                    cols: 2
+                    rows: 2
+                    padding: 50
                     spacing: 15
-                    size_hint: 1, 0.8
+                    size_hint: 1, 0.4
                     LabelU:
-                        text: 'Fecha'
-                    LabelU:
-                        text: 'Importe'
-                    LabelU:
-                        text: 'Estado'
+                        text: 'Codigo'
                     LabelU:
                         text: ''
-                    # fila 1
-                    LabelU:
-                        text: root.data['rows0']['fecha']
-                    LabelU:
-                        text: root.data['rows0']['importe']
-                    LabelU:
-                        id: estado0
-                        text: root.data['rows0']['estado']
+                    Input:
+                        id: id_ticket
+                        hint_text: 'Codigo del ticket'
                     ButtonUanular:
                         text: 'Anular'
-                        on_press: root.confirmacion('rows0')
-                    # fila 2
-                    LabelU:
-                        text: root.data['rows1']['fecha']
-                    LabelU:
-                        text: root.data['rows1']['importe']
-                    LabelU:
-                        id: estado1
-                        text: root.data['rows1']['estado']
-                    ButtonUanular:
-                        text: 'Anular'
-                        on_press: root.confirmacion('rows1')
-                    # fila 3
-                    LabelU:
-                        text: root.data['rows2']['fecha']
-                    LabelU:
-                        text: root.data['rows2']['importe']
-                    LabelU:
-                        id: estado2
-                        text: root.data['rows2']['estado']
-                    ButtonUanular:
-                        text: 'Anular'
-                        on_press: root.confirmacion('rows2')
-                    # fila 4
-                    LabelU:
-                        text: root.data['rows3']['fecha']
-                    LabelU:
-                        text: root.data['rows3']['importe']
-                    LabelU:
-                        id: estado3
-                        text: root.data['rows3']['estado']
-                    ButtonUanular:
-                        text: 'Anular'
-                        on_press: root.confirmacion('rows3')
-                    # fila 5
-                    LabelU:
-                        text: root.data['rows4']['fecha']
-                    LabelU:
-                        text: root.data['rows4']['importe']
-                    LabelU:
-                        id: estado4
-                        text: root.data['rows4']['estado']
-                    ButtonUanular:
-                        text: 'Anular'
-                        on_press: root.confirmacion('rows4')
+                        on_press: root.confirmacion()
                 BoxLayout:
-                    size_hint: 1, 0.1
+                    size_hint: 1, 0.5
                 BoxLayout:
                     size_hint: 0.4, 0.1
                     spacing: 150
-                    ButtonU:
+                    ButtonUback:
                         text: 'Volver'
                         font_size: 20
                         on_press: root.cancel();
 
-<ImprimirScreen>:
+<Compra2Screen>:
     on_enter: root.update_datos()
     canvas.before:
         BorderImage:
@@ -753,7 +822,7 @@
         padding: 40
         orientation: 'vertical'
         LabelU:
-            text: 'Impresión de Tickets'
+            text: 'Compra de Tickets'
             valign: 'top'
             font_size: '40sp'
             size_hint: 1, 0.1
@@ -773,7 +842,7 @@
                 padding: 20
                 size_hint: 0.3, 1
                 AsyncImage:
-                    source: 'images/menu/perfil.png'
+                    source: root.data['ruta_foto']
                     size_hint: 1, 0.4
                 GridLayout:
                     cols: 2
@@ -812,49 +881,260 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1
-                GridLayout:
-                    cols: 4
-                    rows: 3
-                    padding: 20
-                    spacing: 15
-                    size_hint: 1, 0.5
-                    LabelU:
-                        text: 'Fecha'
-                    LabelU:
-                        text: 'Importe'
-                    LabelU:
-                        text: 'Estado'
-                    LabelU:
-                        text: ''
-                    # fila 1
-                    LabelU:
-                        text: root.data['rows0']['fecha']
-                    LabelU:
-                        text: root.data['rows0']['importe']
-                    LabelU:
-                        id: estado0
-                        text: root.data['rows0']['estado']
-                    ButtonUanular:
-                        text: 'Imprimir'
-                        on_press: root.confirmacion('rows0')
-                    # fila 2
-                    LabelU:
-                        text: root.data['rows1']['fecha']
-                    LabelU:
-                        text: root.data['rows1']['importe']
-                    LabelU:
-                        id: estado1
-                        text: root.data['rows1']['estado']
-                    ButtonUanular:
-                        text: 'Imprimir'
-                        on_press: root.confirmacion('rows1')
+                size_hint: 0.7, 1                    
                 BoxLayout:
-                    size_hint: 1, 0.4
+                    size_hint: 1, 0.2
+                    LabelU:
+                        text: 'PASO 2: Ingreso de efectivo'
+                GridLayout:
+                    cols: 2
+                    rows: 2
+                    size_hint: 1, 0.6
+                    padding: 60
+                    spacing: 30
+                    LabelU:
+                        font_size: 20
+                        text: 'Dinero faltante para realizar la compra'
+                    LabelU:
+                        id: faltante
+                        font_size: 20
+                        text: root.data['faltante']
+                    LabelU:
+                        font_size: 20
+                        text: 'Dinero ingresado'
+                    LabelU:
+                        id: ingresado
+                        font_size: 20
+                        text: ""
+                BoxLayout:
+                    size_hint: 0.3, 0.1
+                    ButtonUok:
+                        text: 'Ingresar dinero'
+                        disabled: True
+                        on_press: root.confirmacion()
                 BoxLayout:
                     size_hint: 0.4, 0.1
                     spacing: 150
-                    ButtonU:
+                    ButtonUback:
                         text: 'Volver'
                         font_size: 20
                         on_press: root.cancel();
+
+<Compra1Screen>:
+    on_enter: root.update_datos()
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Compra de Tickets'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: root.data['ruta_foto']
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 4
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'Nombre'
+                    LabelUA:
+                        id: nombre
+                        text: root.data['nombre']
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        id: saldo
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1                    
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    LabelU:
+                        text: 'PASO 1: Elegir día/s'
+                BoxLayout:
+                    size_hint: 1, 0.1
+                    LabelU:
+                        text: 'Compra posible con saldo: '
+                    LabelU:
+                        text: root.data['posibles']
+                GridLayout:
+                    size_hint: 1, 0.4
+                    padding: 20
+                    spacing: 30
+                    cols: 2
+                    rows: 2
+                    # fila 1 labels
+                    LabelU:
+                        text: 'Desde'
+                    LabelU:
+                        text: 'Hasta'
+                    # fila 1 fecha desde o única
+                    Spinner:
+                        id: desde
+                        text: root.data['dia']
+                        values: root.dias_desde
+                    Spinner:
+                        id: hasta
+                        values: root.dias_hasta
+                BoxLayout:
+                    size_hint: 1, 0.2
+                BoxLayout:
+                    size_hint: 1, 0.1
+                    spacing: 150
+                    ButtonUback:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel()
+                    ButtonUnext:
+                        text: 'Continuar'
+                        font_size: 20
+                        on_press: root.medio_de_pago()
+
+<Compra3Screen>:
+    on_enter: root.update_datos()
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Compra de Tickets'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: root.data['ruta_foto']
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 4
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'Nombre'
+                    LabelUA:
+                        id: nombre
+                        text: root.data['nombre']
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        id: saldo
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1                    
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    LabelU:
+                        text: root.data['titulo']
+                GridLayout:
+                    size_hint: 1, 0.4
+                    padding: 20
+                    spacing: 30
+                    cols: 2
+                    rows: 2
+                    LabelU:
+                        text: 'Cantidad'
+                    LabelU:
+                        id: cantidad
+                        text: root.data['cantidad']
+                    LabelU:
+                        text: 'Total'
+                    LabelU:
+                        id: total
+                        text: root.data['total']
+                BoxLayout:
+                    size_hint: 1, 0.3
+                BoxLayout:
+                    size_hint: 1, 0.1
+                    spacing: 150
+                    ButtonUback:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel();
+                    ButtonUnext:
+                        text: 'Comprar'
+                        font_size: 20
+                        on_press: root.confirmar_tickets();
