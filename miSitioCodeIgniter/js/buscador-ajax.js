@@ -3,7 +3,7 @@ $(document).ready(function(){
 		if($("#buscar").val().length >= 0){
 			$.ajax({
 				type: "post",
-				url: "http://localhost/miSitioCodeIgniter/index.php/provincias/search",
+				url: base_url + "index.php/provincias/search",
 				cache: false,				
 				data:'buscar='+$("#buscar").val(),
 				success: function(response){

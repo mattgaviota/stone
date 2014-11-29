@@ -116,4 +116,7 @@
 </div>
 <?php endforeach; ?>
 
+<script type="text/javascript">
+	base_url = '<?=base_url(); ?>';
+</script>
 <script src="<?= base_url('js/buscador-ajax.js')?>"></script>

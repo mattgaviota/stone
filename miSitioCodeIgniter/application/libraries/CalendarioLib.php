@@ -42,11 +42,10 @@ class CalendarioLib {
 				//Nos saltamos los días domingo y sabado.
 				if(date('l', $i) != 'Sunday' && date('l', $i) != 'Saturday'){
 					$data['fecha'] = date('Y-m-d',$i);
-					$data['tickets_disponibles'] = 0;
+					$data['tickets_totales'] = 700;
 					$data['tickets_vendidos'] = 0;
 					$data['id_calendario'] = $id;
 					$data['evento'] = 'Día Hábil';
-					$data['estado'] = 1;//1 = habilitado
 					$this->CI->db->set($data);
 	    			$this->CI->db->insert('dias');					
 	    			//echo date('d-m-Y',$i).'</br>';

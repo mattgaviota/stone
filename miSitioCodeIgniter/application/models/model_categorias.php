@@ -26,7 +26,7 @@ class Model_Categorias extends CI_Model {
 
     function findNombre($nombre){
         $this->db->where('nombre',$nombre);
-        return $this->db->get('categorias')->row();   
+        return $this->db->get('categorias')->row();
     }
 
     function insert($registro){

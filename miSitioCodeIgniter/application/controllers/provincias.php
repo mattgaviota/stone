@@ -15,7 +15,7 @@ class Provincias extends CI_Controller {
 		$data['contenido'] = 'provincias/index';
 		$data['titulo'] = 'Provincias';
 		$data['registros'] = $this->Model_Provincias->all();
-		$this->load->view('template', $data);
+		$this->load->view('template-admin', $data);
 	}
 
 	public function search(){
@@ -35,7 +35,7 @@ class Provincias extends CI_Controller {
 		$data['contenido'] = 'provincias/edit';
 		$data['titulo'] = 'Editar Provincias';
 		$data['registro'] = $this->Model_Provincias->find($id);
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function update(){
@@ -55,7 +55,7 @@ class Provincias extends CI_Controller {
 	public function create(){
 		$data['contenido'] = 'provincias/create';
 		$data['titulo'] = 'Agregar Provincias';
-		$this->load->view('template',$data);
+		$this->load->view('template-admin',$data);
 	}
 
 	public function insert(){

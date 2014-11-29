@@ -7,6 +7,9 @@
 	<div class="row">
 		<div class="col-md-7">
 			<?= $calendario; ?>
+			<script type="text/javascript">
+				base_url = '<?=base_url(); ?>';
+			</script>
 			<script src="<?= base_url('js/calendario-ajax.js'); ?>"></script>
 		</div>
 		<div class="col-md-5">
@@ -15,8 +18,8 @@
 					<h3 class="panel-title">Panel info</h3>
 				</div>
 				<div class="panel-body">
-					<form id="resultadoCalendario" action="http://localhost/miSitioCodeIgniter/index.php/calendario/actualizar" method="post">
-					</form>
+					<?= form_open('index.php/calendario/actualizar', array('id'=>'resultadoCalendario')); ?>
+					<?= form_close(); ?>
 					<br>
 					<span id="mensaje"></span>
 				</div>

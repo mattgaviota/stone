@@ -15,7 +15,7 @@ div.par-botones input[type="button"]{
 	width: 42%;
 	font-size: 1.8em;
 	border-radius: .5em;
-	background-color: #DD4814;
+	background-color: #3498db;
 	background-repeat: no-repeat;
 	background-position: center;
 	color: #FFF;
@@ -31,7 +31,15 @@ div.par-botones input[type="button"]:hover{
 	background-color: #FFF;
 	background-repeat: no-repeat;
 	background-position: center;
-	color: #DD4814;
+	color: #3498db;
+}
+
+fieldset{
+	border-width: .1em;
+	border-style: solid;
+	border-color: #3498db;
+	border-radius: .5em;
+	padding: .5em;
 }
 
 table.calendario{
@@ -64,7 +72,7 @@ table.calendario{
 }
 
 .calendario .dias td:hover{
-	background-color: #FFF;
+	/*background-color: #FFF;*/
 }
 
 .calendario .highlight{
@@ -73,7 +81,7 @@ table.calendario{
 }
 
 .calendario .dias td:nth-child(6){
-	background-color: #F3D4DA;
+	background-color: #FFB9C4;
 }
 
 .calendario .dias td:nth-child(7){

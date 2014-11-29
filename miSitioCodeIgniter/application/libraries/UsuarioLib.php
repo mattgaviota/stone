@@ -7,6 +7,9 @@ class UsuarioLib {
 		$this->CI = & get_instance();//Obtener la instancia del objeto por referencia.
 		$this->CI->load->model('Model_Usuarios');//Cargamos el modelo.
 		$this->CI->load->model('Model_Perfiles');
+		$this->CI->load->model('Model_Dias');
+		$this->CI->load->model('Model_Log_Usuarios');
+		$this->CI->load->model('Model_Tickets');
 	}
 
 	public function loginok($dni, $password){
@@ -55,9 +58,9 @@ class UsuarioLib {
 	}
 
 	public function my_validation($registro){
-		$this->CI->db->where('dni', $registro['dni']);
+		$this->CI->db->where('nombre', $registro['nombre']);
 		$query = $this->CI->db->get('usuarios');
-		if($query->num_rows() > 0){
+		if($query->num_rows() > 0 AND (!isset($registro['dni']) OR ($registro['dni'] != $query->row('dni')))){
 			return FALSE;
 		}else{
 			return TRUE;
@@ -90,6 +93,96 @@ class UsuarioLib {
 		$resultado = $this->generarPassword(4).md5($password).$this->generarPassword(4);
 		return $resultado;
 	}
+
+	public function cargar_log_usuario($dni, $fecha, $accion){
+		$query = $this->CI->Model_Log_Usuarios->find_accion($accion);
+		$registro['fecha'] = $fecha;
+		$registro['lugar'] = 1;//1 -> WEB, 2 -> Máquina
+		$registro['id_accion'] = $query->row('id');
+		$registro['dni'] = $dni;
+		$id_log =  $this->CI->Model_Log_Usuarios->add_log($registro);
+		return $id_log;
+	}
+
+	//Esta función realiza todos los pasos necesarios para la compra de tickets
+	public function realizar_compra($dni, $fecha_log, $dias, $year, $month){
+		//No dejar comprar a un usuarios dos tickets para el mismo día
+		foreach ($dias as $dia) {
+			//Verificamos si el día existe
+			$fecha = $year.'-'.$month.'-'.$dia;
+			$query_dias = $this->CI->Model_Dias->find($fecha);
+			if($query_dias->num_rows() == 1){
+				//Si la siguiente consulta arroja exactamente 0 filas, entonces permitimos comprar.
+				$query_tickets = $this->CI->Model_Dias->consultar_dia_con_ticket($fecha, $dni);
+				if($query_tickets->num_rows() == 0){
+					//Actualizamos la cantidad de tickets vendidos para el día en particular
+					$registro_dia = $query_dias->row();
+					$tickets_vendidos = $registro_dia->tickets_vendidos + 1;
+					$data = array('fecha'=>$fecha, 'tickets_vendidos'=>$tickets_vendidos);
+					$this->CI->Model_Dias->update($data);
+
+					//Cargamos el registro en la tabla log_usuarios
+					$id_log = $this->cargar_log_usuario($dni, $fecha_log,'comprar');
+					
+					$usuario = $this->CI->Model_Usuarios->find($dni);//Necesito el usuario para saber el importe que paga ese usuario
+
+					//Cargo el ticket para el día en cuestión
+					$registro['id_dia'] = $query_dias->row('id');//Cargo el id del día.
+					$registro['unidad'] = 0;//por defecto...reveer esto.
+					$registro['importe'] = $usuario->importe;//Este importe depende de acuerto a la beca que tiene el usuario
+					$registro['estado'] = 1;//0 -> anulado, 1 -> activo
+					$registro['id_log_usuario'] = $id_log;
+					$id_ticket = $this->CI->Model_Tickets->add_ticket($registro);
+
+					$registro = array();
+					$registro['id'] = $id_ticket;
+					$registro['barcode'] = $this->generar_barcode($id_ticket, 10);
+					$this->CI->Model_Tickets->update($registro);
+				}
+			}
+		}
+	}
+
+	public function generar_barcode($id_ticket, $num_ceros){
+		$barcode = strtotime(date('Y-m-d H:i:s'));
+		$num_ceros = $num_ceros - strlen($id_ticket);
+		for($i = 0; $i < $num_ceros; $i++){
+			$barcode = $barcode.'0';
+		}
+		$barcode = $barcode.$id_ticket;
+		return $barcode;
+	}
+
+	public function realizar_anulacion($id_ticket,$dni){
+		//Incrementar Saldo
+		$registro = $this->CI->Model_Usuarios->find($dni);
+		$data['dni'] = $dni;
+		$data['saldo'] = $registro->saldo + $registro->importe;
+		$this->CI->Model_Usuarios->update($data);
+		//Cambiar estado del ticket
+		$data = array();//Reinicio la variable data
+		$data['id'] = $id_ticket;
+		$data['estado'] = 0;
+		$this->CI->Model_Tickets->update($data);
+		//Registrar el nuevo log.
+		$fecha_log = date('Y/m/d H:i:s');
+		$this->cargar_log_usuario($dni, $fecha_log,'anular');
+	}
+
+	public function recordar_clave($dni, $email){
+		$query = $this->CI->Model_Usuarios->find_simple($dni);
+		if($query->num_rows() == 1){
+			//Cambiamos el mail en la base de datos por el que ingreso
+			$data['dni'] = $dni;
+			$data['email'] = $email;
+			$this->CI->Model_Usuarios->update($data);
+			//enviamos un mail con la nueva contraseña.
+			
+
+		}
+
+	}
+
 
 
 }

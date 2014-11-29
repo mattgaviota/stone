@@ -72,7 +72,7 @@ class Model_Calendario extends CI_Model{
     	$this->db->insert('calendario');
     }
 
-    function update($registro){
+    public function update($registro){
     	$this->db->set($registro);
     	$this->db->where('fecha',$registro['fecha']);
     	$this->db->update('dias');

@@ -32,12 +32,38 @@ if ( ! function_exists('my_mensaje_confirmacion'))
 	}
 }
 
+if ( ! function_exists('my_mensaje_error_upload'))
+{
+	function my_mensaje_upload($mostrar,$error)
+	{
+		$salida = "";
+		if($mostrar){
+			$salida = "<div class='alert alert-dismissable alert-danger'>";
+			$salida = $salida."<button type='button' class='close' data-dismiss='alert'>×</button>";
+			$salida = $salida."<h4>Mensaje de validación</h4>";
+			$salida = $salida."<strong>".$error."</strong>";
+			$salida = $salida."</div>";
+		}else{
+			$salida = "<div class='alert alert-dismissable alert-success'>";
+			$salida = $salida."<button type='button' class='close' data-dismiss='alert'>×</button>";
+			$salida = $salida."<h4>Mensaje de validación</h4>";
+			$salida = $salida."<strong>Se subió correctamente el archivo</strong>";
+			$salida = $salida."</div>";
+		}
+		return $salida;
+	}
+}
+
 if( ! function_exists('my_menu_principal'))
 {
 	function my_menu_principal()
-	{
-		$opciones = '<li>'.anchor('home/index', 'Inicio').'</li>';
-		
+	{	
+		$opciones = '';
+		if(get_instance()->session->userdata('perfil_nombre') === 'Alumno'){
+			$opciones = '<li>'.anchor('usuarios/alumno', 'Inicio').'</li>';	
+		}else{
+			$opciones = '<li>'.anchor('usuarios/admin', 'Inicio').'</li>';	
+		}
 		$opciones = $opciones.'<li>'.anchor('home/acerca_de', 'Acerca de').'</li>';
 		return $opciones;
 	}
@@ -49,9 +75,11 @@ if( ! function_exists('my_menu_principal_derecha'))
 	{
 		$opciones = '';
 		if(get_instance()->session->userdata('dni_usuario')){
+			$opciones = $opciones.'<li>'.anchor('home/cambiar_clave', 'Cambiar Clave').'</li>';
 			$opciones = $opciones.'<li>'.anchor('home/salir', 'Salir').'</li>';
 		}else{
 			$opciones = $opciones.'<li>'.anchor('home/ingreso', 'Ingreso').'</li>';
+			$opciones = $opciones.'<li>'.anchor('home/registro', 'Registrarse').'</li>';
 		}
 		return $opciones;
 	}
@@ -103,7 +131,6 @@ if( ! function_exists('my_menu_collapse'))
 					$contenido = $contenido.'<li>'.anchor($irA, $operacion->nombre).'</li>';
 				}
 				$contenido = $contenido.'</ul>';
-
 				$opciones = $opciones.'<div class="panel panel-default">';
 				$opciones = $opciones.'<div class="panel-heading">';
 				$opciones = $opciones.'<h4 class="panel-title">';
@@ -117,6 +144,32 @@ if( ! function_exists('my_menu_collapse'))
 
 		}
 		return $opciones;
+	}
+}
+
+if( ! function_exists('my_botonera_home'))
+{
+	function my_botonera_home()
+	{
+		$botones = "";
+		$botones = $botones."<div class='col-md-8 col-xs-12'>";
+		$botones = $botones.anchor('index.php/home/ingreso', ' Ingresar', array('class' => 'btn btn-primary glyphicon glyphicon-log-in'))."<span>&nbsp</span>";
+		$botones = $botones.anchor('index.php/home/registro', ' Registrarse', array('class' => 'btn btn-info glyphicon glyphicon-book'))."</div>";
+		return $botones;
+	}
+}
+
+if( ! function_exists('my_cambiar_clave_cancelar'))
+{
+	function my_cambiar_clave_cancelar()
+	{
+		$boton = "";
+		if(get_instance()->session->userdata('perfil_nombre') === 'Alumno'){
+			$boton = $boton.anchor('usuarios/alumno', ' Cancelar',array('class'=>'btn btn-default glyphicon glyphicon-remove'));
+		}else{
+			$boton = $boton.anchor('usuarios/admin', ' Cancelar',array('class'=>'btn btn-default glyphicon glyphicon-remove'));
+		}
+		return $boton;
 	}
 }
 
