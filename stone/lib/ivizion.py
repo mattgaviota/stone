@@ -6,7 +6,7 @@ from time import sleep
 
 class Ivizion():
 
-    def __init__(self, port='/dev/ttyS1', write_timeout=0.02, timeout=0.02):
+    def __init__(self, port='/dev/ttyS1', write_timeout=0, timeout=0.02):
         self.ser = Serial()
         self.ser.port = port
         self.ser.baudrate = 9600

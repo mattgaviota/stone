@@ -99,6 +99,7 @@ db.define_table('log_usuarios',
     Field('fecha', type='datetime'),
     Field('id_accion', type='reference acciones'),
     Field('lugar', type='integer'),
+    Field('descripcion', type='string', length=200),
     migrate=migrate)
 
 db.define_table('menu',
@@ -133,12 +134,17 @@ db.define_table('provincias',
 
 db.define_table('tickets',
     Field('id', type='id'),
-    Field('id_dia', type='reference dias', ondelete='SET DEFAULT', unique=True),
+    Field('id_dia', type='reference dias', ondelete='SET DEFAULT'),
     Field('importe', type='double'),
     Field('unidad', type='integer'),
     Field('estado', type='reference estados_tickets', ondelete='SET DEFAULT'),
-    Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT', unique=True),
     Field('barcode', type='string', length=20),
+    migrate=migrate)
+
+db.define_table('tickets_log_usuarios',
+    Field('id', type='id'),
+    Field('id_ticket', type='reference tickets', ondelete='SET DEFAULT'),
+    Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT'),
     migrate=migrate)
 
 db.define_table('tipos_operaciones',

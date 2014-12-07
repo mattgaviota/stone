@@ -73,7 +73,9 @@ def get_categoria_importe(id_categoria):
 def insert_usuario(data):
     '''Inserta un nuevo usuario con los datos de la variable data'''
     db.usuarios.insert(**data)
-    db.commit()
+    db.commit
+    user = {'dni': data['dni']}
+    insert_log(user, 'registrar')
 
 def get_usuario(dni):
     '''Retorna una fila de usuario en base a un dni dado'''
@@ -96,7 +98,7 @@ def update_pass(user, new_pass):
 def update_saldo(user, importe, band):
     '''
     Actualiza el saldo del user de acuerdo al importe del ticket.
-    Si band = 0 anulación => suma el saldo
+    Si band = 0 anulación/carga => suma el saldo
     Si band = 1 compra => resta el saldo
     '''
     if band:
@@ -120,17 +122,34 @@ def get_id_accion(accion):
     row = db(db.acciones.nombre_canonico == accion).select().first()
     return row.id
 
+def get_nombre_accion(id_accion):
+    row = db(db.acciones.id == id_accion).select().first()
+    return row.nombre
+
 #######################
 # Tabla log_usuarios  #
 #######################
-def insert_log(user, accion):
+def insert_log(user, accion, desc=''):
     '''inserta una entrada en el log, de acuerdo a la acción realizada'''
     data = {}
     data['id_accion'] = get_id_accion(accion)
     data['fecha'] = strftime('%Y-%m-%d %H:%M:%S', localtime())
     data['dni'] = user['dni']
     data['lugar'] = 2 # TODO
+    data['descripcion'] = get_nombre_accion(data['id_accion']) + '' + desc
     id_log = db.log_usuarios.insert(**data)
+    db.commit()
+    return id_log
+
+##############################
+# Tabla tickets_log_usuarios #
+##############################
+def insert_ticket_log(id_ticket, id_log_usuario):
+    '''inserta una entrada en el log de tickets'''
+    data = {}
+    data['id_ticket'] = id_ticket
+    data['id_log_usuario'] = id_log_usuario
+    id_log = db.tickets_log_usuarios.insert(**data)
     db.commit()
     return id_log
 
@@ -143,14 +162,15 @@ def get_tickets(user, cant=5, date=strftime('%Y-%m-%d', localtime()), state=0):
     inclusive, siempre que estos estén tengan el estado = state
     '''
     tickets = db((db.tickets.id_dia == db.dias.id) &
-                    (db.tickets.id_log_usuario == db.log_usuarios.id) &
-                    (db.log_usuarios.dni == db.usuarios.dni))
+            (db.tickets.id == db.tickets_log_usuarios.id_ticket) &
+            (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
+            (db.log_usuarios.dni == db.usuarios.dni))
     rows = tickets((db.usuarios.dni == user['dni']) &
-                    (db.dias.fecha >= date) &
-                    (db.tickets.estado != state)).select(db.dias.fecha,
-                    db.tickets.importe, db.tickets.estado, db.tickets.id,
-                    db.tickets.barcode, limitby=(0, cant),
-                    orderby=db.dias.fecha)
+                (db.dias.fecha >= date) &
+                (db.tickets.estado != state)).select(db.dias.fecha,
+                        db.tickets.importe, db.tickets.estado, db.tickets.id,
+                        db.tickets.barcode, limitby=(0, cant),
+                        orderby=db.dias.fecha)
     fila = {}
     lista = []
     for row in rows:
@@ -168,13 +188,14 @@ def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
     Retorna True si hay un ticket activo de ese usuario para ese día,
     en caso contrario retorna False.'''
     tickets = db((db.tickets.id_dia == db.dias.id) &
-                    (db.tickets.id_log_usuario == db.log_usuarios.id) &
-                    (db.log_usuarios.dni == db.usuarios.dni))
+            (db.tickets.id == db.tickets_log_usuarios.id_ticket) &
+            (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
+            (db.log_usuarios.dni == db.usuarios.dni))
     rows = tickets((db.usuarios.dni == user['dni']) &
-                    (db.dias.fecha == date) &
-                    (db.tickets.estado != state)).select(db.dias.fecha,
-                    db.tickets.importe, db.tickets.estado,
-                    db.tickets.id, db.tickets.barcode)
+            (db.dias.fecha == date) &
+            (db.tickets.estado != state)).select(db.dias.fecha,
+                            db.tickets.importe, db.tickets.estado,
+                            db.tickets.id, db.tickets.barcode)
     if rows:
         row = rows.first()
         fila = {}
@@ -189,10 +210,11 @@ def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
 
 def has_ticket(user, id_ticket, state=0):
     tickets = db((db.tickets.id_dia == db.dias.id) &
-                (db.tickets.id_log_usuario == db.log_usuarios.id) & 
-                (db.log_usuarios.dni == user['dni']))
+            (db.tickets.id == db.tickets_log_usuarios.id_ticket) &
+            (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
+            (db.log_usuarios.dni == user['dni']))
     rows = tickets((db.tickets.id == id_ticket) & 
-                    (db.tickets.estado != state)).select(db.dias.fecha)
+            (db.tickets.estado != state)).select(db.dias.fecha)
     if rows:
         row = rows.first()
         return row['fecha'].strftime('%d/%m/%Y')
@@ -220,9 +242,8 @@ def anular_ticket(id_ticket):
     db(db.tickets.id == id_ticket).update(estado = 0)
     db.commit()
 
-def insert_tickets(user, dias):
+def insert_tickets(user, dias, id_log):
     data = {}
-    data['id_log_usuario'] = insert_log(user, 'comprar')
     for dia in dias:
         data['id_dia'] = get_id_dia(dia)
         data['importe'] = get_categoria_importe(user['id_categoria'])
@@ -232,6 +253,7 @@ def insert_tickets(user, dias):
         data['barcode'] = fecha
         id_ticket = db.tickets.insert(**data)
         db.commit()
+        insert_ticket_log(id_ticket, id_log)
         id_ticket = str(id_ticket)
         codigo = fecha + '0' * (10 - len(id_ticket)) + id_ticket
         db(db.tickets.id == id_ticket).update(barcode = codigo)
