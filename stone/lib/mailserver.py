@@ -8,11 +8,9 @@ from email.MIMEText import MIMEText
 from email.Encoders import encode_base64
 
 
-def send_mail(name, mail_to, code):
+def send_mail(name, mail_to, code, data):
     '''Envia un email a la direccion mail_to con el name y el code de acuerdo
     un mensaje almacenado en la DB usando smtplib'''
-    data = controlador.get_configuracion()
-    
     mail_from = data['email']
     mail_pass = data['password']
     

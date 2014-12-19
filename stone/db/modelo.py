@@ -50,6 +50,9 @@ db.define_table('configuraciones',
     Field('asunto', type='string', length=100),
     Field('charset', type='string', length=20),
     Field('email_type', type='string', length=10),
+    Field('hora_anulacion', type='integer'),
+    Field('hora_compra', type='integer'),
+    Field('saldo_maximo', type='integer'),
     migrate=migrate)
 
 db.define_table('dias',
@@ -91,6 +94,14 @@ db.define_table('feriados',
     Field('tipo', type='integer'),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
+    migrate=migrate)
+
+db.define_table('imagenes',
+    Field('id', type='id'),
+    Field('ruta', type='string', length=300),
+    Field('created', type='datetime'),
+    Field('updated', type='datetime'),
+    Field('nombre', type='string', length=30),
     migrate=migrate)
 
 db.define_table('log_usuarios',
@@ -172,4 +183,13 @@ db.define_table('usuarios',
     Field('saldo', type='double', default=0),
     Field('ruta_foto', type='string', length=300),
     primarykey=['dni'],
+    migrate=migrate)
+
+db.define_table('videos',
+    Field('id', type='id'),
+    Field('ruta', type='string', length=300),
+    Field('created', type='datetime'),
+    Field('updated', type='datetime'),
+    Field('nombre', type='string', length=30),
+    Field('titulo', type='string', length=100),
     migrate=migrate)

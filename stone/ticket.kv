@@ -167,7 +167,7 @@
                     LabelU:
                         text: 'Registrarse'
             ButtonU:
-                on_press: app.stop()
+                on_press: root.manager.current = 'ayuda'
                 BoxLayout:
                     orientation: 'vertical'
                     pos: self.parent.pos
@@ -189,25 +189,25 @@
 
 <FormScreen>:
     canvas.before:
-        Color:
-            rgba: 0.92, 0.93, 0.94, 1
-        Rectangle:
-            # self here refers to the widget i.e BoxLayout
+        BorderImage:
+            source: 'images/misc/background.png'
             pos: self.pos
             size: self.size
     BoxLayout:
-        padding: 10
-        AsyncImage:
-            source: 'images/misc/comedor.jpg'
+        padding: 20
+        BoxLayout:
             size_hint: 0.2, 1
+            AsyncImage:
+                source: root.datos['aside']
         BoxLayout:
             orientation: 'vertical'
             size_hint: 0.8, 1
-            padding: 20
             BoxLayout:
                 canvas.before:
-                    BorderImage:
-                        source: 'images/misc/background.png'
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
@@ -278,32 +278,32 @@
                         text: 'Cancelar'
                         font_size: 20
                         on_press: root.cancel()
-            AsyncImage:
-                source: 'images/misc/comedor.jpg'
+            BoxLayout:
                 size_hint: 1, 0.4
-
+                AsyncImage:
+                    source: root.datos['footer']
 
 <LoginScreen>:
     canvas.before:
-        Color:
-            rgba: 0.92, 0.93, 0.94, 1
-        Rectangle:
-            # self here refers to the widget i.e BoxLayout
+        BorderImage:
+            source: 'images/misc/background.png'
             pos: self.pos
             size: self.size
     BoxLayout:
-        padding: 10
-        AsyncImage:
-            source: 'images/misc/comedor.jpg'
+        padding: 20
+        BoxLayout:
             size_hint: 0.2, 1
+            AsyncImage:
+                source: root.data['aside']
         BoxLayout:
             orientation: 'vertical'
             size_hint: 0.8, 1
-            padding: 20   
             BoxLayout:
                 canvas.before:
-                    BorderImage:
-                        source: 'images/misc/background.png'
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
@@ -345,23 +345,21 @@
                         text: 'Cancelar'
                         font_size: 20
                         on_press: root.cancel()
-            AsyncImage:
-                source: 'images/misc/comedor.jpg'
+            BoxLayout:
                 size_hint: 1, 0.4
-
+                AsyncImage:
+                    source: root.data['footer']
 
 <PasswordScreen>:
     canvas.before:
-        Color:
-            rgba: 0.92, 0.93, 0.94, 1
-        Rectangle:
-            # self here refers to the widget i.e BoxLayout
+        BorderImage:
+            source: 'images/misc/background.png'
             pos: self.pos
             size: self.size
     BoxLayout:
-        padding: 10
+        padding: 20
         AsyncImage:
-            source: 'images/misc/comedor.jpg'
+            source: root.data['aside']
             size_hint: 0.2, 1
         BoxLayout:
             orientation: 'vertical'
@@ -369,8 +367,10 @@
             padding: 20   
             BoxLayout:
                 canvas.before:
-                    BorderImage:
-                        source: 'images/misc/background.png'
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
@@ -423,9 +423,11 @@
                         text: 'Cancelar'
                         font_size: 20
                         on_press: root.cancel();
-            AsyncImage:
-                source: 'images/misc/comedor.jpg'
+            BoxLayout:
                 size_hint: 1, 0.4
+                AsyncImage:
+                    source: root.data['footer']
+                
 
 <MenuScreen>:
     canvas.before:
@@ -573,6 +575,7 @@
                         x: self.parent.x + self.parent.width - 70
                         size: 150, 150
                         allow_stretch: True
+
 <ProfileScreen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -822,7 +825,7 @@
                     size_hint: 1, 0.4
                 GridLayout:
                     cols: 2
-                    rows: 4
+                    rows: 3
                     padding: 40
                     spacing: 20
                     size_hint: 1, 0.2
@@ -839,11 +842,6 @@
                         text: 'Categoria'
                     LabelUA:
                         text: root.data['categoria']
-                    LabelUA:
-                        text: 'Saldo'
-                    LabelUA:
-                        id: saldo
-                        text: root.data['saldo']
                 BoxLayout:
                     size_hint: 1, 0.4
             BoxLayout:
@@ -869,12 +867,12 @@
                     padding: 60
                     spacing: 30
                     LabelU:
-                        font_size: 20
-                        text: 'Dinero cargado hasta el momento'
+                        font_size: 30
+                        text: 'Su SALDO es'
                     LabelU:
-                        id: total
-                        font_size: 20
-                        text: "$ 0.00"
+                        id: saldo
+                        font_size: 30
+                        text: root.data['saldo']
                     LabelU:
                         font_size: 30
                         text: 'Dinero ingresado'
@@ -979,11 +977,11 @@
                     padding: 60
                     spacing: 30
                     LabelU:
-                        font_size: 20
-                        text: 'Dinero faltante para realizar la compra'
+                        font_size: 30
+                        text: 'Dinero faltante para\r\n realizar la compra'
                     LabelU:
                         id: faltante
-                        font_size: 20
+                        font_size: 30
                         text: root.data['faltante']
                     LabelU:
                         font_size: 30
@@ -1225,3 +1223,92 @@
                         text: 'Comprar'
                         font_size: 20
                         on_press: root.confirmar_tickets();
+
+<AyudaScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Ayuda'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                LabelU:
+                    text: 'Temas'
+                    size_hint: 1, 0.1
+                GridLayout:
+                    cols: 1
+                    rows: 6
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.6
+                    ButtonU:
+                        text: 'Ingreso'
+                        on_press: root.play('ingreso')
+                    ButtonU:
+                        text: 'Registro'
+                        on_press: root.play('registro')
+                    ButtonU:
+                        text: 'Compra'
+                        on_press: root.play('compra')
+                    ButtonU:
+                        text: 'Carga'
+                        on_press: root.play('carga')
+                    ButtonU:
+                        text: 'Anulación'
+                        on_press: root.play('anulacion')
+                    ButtonU:
+                        text: 'Perfil'
+                        on_press: root.play('perfil')
+                BoxLayout:
+                    size_hint: 1, 0.2
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1                    
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    LabelU:
+                        id: titulo
+                        text: root.data['titulo']
+                Video:
+                    id: player
+                    size_hint: 1, 0.7
+                    source: ''
+                    allow_fullscreen: False
+                    thumbnail: 'images/home/ayuda.png'
+                BoxLayout:
+                    size_hint: 0.4, 0.1
+                    spacing: 150
+                    ButtonUback:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel();

@@ -133,7 +133,7 @@ class Printer():
         self.tup.send(bytearray(" \x09 Hora %s\r\n" % (hora)))
         self.tup.send(bytearray(self.to_int(['1b', '44', '20', '00']))) # Set Horizontal tab pag 48
         self.tup.send(bytearray("Nro ticket: %s" % (ticket))) 
-        self.tup.send(bytearray(" \x09 Terminal: %s\r\n" % (unidad)))
+        self.tup.send(bytearray(" \x09 Terminal: %s\r\n" % (unidad), 'cp850'))
         self.tup.send(bytearray("---------------------------------------------\r\n\r\n"))
         # end Header
         # Body

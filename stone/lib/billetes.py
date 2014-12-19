@@ -16,8 +16,7 @@ class Manager():
 
     def __init__(self):
         self.ivizion = Ivizion()
-        if not self.ivizion.is_connected():
-            self.ivizion.connect()
+        self.ivizion.connect()
         self.message = Message()
         self.response = Response()
 
@@ -49,12 +48,17 @@ class Manager():
 
 def init():
     manager = Manager()
-    sleep(0.2)
-    if manager.ivizion.is_connected():
+    count = 0
+    while manager.ivizion.is_connected():
         resp = manager.get_status()
         if resp in ('40', '41', '42'):
             manager.send_command()
             sleep(3)
+            return
+        else:
+            count += 1
+            if count >= 200:
+                return
 
 
 def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
@@ -67,7 +71,7 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
         status = cola_estado.get(False)
     except Empty:
         status = None
-    while manager.ivizion.is_connected():
+    while True:
         if resp in ('1b', '11', '1a'):
             if status['security'] == NOT_SENT:
                 status['security'] = SENDING
@@ -96,21 +100,18 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
                 if stackbill == 1:
                     manager.send_command(cmd=STACK_1) # stack 1
                     total += valor
-                    sleep(0.1)
                     timeout = 10
                     stackbill = 0
                     valor = 0
                 elif stackbill == 2:
                     manager.send_command(cmd=STACK_2) # stack 2
                     total += valor
-                    sleep(0.1)
                     timeout = 10
                     stackbill = 0
                     valor = 0
                 elif stackbill == 0:
                     cola_billetes.put(0)
                     manager.send_command(cmd=RETURN) # return bill
-                    sleep(0.1)
                     timeout = 10
                     valor = 0
                 else:
@@ -131,7 +132,6 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
         else:
             if total >= a_ingresar:
                 manager.send_command(LNG_6, INHIBIT, '01', '')
-                manager.ivizion.disconnect()
                 return
             else:
                 try:
@@ -139,18 +139,21 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
                 except Empty:
                     stop_data = False
                 if stop_data:
+                    manager.send_command(cmd=RETURN)
                     manager.send_command(LNG_6, INHIBIT, '01', '')
-                    manager.ivizion.disconnect()
                     return
                 else:
                     try:
                         band = cola_bool.get(False)
                     except Empty:
                         band = 0
-                    if band:
+                    if band == 1:
                         stackbill = 1
+                        timeout = 0
+                    elif band == 2:
+                        stackbill = 0
                         timeout = 0
                     else:
                         resp = manager.get_status()
         resp = manager.get_status()
-        sleep(0.2)
+        sleep(0.1)

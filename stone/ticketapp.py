@@ -7,6 +7,8 @@ from threading import Thread, Event
 from Queue import Queue, Empty
 from datetime import datetime
 from time import mktime, localtime, sleep
+import json
+from os import path
 # intra-packages imports
 from db import controlador
 from lib import mailserver, session, utils, impresora, billetes
@@ -23,7 +25,11 @@ from kivy.clock import Clock, mainthread
 
 #session
 user_session = session.Session()
-
+# Cargamos el archivo de configuración
+file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
+                'stone/config/parametros.json')
+with open(file_path) as data_file:    
+    parametros = json.load(data_file)
 
 class ConfirmPopup(GridLayout):
     text = StringProperty()
@@ -48,6 +54,10 @@ class PasswordScreen(Screen):
         self.scr_accept = screen_accept
         self.scr_cancel = screen_cancel
         self.mensaje = StringProperty("")
+        self.data = {}
+        self.data['fondo'] = controlador.get_images('fondo')
+        self.data['aside'] = controlador.get_images('aside')
+        self.data['footer'] = controlador.get_images('footer')
         self.name = name
         Screen.__init__(self)
 
@@ -111,8 +121,8 @@ class PasswordScreen(Screen):
             if pass_db == old_pass:
                 tmp = utils.ofuscar_pass(new_pass)
                 controlador.update_pass(user, tmp)
-                if user['estado'] != 1:
-                    controlador.update_estado(user, 1)
+                if user['estado'] != 2: # si no está activo se lo activa
+                    controlador.update_estado(user, 2)
                 return 1
             else:
                 return 2
@@ -249,7 +259,6 @@ class Compra1Screen(Screen):
                     self.manager.current = 'compra_3'
                 else:
                     faltante = (len(dias) * self.importe) - self.user['saldo']
-                    print "faltante %d" % (faltante)
                     self.manager.add_widget(Compra2Screen(dias, faltante,
                                         self.user['saldo'], name='compra_2'))
                     self.manager.current = 'compra_2' 
@@ -277,6 +286,7 @@ class Compra2Screen(Screen):
         self.stop = Event()
         self.faltante = faltante
         self.cargar_datos()
+        self.cargar_threads()
         self.mensaje = StringProperty("")
         Screen.__init__(self)
 
@@ -305,7 +315,7 @@ class Compra2Screen(Screen):
                     self.update_ingreso(str(self.valor), False)
                 else:
                     self.update_ingreso("", True)
-            sleep(0.2)
+            sleep(0.1)
 
     def cargar_billetes(self):
         Thread(target=self.stack, args=(self.cola_bool,)).start()
@@ -328,7 +338,8 @@ class Compra2Screen(Screen):
         siguiente pantalla.
         '''
         id_log = controlador.insert_log(self.user, 'comprar')
-        controlador.insert_tickets(self.user, self.dias, id_log)
+        controlador.insert_tickets(self.user, self.dias, id_log,
+                                                parametros['terminal'])
         controlador.update_saldo(self.user, self.saldo, 1)
         controlador.update_saldo(self.user, excedente, 0)
         self.update_datos()
@@ -348,7 +359,7 @@ class Compra2Screen(Screen):
             dni = self.data['dni'].decode('utf8')
             cat = self.data['categoria'].decode('utf8')
             fac = self.data['facultad'].decode('utf8')
-            unit = '03' # chequear db TODO
+            unit = parametros['terminal'].decode('utf8')
             ticket = str(id_ticket)
             print_thread = Thread(target=impresora.imprimir_ticket_alumno,
                     args=(nom, dni, fac, cat, code, unit, ticket, fecha))
@@ -374,7 +385,9 @@ class Compra2Screen(Screen):
         self.total = importe * cantidad
         self.saldo = self.user['saldo']
         self.data['faltante'] = str(self.faltante)
-        # Threads & Queue
+
+    def cargar_threads(self):
+        '''Carga los hilos que manejan la maquina verificadora de billetes.'''
         self.cola_bool = Queue()
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
@@ -388,14 +401,14 @@ class Compra2Screen(Screen):
         self.cola_estado.put(status)
         bill_thread = Thread(target=billetes.pool, args=(self.cola_billetes,
                                 self.cola_bool, self.cola_stop, self.faltante,
-                                self.cola_estado, 10))
+                                self.cola_estado, 8))
         bill_thread.daemon = True
         bill_thread.start()
 
     def cancel(self):
         '''Vuelve a una pantalla anterior'''
         self.stop.set()
-        self.cola_stop.put(self.stop.is_set())
+        self.cola_stop.put(True)
         self.manager.current = 'compra_1'
         self.update_ingreso("", True)
         self.manager.remove_widget(self.manager.get_screen('compra_2'))
@@ -479,7 +492,7 @@ class Compra3Screen(Screen):
             dni = self.data['dni'].decode('utf8')
             cat = self.data['categoria'].decode('utf8')
             fac = self.data['facultad'].decode('utf8')
-            unit = '03' # chequear db TODO
+            unit = parametros['terminal'] # leemos del archivo de configuración
             ticket = str(id_ticket)
             print_thread = Thread(target=impresora.imprimir_ticket_alumno,
                     args=(nom, dni, fac, cat, code, unit, ticket, fecha))
@@ -492,7 +505,8 @@ class Compra3Screen(Screen):
         siguiente pantalla.
         '''
         id_log = controlador.insert_log(self.user, 'comprar')
-        controlador.insert_tickets(self.user, self.dias, id_log)
+        controlador.insert_tickets(self.user, self.dias, id_log,
+                                                    parametros['terminal'])
         controlador.update_saldo(self.user, self.total, 1)
         self.update_datos()
         self.imprimir_todos()
@@ -506,6 +520,31 @@ class Compra3Screen(Screen):
         '''Vuelve a una pantalla anterior'''
         self.manager.current = 'compra_1'
         self.manager.remove_widget(self.manager.get_screen('compra_3'))
+
+
+class AyudaScreen(Screen):
+
+    def __init__(self, name=''):
+        '''Pantalla para mostrar la ayuda'''
+        self.data = {}
+        self.name = name
+        self.cargar_datos()
+        Screen.__init__(self)
+
+    def cargar_datos(self):
+        '''Carga los datos del usuario dentro de la pantalla de compra'''
+        self.data['titulo'] = 'Ningún video cargado'
+        self.playlist = controlador.get_videos()
+
+    def play(self, source):
+        self.ids.player.play = False
+        self.ids.titulo.text = self.playlist[source][1]
+        self.ids.player.source = self.playlist[source][0]
+        self.ids.player.play = True
+
+    def cancel(self):
+        '''Vuelve a una pantalla anterior'''
+        self.manager.current = 'splash'
 
 
 class ProfileScreen(Screen):
@@ -628,8 +667,15 @@ class AnularScreen(Screen):
                 WarningPopup().open()
             else:
                 fecha = controlador.has_ticket(self.user, self.ids.id_ticket.text)
+                hora_max = controlador.get_hora_anulacion()
                 if fecha:
-                    return fecha
+                    if self.check_hora(fecha, hora_max):
+                        return fecha
+                    else:
+                        self.ids.id_ticket.text = ""
+                        self.ids.id_ticket.focus = True
+                        self.mensaje = "No puede anular un ticket\r\n despues de las %d hs." % (hora_max)
+                        WarningPopup().open()
                 else:
                     self.ids.id_ticket.text = ""
                     self.ids.id_ticket.focus = True
@@ -666,6 +712,9 @@ class AnularScreen(Screen):
         controlador.anular_ticket(id_ticket)
         id_log = controlador.insert_log(self.user, 'anular')
         controlador.insert_ticket_log(id_ticket, id_log)
+        importe = controlador.get_importe_ticket(id_ticket)
+        controlador.update_saldo(self.user, importe, 0)
+        self.update_datos()
 
     def update_datos(self):
         '''Actualiza los datos de la pantalla para plasmar cambios'''
@@ -674,7 +723,7 @@ class AnularScreen(Screen):
         self.ids.saldo.text = self.data['saldo']
         self.ids.nombre.text = self.data['nombre']
 
-    def check_hora(self, fecha, hora=11):
+    def check_hora(self, fecha, hora):
         '''Verifica que no se pueda anular un ticket despues de la hora'''
         ahora = datetime.now()
         fecha = datetime.strptime(fecha, '%d/%m/%Y')
@@ -711,7 +760,9 @@ class CargaScreen(Screen):
         self.name = name
         self.stop = Event()
         self.cargar_datos()
+        self.cargar_threads()
         self.total = 0
+        
         self.mensaje = StringProperty("")
         Screen.__init__(self)
 
@@ -737,29 +788,33 @@ class CargaScreen(Screen):
                 return
             else:
                 if self.valor:
-                    self.update_ingreso(str(self.valor), False)
+                    if self.user['saldo'] + self.valor > 100:
+                        Thread(target=self.stack,
+                                    args=(self.cola_bool, 2)).start()
+                        self.mensaje = "No puede cargar mas de $ 100"
+                        WarningPopup().open()
+                    else:
+                        self.update_ingreso(str(self.valor), False)
                 else:
                     self.update_ingreso("", True)
-            sleep(0.2)
+            sleep(0.1)
 
     def cargar_billetes(self):
-        Thread(target=self.stack, args=(self.cola_bool,)).start()
-        sleep(0.5)
+        Thread(target=self.stack, args=(self.cola_bool, 1)).start()
+        sleep(1)
         self.update_ingreso("", True)
-        self.cargar_saldo(self.valor)
+        self.cargar_saldo()
 
-    def cargar_saldo(self, excedente):
+    def cargar_saldo(self):
         '''
         Realiza la inserción de los tickets en la db y cambia a la
         siguiente pantalla.
         '''
         controlador.update_saldo(self.user, self.valor, 0)
-        self.total += self.valor
-        self.ids.total.text = "$ %.2f" %(self.total)
         self.update_datos()
 
-    def stack(self, cola_bool):
-        cola_bool.put(1)
+    def stack(self, cola_bool, value):
+        cola_bool.put(value)
 
     def cargar_datos(self):
         '''
@@ -773,7 +828,9 @@ class CargaScreen(Screen):
         self.data['categoria'] = controlador.get_categoria_nombre(self.user['id_categoria'])
         self.data['facultad'] = controlador.get_facultad(self.user['id_facultad'])
         self.data['ruta_foto'] = self.user['ruta_foto']
-        # Threads & Queue
+
+    def cargar_threads(self):
+        '''Carga los hilos que manejan la maquina verificadora de billetes.'''
         self.cola_bool = Queue()
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
@@ -782,13 +839,14 @@ class CargaScreen(Screen):
                                     args=(self.cola_billetes,))
         get_bill_thread.daemon = True
         get_bill_thread.start()
+        saldo_maximo = controlador.get_saldo_maximo()
         status = {'security': 0, 'enable': 0, 'communication': 0, 'inhibit': 0}
         self.cola_estado = Queue()
         self.cola_estado.put(status)
         bill_thread = Thread(target=billetes.pool, args=(self.cola_billetes,
-                                self.cola_bool,
-                                self.cola_stop, 100 - self.user['saldo'],
-                                self.cola_estado, 10))
+                                self.cola_bool, self.cola_stop,
+                                saldo_maximo - self.user['saldo'],
+                                self.cola_estado, 8))
         bill_thread.daemon = True
         bill_thread.start()
 
@@ -797,7 +855,7 @@ class CargaScreen(Screen):
         if self.total:
             controlador.insert_log(self.user, 'cargar', str(self.total))
         self.stop.set()
-        self.cola_stop.put(self.stop.is_set())
+        self.cola_stop.put(True)
         self.manager.current = 'menu'
         self.manager.remove_widget(self.manager.get_screen('carga'))
 
@@ -809,18 +867,27 @@ class SplashScreen(Screen):
 
 class FormScreen(Screen):
     '''Pantalla de registro del sistema'''
-    facultades = controlador.get_all_facultades()
-    provincias = controlador.get_all_provincias()
-    facultades_nombre = sorted(facultades.keys())
-    provincias_nombre = sorted(provincias.keys())
+
+    def __init__(self, name=''):
+        self.facultades = controlador.get_all_facultades()
+        self.provincias = controlador.get_all_provincias()
+        self.facultades_nombre = sorted(self.facultades.keys())
+        self.provincias_nombre = sorted(self.provincias.keys())
+        self.datos = {}
+        self.datos['fondo'] = controlador.get_images('fondo')
+        self.datos['aside'] = controlador.get_images('aside')
+        self.datos['footer'] = controlador.get_images('footer')
+        self.mensaje = StringProperty("")
+        self.name = name
+        Screen.__init__(self)
     
     def mailvalidator(self, email):
         '''Valida que el mail esté bien formado'''
-        if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$", email) != None:
+        if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
+                                                                email) != None:
             return 1
         return 0
 
-    mensaje = StringProperty("")
     def validar(self):
         '''Valida las entradas de texto y manda a registrar al usuario
         si todo esta bien.'''
@@ -891,14 +958,16 @@ class FormScreen(Screen):
             data['id_provincia'] = self.provincias[self.ids.provincia.text]
             password = utils.generar_pass()
             data['password'] = utils.ofuscar_pass(password)
-            data['estado'] = 2
+            data['estado'] = 1 # registrado, no confirmado
             data['id_perfil'] = controlador.get_perfil('Alumno')
             data['id_categoria'] = controlador.get_categoria_id('Regular')
             # insertamos el usuario en la db
-            db_thread = Thread(target=controlador.insert_usuario, args=(data,))
-            db_thread.start()
+            controlador.insert_usuario(data)
             # Enviamos el mail de confirmación
-            mail_thread = Thread(target=mailserver.send_mail, args=(data['nombre'], data['email'], password))
+            datos_mail = controlador.get_configuracion()
+            mail_thread = Thread(target=mailserver.send_mail,
+                            args=(data['nombre'], data['email'],
+                                    password, datos_mail))
             mail_thread.start()
             self.mensaje = "Gracias por registrarte!!\r\n\r\n Comprueba tu mail\r\n para completar el registro"
             WarningPopup().open()
@@ -913,16 +982,25 @@ class FormScreen(Screen):
 
 class LoginScreen(Screen):
     '''Pantalla para ingresar al sistema'''
-    mensaje = StringProperty("")
+
+    def __init__(self, name=''):
+        self.name = name
+        self.mensaje = StringProperty("")
+        self.data = {}
+        self.data['fondo'] = controlador.get_images('fondo')
+        self.data['aside'] = controlador.get_images('aside')
+        self.data['footer'] = controlador.get_images('footer')
+        Screen.__init__(self)
+
     def validar(self):
         '''Valida las entradas y chequea en la base de datos por el par
         dni - password'''
         if self.ids.dni.text:
             if not self.ids.dni.text.isdigit():
-                self.mensaje = u"Su DNI solo puede contenter números"
-                WarningPopup().open()
                 self.ids.dni.text = ""
                 self.ids.dni.focus = True
+                self.mensaje = u"Su DNI solo puede contenter números"
+                WarningPopup().open()
             elif not self.ids.passw.text:
                 self.mensaje = u"Su PASSWORD no puede estar vacío"
                 self.ids.passw.focus = True
@@ -932,16 +1010,17 @@ class LoginScreen(Screen):
                 password = self.ids.passw.text
                 login = self.validar_login(dni, password)
                 if login:
-                    if login == 1:
+                    if login == 2:
                         self.clear()
                         user_session.init(controlador.get_usuario(dni))
                         user = user_session.get_user()
                         controlador.insert_log(user, 'ingresar')
                         self.manager.current = 'menu'
-                    elif login == 2:
+                    elif login == 1:
                         self.clear()
                         user_session.init(controlador.get_usuario(dni))
-                        self.manager.add_widget(PasswordScreen('splash', 'splash', 'pass'))
+                        self.manager.add_widget(PasswordScreen('splash',
+                                                            'splash', 'pass'))
                         self.manager.current = 'pass'
                     else:
                         self.clear()
@@ -966,16 +1045,16 @@ class LoginScreen(Screen):
         '''Revisa el password de acuerdo al dni ingresado y devuelve los
         siguientes estados:
             0: No existe el dni o no coincide con el password
-            1: Existe el usuario y está activo(ingresar)
-            2: Existe el usuario pero no confirmó su registro(cambiar pass)
-            3: Existe el usuario pero esta inactivo(cancelar ingreso)'''
+            1: Existe el usuario pero no confirmó su registro(cambiar pass)
+            2: Existe el usuario y está registrado(ingresar)
+            3: Existe el usuario pero esta suspendido(cancelar ingreso)'''
         user = controlador.get_usuario(dni)
         if user:
             if self.comparar_pass(password, user):
-                if user['estado'] == 2: # estado wait / login & cambiar pass
-                    return 2
-                elif user['estado'] == 1: # estado activo / login & menu
+                if user['estado'] == 1: # estado wait / login & cambiar pass
                     return 1
+                elif user['estado'] == 2: # estado activo / login & menu
+                    return 2
                 else: # estado inactivo / cancel
                     return 3
             else:
@@ -1000,15 +1079,18 @@ class TicketApp(App):
 
     def build(self):
         # Creamos el screen manager con la WipeTransition
-        Thread(target=billetes.init).start()
         sm = ScreenManager(transition=WipeTransition())
         # Agregamos las pantallas fijas del sistema
         sm.add_widget(SplashScreen(name='splash'))
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(FormScreen(name='formulario'))
         sm.add_widget(LoginScreen(name='login'))
+        sm.add_widget(AyudaScreen(name='ayuda'))
         return sm
 
 
 if __name__ == '__main__':
+    init_thread = Thread(target=billetes.init)
+    init_thread.daemon = True
+    init_thread.start()
     TicketApp().run()

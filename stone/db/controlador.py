@@ -136,7 +136,7 @@ def insert_log(user, accion, desc=''):
     data['fecha'] = strftime('%Y-%m-%d %H:%M:%S', localtime())
     data['dni'] = user['dni']
     data['lugar'] = 2 # TODO
-    data['descripcion'] = get_nombre_accion(data['id_accion']) + '' + desc
+    data['descripcion'] = "%s %s" %(get_nombre_accion(data['id_accion']), desc)
     id_log = db.log_usuarios.insert(**data)
     db.commit()
     return id_log
@@ -235,6 +235,7 @@ def get_importe_ticket(id_ticket):
 def anular_ticket(id_ticket):
     '''
     Anula el ticket a traves de su id actualizando el estado.
+    estado = 3 -> consumido
     estado = 2 -> impreso
     estado = 1 -> activo
     estado = 0 -> anulado
@@ -242,12 +243,12 @@ def anular_ticket(id_ticket):
     db(db.tickets.id == id_ticket).update(estado = 0)
     db.commit()
 
-def insert_tickets(user, dias, id_log):
+def insert_tickets(user, dias, id_log, unit):
     data = {}
     for dia in dias:
         data['id_dia'] = get_id_dia(dia)
         data['importe'] = get_categoria_importe(user['id_categoria'])
-        data['unidad'] = 5 # terminal o web
+        data['unidad'] = int(unit) # terminal o web
         data['estado'] = 2 # activo e impreso
         fecha = str(int(time()))
         data['barcode'] = fecha
@@ -291,3 +292,32 @@ def get_configuracion():
     '''Retorna la fila de configuracion'''
     row = db().select(db.configuraciones.ALL).first()
     return row
+
+def get_hora_anulacion():
+    row = get_configuracion()
+    return row['hora_anulacion']
+
+def get_hora_compra():
+    row = get_configuracion()
+    return row['hora_compra']
+
+def get_saldo_maximo():
+    row = get_configuracion()
+    return row['saldo_maximo']
+
+##################
+# Tabla imagenes #
+##################
+def get_images(nombre):
+    row = db(db.imagenes.nombre == nombre).select(db.imagenes.ruta).first()
+    return row.ruta
+
+##################
+# Tabla videos   #
+##################
+def get_videos():
+    rows = db().select(db.videos.ruta, db.videos.nombre, db.videos.titulo)
+    diccionario = {}
+    for row in rows:
+        diccionario[row['nombre']] = [row['ruta'], row['titulo']]
+    return diccionario
