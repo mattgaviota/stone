@@ -3,10 +3,12 @@
 <LabelU@Label>:
     font_name: 'fonts/Ubuntu-R.ttf'
     font_size: '30sp'
+    color: 0.2, 0.2, 0.2, 1
 
 <LabelUA@Label>:
     font_name: 'fonts/Ubuntu-R.ttf'
     font_size: '15sp'
+    color: 0.2, 0.2, 0.2, 1
     size_hint_y: None
     text_size: self.width, None
     height: self.texture_size[1]
@@ -48,7 +50,7 @@
         orientation: 'vertical'
         LabelU:
             font_size: '20sp'
-            text: app.root.current_screen.mensaje
+            text: root.mensaje
             size_hint: 1, 0.8
         ButtonU:
             text: 'Aceptar'
@@ -60,13 +62,14 @@
     background_normal: 'images/buttons/normalbtn.png'
     background_down: 'images/buttons/downbtn.png'
     border: 20, 20, 20, 20
-
+    color: 0.2, 0.2, 0.2, 1
 
 <ButtonUok@Button>:
     font_name: 'fonts/Ubuntu-R.ttf'
     background_normal: 'images/buttons/normalbtnok.png'
     background_down: 'images/buttons/downbtnok.png'
     border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
     Image:
         source: 'images/buttons/accept.png'
         y: self.parent.y + self.parent.height - 38
@@ -79,6 +82,7 @@
     background_normal: 'images/buttons/normalbtnok.png'
     background_down: 'images/buttons/downbtnok.png'
     border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
     Image:
         source: 'images/buttons/next.png'
         y: self.parent.y + self.parent.height - 38
@@ -91,6 +95,7 @@
     background_normal: 'images/buttons/normalbtn.png'
     background_down: 'images/buttons/downbtn.png'
     border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
     Image:
         source: 'images/buttons/back.png'
         y: self.parent.y + self.parent.height - 38
@@ -103,6 +108,7 @@
     background_normal: 'images/buttons/normalbtncancel.png'
     background_down: 'images/buttons/downbtncancel.png'
     border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
     Image:
         source: 'images/buttons/cancel.png'
         y: self.parent.y + self.parent.height - 38
@@ -115,8 +121,340 @@
     background_normal: 'images/buttons/normalbtncancel.png'
     background_down: 'images/buttons/downbtncancel.png'
     border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
 
+# TODO ServiceScreen
+<ServiceScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Servicios'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1 
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 175
+            spacing: 10
+            size_hint: 1, 0.8
+            ButtonU:
+                on_press: root.imprimir()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/printer.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Ticket de Prueba'
+            ButtonU:
+                on_press: root.confirmacion()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/billetes.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Retiro de Dinero'
+            ButtonU:
+                on_press: root.informacion()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/info.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Información'
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True
 
+# TODO InfoScreen
+<InfoScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Información'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1 
+        BoxLayout:
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.93, 0.94, 0.3
+                Rectangle:
+                    # self here refers to the widget i.e BoxLayout
+                    pos: self.pos
+                    size: self.size
+            size_hint: 1, 0.7
+            GridLayout:
+                cols:2
+                rows:4
+                padding: 30
+                spacing: 10
+                size_hint: 0.7, 0.4
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Ubicación"
+                LabelU:
+                    font_size: '20sp'
+                    id: ubicacion
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Unidad"
+                LabelU:
+                    font_size: '20sp'
+                    id: unidad
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Hora de Inicio"
+                LabelU:
+                    font_size: '20sp'
+                    id: hora_inicio
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Hora de Cierre"
+                LabelU:
+                    font_size: '20sp'
+                    id: hora_cierre
+            LabelU:
+                text: "Hardware"
+                font_size: '40sp'
+                size_hint: 0.7, 0.1
+            GridLayout:
+                cols:3
+                rows:3
+                padding: 20
+                spacing: 20
+                size_hint: 0.7, 0.5
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Conexion"
+                LabelUA:
+                    font_size: '20sp'
+                    id: conexion
+                ButtonU:
+                    text: "Probar"
+                    id: try_conexion
+                    on_press: root.try_conexion()
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Papel"
+                LabelUA:
+                    font_size: '20sp'
+                    id: papel
+                ButtonU:
+                    text: "Probar"
+                    id: try_papel
+                    on_press: root.try_papel()
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Billetes\r\n"
+                AsyncImage:
+                    id: ingresado
+                    source: ""
+                ButtonU:
+                    text: "Probar"
+                    id: try_billetes
+                    on_press: root.try_billetes()
+        BoxLayout:
+            size_hint: 1, 0.1
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True
+
+# TODO MainScreen
+<MainScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 20
+        BoxLayout:
+            size_hint: 0.2, 1
+            AsyncImage:
+                source: root.data['aside']
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.8, 1
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 80
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'Ingresar al Menu de Control'
+                    valign: 'top'
+                    font_size: '40sp'
+                    size_hint: 1, 0.1
+                    padding: (40, 30)
+                GridLayout:
+                    cols: 2
+                    rows: 2
+                    padding: 40
+                    spacing: 10
+                    size_hint: 1, 0.7
+                    LabelU:
+                        text: 'DNI'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: dni
+                        hint_text: 'DNI sin puntos'
+                    LabelU:
+                        text: 'Password'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: passw
+                        hint_text: 'Tu password'
+                        password: True
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Aceptar'
+                        font_size: 20
+                        on_press: root.validar()
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel()
+            BoxLayout:
+                size_hint: 1, 0.4
+                AsyncImage:
+                    source: root.data['footer']
+
+# TODO ControlScreen
+<ControlScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: '\rSistema de Tickets del Comedor Universitario\r\n Pantalla de Control'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1 
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 200
+            spacing: 10
+            ButtonU:
+                on_press: root.iniciar()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/iniciar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Iniciar'
+            ButtonU:
+                on_press: root.servicios()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/servicios.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Servicios'
+            ButtonU:
+                on_press: root.confirmacion()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/apagar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Apagar'
+
+# TODO SplashScreen
 <SplashScreen>:
     canvas.before:
         BorderImage:
@@ -137,7 +475,7 @@
             padding: 200
             spacing: 10
             ButtonU:
-                on_press: root.manager.current = 'login'
+                on_press: root.login()
                 BoxLayout:
                     orientation: 'vertical'
                     pos: self.parent.pos
@@ -152,7 +490,7 @@
                     LabelU:
                         text: 'Ingresar'
             ButtonU:
-                on_press: root.manager.current = 'formulario'
+                on_press: root.registro()
                 BoxLayout:
                     orientation: 'vertical'
                     pos: self.parent.pos
@@ -167,7 +505,7 @@
                     LabelU:
                         text: 'Registrarse'
             ButtonU:
-                on_press: root.manager.current = 'ayuda'
+                on_press: # root.manager.current = 'ayuda'
                 BoxLayout:
                     orientation: 'vertical'
                     pos: self.parent.pos
@@ -181,12 +519,18 @@
                         allow_stretch: True
                     LabelU:
                         text: 'Ayuda'
+        LabelU:
+            id: disponibles
+            text: ''
+            font_size: '40sp'
+            size_hint: 1, 0.1 
 
 
 <Input@TextInput>:
     multiline: False
     font_name: 'fonts/Ubuntu-R.ttf'
 
+# TODO FormScreen
 <FormScreen>:
     canvas.before:
         BorderImage:
@@ -283,6 +627,7 @@
                 AsyncImage:
                     source: root.datos['footer']
 
+# TODO LoginScreen
 <LoginScreen>:
     canvas.before:
         BorderImage:
@@ -350,6 +695,7 @@
                 AsyncImage:
                     source: root.data['footer']
 
+# TODO PasswordScreen
 <PasswordScreen>:
     canvas.before:
         BorderImage:
@@ -357,14 +703,17 @@
             pos: self.pos
             size: self.size
     BoxLayout:
-        padding: 20
-        AsyncImage:
-            source: root.data['aside']
-            size_hint: 0.2, 1
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Cambio de Contraseña'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
         BoxLayout:
-            orientation: 'vertical'
-            size_hint: 0.8, 1
-            padding: 20   
+            size_hint: 1, 0.9
+            spacing: 30
             BoxLayout:
                 canvas.before:
                     Color:
@@ -374,20 +723,54 @@
                         pos: self.pos
                         size: self.size
                 orientation: 'vertical'
-                padding: 80
-                size_hint: 1, 0.6
-                LabelU:
-                    text: 'Cambiar Password'
-                    valign: 'top'
-                    font_size: '40sp'
-                    size_hint: 1, 0.1
-                    padding: (40, 30)
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: root.data['ruta_foto']
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 4
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Facultad'
+                    LabelUA:
+                        text: root.data['facultad']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        id: saldo
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1
                 GridLayout:
                     cols: 2
                     rows: 3
                     padding: 20
                     spacing: 10
-                    size_hint: 1, 0.7
+                    size_hint: 1, 0.4
                     LabelU:
                         text: 'Password actual'
                         size_hint: 0.2, 0.4
@@ -413,7 +796,9 @@
                         password: True
                         size_hint: 0.2, 0.6
                 BoxLayout:
-                    size_hint: 1, 0.2
+                    size_hint: 1, 0.5
+                BoxLayout:
+                    size_hint: 1, 0.1
                     spacing: 150
                     ButtonUok:
                         text: 'Aceptar'
@@ -423,12 +808,8 @@
                         text: 'Cancelar'
                         font_size: 20
                         on_press: root.cancel();
-            BoxLayout:
-                size_hint: 1, 0.4
-                AsyncImage:
-                    source: root.data['footer']
-                
 
+# TODO MenuScreen
 <MenuScreen>:
     canvas.before:
         BorderImage:
@@ -494,6 +875,7 @@
                     LabelU:
                         text: 'Salir'
 
+# TODO OptionScreen
 <OptionScreen>:
     canvas.before:
         BorderImage:
@@ -576,6 +958,7 @@
                         size: 150, 150
                         allow_stretch: True
 
+# TODO ProfileScreen
 <ProfileScreen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -648,20 +1031,15 @@
                 size_hint: 0.7, 1
                 GridLayout:
                     cols: 2
-                    rows: 6
+                    rows: 5
                     padding: 20
                     spacing: 15
-                    size_hint: 1, 0.7
+                    size_hint: 1, 0.6
                     LabelU:
                         text: 'Nombre'
                     Input:
                         id: nombre
                         text: root.data['nombre']
-                    LabelU:
-                        text: 'LU'
-                    Input:
-                        id: lu
-                        text: root.data['lu']
                     LabelU:
                         text: 'Email'
                     Input:
@@ -679,7 +1057,7 @@
                         text: 'Cambiar'
                         on_press: root.cambiar_pass()
                 BoxLayout:
-                    size_hint: 1, 0.2
+                    size_hint: 1, 0.3
                 BoxLayout:
                     size_hint: 1, 0.1
                     spacing: 150
@@ -692,7 +1070,7 @@
                         font_size: 20
                         on_press: root.cancel();
 
-
+# TODO AnularScreen
 <AnularScreen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -790,6 +1168,7 @@
                         font_size: 20
                         on_press: root.cancel();
 
+# TODO CargaScreen
 <CargaScreen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -876,10 +1255,9 @@
                     LabelU:
                         font_size: 30
                         text: 'Dinero ingresado'
-                    LabelU:
+                    AsyncImage:
                         id: ingresado
-                        font_size: 30
-                        text: ""
+                        source: ''
                 BoxLayout:
                     size_hint: 0.4, 0.1
                     ButtonUok:
@@ -895,6 +1273,7 @@
                         font_size: 20
                         on_press: root.cancel();
 
+# TODO Compra2Screen
 <Compra2Screen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -986,10 +1365,9 @@
                     LabelU:
                         font_size: 30
                         text: 'Dinero ingresado'
-                    LabelU:
+                    AsyncImage:
                         id: ingresado
-                        font_size: 30
-                        text: ""
+                        source: ''
                 BoxLayout:
                     size_hint: 0.4, 0.1
                     ButtonUok:
@@ -1005,6 +1383,7 @@
                         font_size: 20
                         on_press: root.cancel();
 
+# TODO Compra1Screen
 <Compra1Screen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -1085,7 +1464,7 @@
                     LabelU:
                         text: 'Compra posible con saldo: '
                     LabelU:
-                        text: root.data['posibles']
+                        id: posibles
                 GridLayout:
                     size_hint: 1, 0.4
                     padding: 20
@@ -1100,25 +1479,27 @@
                     # fila 1 fecha desde o única
                     Spinner:
                         id: desde
-                        text: root.data['dia']
-                        values: root.dias_desde
+                        values: []
                     Spinner:
                         id: hasta
-                        values: root.dias_hasta
+                        values: []
                 BoxLayout:
                     size_hint: 1, 0.2
                 BoxLayout:
                     size_hint: 1, 0.1
                     spacing: 150
                     ButtonUback:
+                        id: btn_back
                         text: 'Volver'
                         font_size: 20
                         on_press: root.cancel()
                     ButtonUnext:
+                        id: btn_next
                         text: 'Continuar'
                         font_size: 20
                         on_press: root.medio_de_pago()
 
+# TODO Compra3Screen
 <Compra3Screen>:
     on_enter: root.update_datos()
     canvas.before:
@@ -1224,6 +1605,7 @@
                         font_size: 20
                         on_press: root.confirmar_tickets();
 
+# TODO AyudaScreen
 <AyudaScreen>:
     canvas.before:
         BorderImage:

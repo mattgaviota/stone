@@ -3,13 +3,18 @@
 
 class Session():
 
-    def init(self, user):
+    def init(self, user, time):
         '''Clase para el manejo de la sesion del usuario'''
         self.user = user
+        self.init_time = time
 
     def get_user(self):
         '''Retorna el usuario logueado actual'''
         return self.user
+
+    def get_init_time(self):
+        '''Retorna la hora cuando se inició la sesión'''
+        return self.init_time
 
     def update(self, user):
         '''Actualiza el usuario logueado actual'''

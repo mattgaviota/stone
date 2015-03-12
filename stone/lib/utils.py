@@ -1,7 +1,8 @@
 #-*- coding: utf-8 -*-
 
-from md5 import md5
+from hashlib import md5
 import random
+import urllib2
 # funciones útiles para el sistema
 
 def generar_pass(longitud=10):
@@ -13,7 +14,7 @@ def generar_pass(longitud=10):
 def ofuscar_pass(password):
     '''ofusca el password en md5 para su posterior almacenado'''
     tmp = md5(password).hexdigest()
-    code = generar_pass(8)
+    code = ''.join(random.sample('abcdefABCDEF0123456789', 8))
     tmp = code[:4] + tmp + code[4:]
     return tmp
 
@@ -24,3 +25,13 @@ def md5_pass(password):
 def aclarar_pass(password):
     '''Hace el proceso inverso de ofuscar_pass'''
     return password[4:-4]
+
+def internet_on():
+    ''' Chequea la conexión a internet. Devuelve True si hay conexión y
+    False en otro caso.'''
+    try:
+        response=urllib2.urlopen('http://74.125.228.100', timeout=3)
+        return True
+    except:
+        pass
+    return False

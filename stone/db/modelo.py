@@ -25,6 +25,23 @@ db.define_table('acciones',
     Field('nombre_canonico', type='string', length=15),
     migrate=migrate)
 
+db.define_table('alumnos',
+    Field('id', type='id'),
+    Field('facultad', type='string', length=5),
+    Field('lu', type='string', length=10),
+    Field('nombre', type='string', length=70),
+    Field('dni', type='string', length=12),
+    Field('materias', type='string', length=3),
+    migrate=migrate)
+
+db.define_table('billetes',
+    Field('id', type='id'),
+    Field('fecha', type='datetime'),
+    Field('dni', type='reference usuarios'),
+    Field('id_maquina', type='reference maquinas'),
+    Field('valor', type='double'),
+    migrate=migrate)
+
 db.define_table('calendario',
     Field('id', type='id'),
     Field('desde', type='datetime'),
@@ -38,6 +55,7 @@ db.define_table('categorias',
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
     Field('importe', type='double'),
+    Field('dias_maximos', type='integer'),
     migrate=migrate)
 
 db.define_table('configuraciones',
@@ -53,6 +71,7 @@ db.define_table('configuraciones',
     Field('hora_anulacion', type='integer'),
     Field('hora_compra', type='integer'),
     Field('saldo_maximo', type='integer'),
+    Field('session_time', type='integer'),
     migrate=migrate)
 
 db.define_table('dias',
@@ -62,6 +81,11 @@ db.define_table('dias',
     Field('tickets_vendidos', type='integer'),
     Field('evento', type='string', length=200),
     Field('id_calendario', type='reference calendario', ondelete='SET DEFAULT'),
+    migrate=migrate)
+
+db.define_table('estados_maquina',
+    Field('id', type='id'),
+    Field('descripcion', type='string', length=100),
     migrate=migrate)
 
 db.define_table('estados_tickets',
@@ -85,6 +109,7 @@ db.define_table('facultades',
     Field('nombre', type='string', length=50),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
+    Field('nombre_canonico', type='string'),
     migrate=migrate)
 
 db.define_table('feriados',
@@ -106,11 +131,18 @@ db.define_table('imagenes',
 
 db.define_table('log_usuarios',
     Field('id', type='id'),
-    Field('dni', type='string', length=8),
+    Field('dni', type='reference usuarios'),
     Field('fecha', type='datetime'),
     Field('id_accion', type='reference acciones'),
     Field('lugar', type='integer'),
     Field('descripcion', type='string', length=200),
+    migrate=migrate)
+
+db.define_table('maquinas',
+    Field('id', type='integer'),
+    Field('ubicacion', type='reference facultades'),
+    Field('estado', type='reference estados_maquina'),
+    primarykey=['id'],
     migrate=migrate)
 
 db.define_table('menu',
@@ -119,6 +151,7 @@ db.define_table('menu',
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
     Field('orden', type='integer'),
+    Field('estado', type='integer'),
     migrate=migrate)
 
 db.define_table('perfiles',
@@ -152,6 +185,15 @@ db.define_table('tickets',
     Field('barcode', type='string', length=20),
     migrate=migrate)
 
+db.define_table('tickets_cierre',
+    Field('id', type='id'),
+    Field('fecha', type='datetime'),
+    Field('id_log_usuario', type='reference log_usuarios'),
+    Field('id_maquina', type='reference maquinas'),
+    Field('total', type='double'),
+    Field('barcode', type='string', length=20),
+    migrate=migrate)
+
 db.define_table('tickets_log_usuarios',
     Field('id', type='id'),
     Field('id_ticket', type='reference tickets', ondelete='SET DEFAULT'),
@@ -182,6 +224,7 @@ db.define_table('usuarios',
     Field('id_categoria', type='reference categorias', ondelete='SET DEFAULT'),
     Field('saldo', type='double', default=0),
     Field('ruta_foto', type='string', length=300),
+    Field('activo',type='integer'),
     primarykey=['dni'],
     migrate=migrate)
 
