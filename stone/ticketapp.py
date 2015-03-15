@@ -282,7 +282,9 @@ class Compra1Screen(Screen):
     def update_datos(self):
         '''Actualiza los datos de la pantalla para plasmar cambios'''
         user_session.update(controlador.get_usuario(self.data['dni']))
+        self.user = user_session.get_user()
         self.cargar_datos()
+        self.data['saldo'] = '$ %.0f' % (self.user['saldo'])
         self.ids.saldo.text = self.data['saldo']
         self.ids.nombre.text = self.data['nombre']
         self.ids.desde.text = self.data['dia']
@@ -292,15 +294,16 @@ class Compra1Screen(Screen):
         '''Carga los datos del usuario dentro de la pantalla de compra'''
         limite = controlador.get_categoria_limite(self.user['id_categoria'])
         self.dias_desde = controlador.get_dias(self.user, limite)
-        self.ids.desde.values = self.dias_desde
         if not self.dias_desde:
+            self.dias_hasta = [u"Solo para este día"]
             self.ids.desde.values = []
             self.ids.hasta.values = []
             self.data['dia'] = ''
             self.ids.desde.text = self.data['dia']
-            self.ids.posibles.text = 'No hay días disponibles para la compra'
+            self.ids.posibles.text = '\rNo hay días disponibles\r\n para la compra'
             self.ids.btn_next.disabled = True
         else:
+            self.ids.desde.values = self.dias_desde
             self.dias_hasta = [u"Solo para este día"] + self.dias_desde[1:]
             self.ids.hasta.values = self.dias_hasta
             self.ids.hasta.text = self.dias_hasta[0]
@@ -378,6 +381,7 @@ class Compra2Screen(Screen):
         self.saldo = saldo
         self.stop = Event()
         self.faltante = faltante
+        self.total_parcial = 0
         self.cargar_datos()
         self.cargar_threads()
         super(Compra2Screen, self).__init__(**kwargs)
@@ -388,6 +392,7 @@ class Compra2Screen(Screen):
         self.cargar_datos()
         self.ids.saldo.text = self.data['saldo']
         self.ids.nombre.text = self.data['nombre']
+        self.total_parcial = 0
 
     @mainthread
     def update_ingreso(self, valor, disabled):
@@ -422,12 +427,14 @@ class Compra2Screen(Screen):
     def cargar_billetes(self):
         '''
         Inicia el hilo que se encarga de almacenar el billete en la maquina.
+        Comprueba el dinero faltante.
         '''
         Thread(target=self.stack, args=(self.cola_bool,)).start()
         sleep(1)
         self.update_ingreso("", True)
         id_maquina = UNIDAD
         controlador.insert_billete(self.user, self.valor, id_maquina)
+        self.total_parcial += self.valor
         self.faltante -= self.valor
         if self.faltante <= 0:
             self.ids.faltante.text = "0"
@@ -436,6 +443,7 @@ class Compra2Screen(Screen):
             else:
                 self.excedente = 0
             self.comprar_tickets(self.excedente)
+            self.tota_parcial = 0
         else:
             self.ids.faltante.text = "%d" % self.faltante
 
@@ -525,6 +533,8 @@ class Compra2Screen(Screen):
         '''Vuelve a una pantalla anterior'''
         self.stop.set()
         self.cola_stop.put(True)
+        print self.total_parcial
+        controlador.update_saldo(self.user, self.total_parcial, 0)
         self.manager.current = 'compra_1'
         self.update_ingreso("", True)
         self.manager.remove_widget(self.manager.get_screen('compra_2'))
@@ -1369,7 +1379,7 @@ class ServiceScreen(Screen):
         nom = user['nombre']
         dni = user['dni']
         cat = u"control"
-        fac = u"Secretaría de Bienestar".decode("utf8")
+        fac = u"Secretaría de Bienestar"
         unit = str(UNIDAD)
         msj = u"Ticket NO VALIDO"
         ticket = "XXX"
@@ -1666,13 +1676,13 @@ class TicketApp(App):
         # Creamos el screen manager con la WipeTransition
         sm = ScreenManager(transition=WipeTransition())
         # Agregamos las pantallas fijas del sistema
-        sm.add_widget(MainScreen(name='main'))
-        sm.add_widget(ControlScreen(name='menu_control'))
         sm.add_widget(SplashScreen(name='splash'))
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(FormScreen(name='formulario'))
         sm.add_widget(LoginScreen(name='login'))
         sm.add_widget(AyudaScreen(name='ayuda'))
+        sm.add_widget(MainScreen(name='main'))
+        sm.add_widget(ControlScreen(name='menu_control'))
         return sm
 
 

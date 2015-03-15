@@ -234,6 +234,17 @@ def get_tickets(user, cant=5, date=strftime('%Y-%m-%d', localtime()), state=0):
         fila = {}
     return lista
 
+def get_count_tickets(user, state=2, accion=3):
+    '''Retorna la cantidad de tickets impresos de un usuario que tengan el
+    estado 2(impreso) y la accion 3 (imprimir).'''
+    tickets = db((db.tickets.id == db.tickets_log_usuarios.id_ticket) &
+            (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
+            (db.log_usuarios.dni == db.usuarios.dni))
+    cantidad = tickets((db.usuarios.dni == user['dni']) &
+            (db.tickets.estado == state) &
+            (db.log_usuarios.id_accion == accion)).count()
+    return cantidad
+
 def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
     '''
     Retorna True si hay un ticket activo de ese usuario para ese día,
