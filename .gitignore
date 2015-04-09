@@ -53,7 +53,8 @@ docs/_build/
 target/
 
 # conf
-config/
+.config/
 .json
 .sql
 dump.py
+doc/
