@@ -1,5 +1,9 @@
 #-*- coding: utf-8 -*-
-
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 from modelo import db
 from time import strftime, localtime, time
 
@@ -245,6 +249,17 @@ def get_count_tickets(user, state=2, accion=3):
             (db.log_usuarios.id_accion == accion)).count()
     return cantidad
 
+def get_select_tickets(user, state=2, accion=3):
+    '''Retorna la cantidad de tickets impresos de un usuario que tengan el
+    estado 2(impreso) y la accion 3 (imprimir).'''
+    tickets = db((db.tickets.id == db.tickets_log_usuarios.id_ticket) &
+            (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
+            (db.log_usuarios.dni == db.usuarios.dni))
+    cantidad = tickets((db.usuarios.dni == user['dni']) &
+            (db.tickets.estado == state) &
+            (db.log_usuarios.id_accion == accion)).select()
+    return cantidad
+
 def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
     '''
     Retorna True si hay un ticket activo de ese usuario para ese día,
@@ -278,7 +293,8 @@ def has_ticket(user, id_ticket, state=0):
             (db.log_usuarios.dni == db.usuarios.dni) &
             (db.usuarios.dni == user['dni']))
     rows = tickets((db.tickets.id == id_ticket) & 
-            (db.tickets.estado != state)).select(db.dias.fecha)
+            ((db.tickets.estado == 1) |
+            (db.tickets.estado == 2))).select(db.dias.fecha)
     if rows:
         row = rows.first()
         return row['fecha'].strftime('%d/%m/%Y')
@@ -307,6 +323,31 @@ def get_dia_ticket(id_ticket):
     else:
         return None
 
+def update_ticket(id_ticket, user, unidad, state):
+    ''' Actualiza el estado del ticket por su id.
+    estado = 4 -> vencido
+    estado = 3 -> consumido
+    estado = 2 -> impreso
+    estado = 1 -> activo
+    estado = 0 -> anulado
+    '''
+    db(db.tickets.id == id_ticket).update(estado = state)
+    db.commit()
+    if state == 4:
+        id_log = insert_log(user, 'vencer', unidad)
+        insert_ticket_log(id_ticket, id_log)
+    elif state == 3:
+        id_log = insert_log(user, 'consumir', unidad)
+        insert_ticket_log(id_ticket, id_log)
+    elif state == 2:
+        id_log = insert_log(user, 'imprimir', unidad)
+        insert_ticket_log(id_ticket, id_log)
+    elif state == 0:
+        id_log = insert_log(user, 'anular', unidad)
+        insert_ticket_log(id_ticket, id_log)
+    else:
+        pass
+    
 def anular_ticket(id_ticket, user, unidad):
     '''
     Anula el ticket a traves de su id actualizando el estado.
@@ -352,20 +393,31 @@ def  get_dias(user, limit):
     '''
     Retorna una lista de limit cantidad de dias que tengan tickets
     disponibles a partir de la fecha de hoy.'''
-    today = localtime()
-    hora = get_hora_compra()
-    if today.tm_hour < hora:
-        date = strftime('%Y-%m-%d', today)
+    cantidad = get_count_tickets(user)
+    weekdays = {0: 'Lu', 1: 'Ma', 2: 'Mi', 3: 'Ju', 4: 'Vi'}
+    lista_nombres = []
+    lista_dias = []
+    if limit > cantidad:
+        limit -= cantidad
+        today = localtime()
+        hora = get_hora_compra()
+        if today.tm_hour < hora:
+            date = strftime('%Y-%m-%d', today)
+        else:
+            date = '%d-%d-%d' % (today.tm_year, today.tm_mon, today.tm_mday + 1)
+        rows = db((db.dias.tickets_vendidos < db.dias.tickets_totales) &
+                (db.dias.fecha >= date)).select(db.dias.fecha,
+                                        orderby=db.dias.fecha)
+        for row in rows:
+            date = row.fecha.strftime('%d/%m/%Y')
+            if ((not get_ticket(user, date)) and (len(lista_dias) < limit)):
+                fecha = row.fecha
+                fecha = "%s %s" % (weekdays[fecha.weekday()], date)
+                lista_nombres.append(fecha)
+                lista_dias.append(date)
+        return lista_dias, lista_nombres
     else:
-        date = '%d-%d-%d' % (today.tm_year, today.tm_mon, today.tm_mday + 1)
-    rows = db((db.dias.tickets_vendidos < db.dias.tickets_totales) &
-            (db.dias.fecha >= date)).select(db.dias.fecha,
-                                    orderby=db.dias.fecha, limitby=(0,limit))
-    lista = []
-    for row in rows:
-        if not get_ticket(user, date=row.fecha.strftime('%d/%m/%Y')):
-            lista.append(row.fecha.strftime('%d/%m/%Y'))
-    return lista
+        return lista_dias, lista_nombres
 
 def get_tickets_disponibles(date=strftime('%Y-%m-%d', localtime())):
     '''Devuelve los tickets disponibles para cierto día. Por defecto para
@@ -488,6 +540,13 @@ def get_maquina(ubicacion):
     else:
         return None
 
+def get_maquina_ubicacion(id_facultad):
+    row = db(db.maquinas.ubicacion == id_facultad).select().first()
+    if row:
+        return row.id
+    else:
+        return None
+
 def get_ubicacion(id_maquina):
     ''' Obtiene la ubicación de una maquina de acuerdo al número '''
     row = db(db.maquinas.id == id_maquina).select().first()
@@ -523,7 +582,10 @@ def get_total(unidad, date=strftime('%Y-%m-%d', localtime())):
     for row in rows:
         if row.fecha.strftime('%Y-%m-%d') == date:
             total += row.valor
-            billetes[row.valor] += 1
+            try:
+                billetes[row.valor] += 1
+            except KeyError:
+                pass
     return total, billetes
 
 ########################
@@ -554,3 +616,12 @@ def get_ticket_cierre(id_ticket):
         return row
     else:
         return None
+
+def get_id_ticket_cierre(unidad, date=strftime('%Y-%m-%d', localtime())):
+    ''' Obtiene el id del ticket de  cierre de acuerdo al día
+    y a la unidad. '''
+    rows = db(db.tickets_cierre.id_maquina == unidad).select()
+    for row in rows:
+        if row.fecha.strftime('%Y-%m-%d') == date:
+            return row.id
+    return None

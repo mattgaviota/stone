@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 # states
 NOT_SENT = 0
 SENDING = 1

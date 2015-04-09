@@ -2,9 +2,11 @@
 
 # CRC16Kermit (CRC-CCITT (Kermit)) MODULE
 # 
-# Cristian NAVALICI cristian.navalici at gmail dot com
-# Modificado por Matias Novoa
-
+# Autor: Cristian NAVALICI cristian.navalici at gmail dot com
+#        Modificado por Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 from ctypes import c_ushort
 
 class CRC16Kermit(object):

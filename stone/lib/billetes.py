@@ -1,5 +1,9 @@
 #-*- coding: utf-8 -*-
-
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 from threading import Thread
 from Queue import Empty
 from message import Message
@@ -120,6 +124,12 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
                 manager.send_command(cmd=HOLD)
         elif resp == '4a': # communication error
             resp = manager.get_status() # status request
+        elif resp == '45':
+            valor = -1
+            cola_billetes.put(valor)
+        elif resp == '46':
+            valor = -1
+            cola_billetes.put(valor)
         else:
             resp = manager.get_status()
 

@@ -1,12 +1,16 @@
 #-*- coding: utf-8 -*-
-
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 from dal import DAL, Field
 import json
 from os import path
 
 # Cargamos el archivo de configuración
 file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
-                'config/db.json')
+                '.config/db.json')
 with open(file_path) as data_file:    
     data = json.load(data_file)
 

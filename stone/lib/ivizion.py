@@ -1,5 +1,9 @@
 #-*- coding: utf-8 -*-
-
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 from serial import Serial, EIGHTBITS, PARITY_EVEN, STOPBITS_ONE
 from time import sleep
 

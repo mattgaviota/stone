@@ -1,5 +1,9 @@
 #-*- coding: utf-8 -*-
-
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 from hashlib import md5
 import random
 import urllib2
@@ -7,7 +11,7 @@ import urllib2
 
 def generar_pass(longitud=10):
     '''Genera un password aleatorio de longitud de caracteres'''
-    caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#$%&?."
+    caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#$%&?.-_"
     password = ''.join(random.sample(caracteres, longitud))
     return password
 

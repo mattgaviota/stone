@@ -1,3 +1,9 @@
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
+
 class ImprimirScreen(Screen):
 
     def __init__(self, name=''):

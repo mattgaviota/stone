@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
 # las páginas se refieren al archivo comandos de impresora en la carpeta doc/
 
 from tup500 import Tup500
@@ -43,20 +47,22 @@ class Printer():
             if not paper:
                 return 1 # online y con papel
             else:
-                return 2 # online y sin papel
+                if paper == 4:
+                    return 2 # online y con papel por acabarse
+                else:
+                    return 2 # online y sin papel
         else:
             return 3 # offline y error
             #TODO especificación de error
 
     def print_ticket_cierre(self, user, id_ticket, unidad, inicio, bills,
-                                                                total, code):
+                                                            total, code, dia):
         # Header
         self.tup.send(bytearray(self.to_int(['1b', '1d', '61', '01']))) # center alignment pag 50
         self.tup.send(bytearray(self.to_int(['1b', '1c', '70', '01', '00']))) # print logo pag 59
         self.tup.send(bytearray("\r\n"))
         self.tup.send(bytearray(self.to_int(['1b', '1d', '61', '00']))) # left alignment pag 50
         self.tup.send(bytearray(self.to_int(['1b', '44', '22', '00']))) # Set Horizontal tab pag 48
-        dia = strftime("%d/%m/%Y", localtime())
         self.tup.send(bytearray("Fecha %s" % (dia)))
         hora = strftime("%H:%M", localtime())
         self.tup.send(bytearray(" \x09 Hora %s\r\n" % (hora)))
@@ -105,7 +111,7 @@ class Printer():
     
     
     def print_ticket_alumno(self, alumno, dni, facultad, categoria, code, 
-                                            unidad, ticket, fecha, mensaje):
+                                        unidad, ticket, fecha, mensaje, saldo):
         # Header
         self.tup.send(bytearray(self.to_int(['1b', '1d', '61', '01']))) # center alignment pag 50
         self.tup.send(bytearray(self.to_int(['1b', '1c', '70', '01', '00']))) # print logo pag 59
@@ -127,7 +133,8 @@ class Printer():
         self.tup.send(bytearray(u"Alumno: %s\r\n" %(alumno), 'cp850'))
         self.tup.send(bytearray(u"DNI: %s\r\n" %(dni), 'cp850'))
         self.tup.send(bytearray(u"Facultad: %s\r\n" % (facultad), 'cp850'))
-        self.tup.send(bytearray(u"Categoria: %s\r\n\r\n" % (categoria), 'cp850'))
+        self.tup.send(bytearray(u"Categoria: %s\r\n" % (categoria), 'cp850'))
+        self.tup.send(bytearray("Saldo: $%d\r\n\r\n" % (saldo)))
         self.tup.send(bytearray(self.to_int(['1b', '46']))) # Cancel emphasys
         if categoria == u"Regular":
             precio = 5
@@ -153,10 +160,13 @@ class Printer():
         self.tup.send(bytearray(self.to_int(['1b', '62', '06', '02', '02']))) # Barcode pag 61
         self.tup.send(bytearray(" %s\x1e\r\n" % (code))) # Barcode pag 61
         # end Footer
+        self.tup.send(bytearray(self.to_int(['1b', '64', '03']))) # paper fed and full cut page 63
+
+    def feed_and_full_cut(self):
         self.tup.send(bytearray(self.to_int(['1b', '64', '02']))) # paper fed and full cut page 63
 
     def print_ticket_carga(self, alumno, dni, facultad, categoria, code,
-                                        unidad, log, mensaje, precio):
+                                        unidad, log, mensaje, precio, saldo):
         # Header
         self.tup.send(bytearray(self.to_int(['1b', '1d', '61', '01']))) # center alignment pag 50
         self.tup.send(bytearray(self.to_int(['1b', '1c', '70', '01', '00']))) # print logo pag 59
@@ -179,6 +189,7 @@ class Printer():
         self.tup.send(bytearray(u"DNI: %s\r\n" %(dni), 'cp850'))
         self.tup.send(bytearray(u"Facultad: %s\r\n" % (facultad), 'cp850'))
         self.tup.send(bytearray(u"Categoria: %s\r\n\r\n" % (categoria), 'cp850'))
+        self.tup.send(bytearray("Saldo: $%d\r\n\r\n" % (saldo)))
         self.tup.send(bytearray(self.to_int(['1b', '46']))) # Cancel emphasys
         self.tup.send(bytearray(self.to_int(['1b', '44', '10', '26', '00']))) # Set Horizontal tab pag 48
         self.tup.send(bytearray("Importe Cargado \x09"))
