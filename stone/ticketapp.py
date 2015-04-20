@@ -31,7 +31,7 @@ user_session = session.Session()
 # Cargamos el archivo de configuración
 file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
                 'stone/.config/parametros.json')
-with open(file_path) as data_file:    
+with open(file_path) as data_file:
     parametros = json.load(data_file)
     UNIDAD = controlador.get_maquina(parametros['terminal'])
 
@@ -55,7 +55,7 @@ class WarningPopup(Popup):
 
 
 class PasswordScreen(Screen):
-    
+
     def __init__(self, screen_accept, screen_cancel, name):
         '''Pantalla para cambiar el password actual'''
         self.scr_accept = screen_accept
@@ -121,7 +121,7 @@ class PasswordScreen(Screen):
                 mensaje = u"El password nuevo no coincide"
                 WarningPopup(mensaje).open()
                 self.clear()
-            
+
 
     def cancel(self):
         '''
@@ -315,7 +315,11 @@ class Compra1Screen(Screen):
             self.ids.desde.text = self.data['dia']
             self.importe = controlador.get_categoria_importe(
                                                     self.user['id_categoria'])
-            self.tickets_posibles = int(self.user['saldo'] / self.importe)
+            if self.importe:
+                self.tickets_posibles = int(self.user['saldo'] / self.importe)
+            else:
+                self.tickets_posibles = limite - controlador.get_count_tickets(
+                                                                    self.user)
             self.ids.posibles.text = str(self.tickets_posibles)
 
     def controlar_dias(self):
@@ -361,7 +365,7 @@ class Compra1Screen(Screen):
                     faltante = (len(dias) * self.importe) - self.user['saldo']
                     self.manager.add_widget(Compra2Screen(dias, faltante,
                                         self.user['saldo'], name='compra_2'))
-                    self.manager.current = 'compra_2' 
+                    self.manager.current = 'compra_2'
             else:
                 faltante = (len(dias) * self.importe) - self.user['saldo']
                 self.manager.add_widget(Compra2Screen(dias, faltante,
@@ -482,16 +486,23 @@ class Compra2Screen(Screen):
         '''
         self.update_ingreso("no", True)
         id_log = controlador.insert_log(self.user, 'comprar', UNIDAD)
-        controlador.insert_tickets(self.user, self.dias, id_log, UNIDAD)
-        controlador.update_saldo(self.user, self.saldo, 1)
-        controlador.update_saldo(self.user, excedente, 0)
-        self.update_datos()
-        self.imprimir_todos()
-        self.manager.add_widget(ConfirmacionScreen(len(self.dias),
+        cant = 0
+        while not id_log and cant < 2:
+            id_log = controlador.insert_log(self.user, 'comprar', UNIDAD)
+            cant += 1
+        if id_log:
+            controlador.insert_tickets(self.user, self.dias, id_log, UNIDAD)
+            controlador.update_saldo(self.user, self.saldo, 1)
+            controlador.update_saldo(self.user, excedente, 0)
+            self.update_datos()
+            self.imprimir_todos()
+            self.manager.add_widget(ConfirmacionScreen(len(self.dias),
                                                         name='confirmacion'))
-        self.manager.current = 'confirmacion'
-        self.manager.remove_widget(self.manager.get_screen('compra_1'))
-        self.manager.remove_widget(self.manager.get_screen('compra_2'))
+            self.manager.current = 'confirmacion'
+            self.manager.remove_widget(self.manager.get_screen('compra_1'))
+            self.manager.remove_widget(self.manager.get_screen('compra_2'))
+        else:
+            self.cancel()
 
     def imprimir_todos(self):
         '''
@@ -501,24 +512,30 @@ class Compra2Screen(Screen):
         ticket_list = []
         for dia in self.dias:
             ticket_data = {}
-            row = controlador.get_ticket(self.user, dia)
-            id_ticket = row['id']
-            ticket_data['fecha'] = row['fecha'].strftime('%d/%m/%Y')
-            ticket_data['code'] = row['barcode']
-            ticket_data['nom'] = self.data['nombre'].decode('utf8')
-            ticket_data['dni'] = self.data['dni'].decode('utf8')
-            ticket_data['cat'] = self.data['categoria'].decode('utf8')
-            ticket_data['fac'] = self.data['facultad'].decode('utf8')
-            ticket_data['unit'] = str(UNIDAD)
-            ticket_data['msj'] = u"Gracias por usar el Comedor Universitario"
-            ticket_data['ticket'] = str(id_ticket)
-            ticket_data['saldo'] = self.user['saldo']
-            controlador.insert_ticket_log(id_ticket, id_log)
-            ticket_list.append(ticket_data)
+            row = controlador.get_ticket(self.user, date=dia)
+            cant = 0
+            while not row and cant < 2:
+                row = controlador.get_ticket(self.user, date=dia)
+                cant += 1
+            if row:
+                id_ticket = row['id']
+                ticket_data['fecha'] = row['fecha'].strftime('%d/%m/%Y')
+                ticket_data['code'] = row['barcode']
+                ticket_data['nom'] = self.data['nombre'].decode('utf8')
+                ticket_data['dni'] = self.data['dni'].decode('utf8')
+                ticket_data['cat'] = self.data['categoria'].decode('utf8')
+                ticket_data['fac'] = self.data['facultad'].decode('utf8')
+                ticket_data['unit'] = str(UNIDAD)
+                ticket_data['msj'] = u"Gracias por usar el Comedor Universitario"
+                ticket_data['ticket'] = str(id_ticket)
+                ticket_data['saldo'] = self.user['saldo']
+                controlador.insert_ticket_log(id_ticket, id_log)
+                ticket_list.append(ticket_data)
+                row = None
         print_thread = Thread(target=impresora.imprimir_tickets_alumno,
                                                             args=ticket_list)
         print_thread.start()
-            
+
 
     def stack(self, cola_bool):
         '''Envía la orden para almacenar el billete en la lectora.'''
@@ -636,19 +653,25 @@ class Compra3Screen(Screen):
         for dia in self.dias:
             ticket_data = {}
             row = controlador.get_ticket(self.user, dia)
-            id_ticket = row['id']
-            ticket_data['fecha'] = row['fecha'].strftime('%d/%m/%Y')
-            ticket_data['code'] = row['barcode']
-            ticket_data['nom'] = self.data['nombre'].decode('utf8')
-            ticket_data['dni'] = self.data['dni'].decode('utf8')
-            ticket_data['cat'] = self.data['categoria'].decode('utf8')
-            ticket_data['fac'] = self.data['facultad'].decode('utf8')
-            ticket_data['unit'] = str(UNIDAD)
-            ticket_data['msj'] = u"Gracias por usar el Comedor Universitario"
-            ticket_data['ticket'] = str(id_ticket)
-            ticket_data['saldo'] = self.user['saldo']
-            controlador.insert_ticket_log(id_ticket, id_log)
-            ticket_list.append(ticket_data)
+            cant = 0
+            while not row and cant < 2:
+                row = controlador.get_ticket(self.user, date=dia)
+                cant += 1
+            if row:
+                id_ticket = row['id']
+                ticket_data['fecha'] = row['fecha'].strftime('%d/%m/%Y')
+                ticket_data['code'] = row['barcode']
+                ticket_data['nom'] = self.data['nombre'].decode('utf8')
+                ticket_data['dni'] = self.data['dni'].decode('utf8')
+                ticket_data['cat'] = self.data['categoria'].decode('utf8')
+                ticket_data['fac'] = self.data['facultad'].decode('utf8')
+                ticket_data['unit'] = str(UNIDAD)
+                ticket_data['msj'] = u"Gracias por usar el Comedor Universitario"
+                ticket_data['ticket'] = str(id_ticket)
+                ticket_data['saldo'] = self.user['saldo']
+                controlador.insert_ticket_log(id_ticket, id_log)
+                ticket_list.append(ticket_data)
+                row = None
         print_thread = Thread(target=impresora.imprimir_tickets_alumno,
                                                             args=ticket_list)
         print_thread.start()
@@ -659,18 +682,25 @@ class Compra3Screen(Screen):
         siguiente pantalla.
         '''
         id_log = controlador.insert_log(self.user, 'comprar', UNIDAD)
-        controlador.insert_tickets(self.user, self.dias, id_log, UNIDAD)
-        controlador.update_saldo(self.user, self.total, 1)
-        self.update_datos()
-        self.imprimir_todos()
-        self.manager.add_widget(ConfirmacionScreen(len(self.dias),
+        cant = 0
+        while not id_log and cant < 2:
+            id_log = controlador.insert_log(self.user, 'comprar', UNIDAD)
+            cant += 1
+        if id_log:
+            controlador.insert_tickets(self.user, self.dias, id_log, UNIDAD)
+            controlador.update_saldo(self.user, self.total, 1)
+            self.update_datos()
+            self.imprimir_todos()
+            self.manager.add_widget(ConfirmacionScreen(len(self.dias),
                                                         name='confirmacion'))
-        self.manager.current = 'confirmacion'
-        if self.manager.has_screen('compra_2'):
-            self.manager.remove_widget(self.manager.get_screen('compra_2'))
-        self.manager.remove_widget(self.manager.get_screen('compra_1'))
-        self.manager.remove_widget(self.manager.get_screen('compra_3'))
-        
+            self.manager.current = 'confirmacion'
+            if self.manager.has_screen('compra_2'):
+                self.manager.remove_widget(self.manager.get_screen('compra_2'))
+            self.manager.remove_widget(self.manager.get_screen('compra_1'))
+            self.manager.remove_widget(self.manager.get_screen('compra_3'))
+        else:
+            self.cancel()
+
     def cancel(self):
         '''Vuelve a una pantalla anterior'''
         self.manager.current = 'compra_1'
@@ -679,7 +709,7 @@ class Compra3Screen(Screen):
 
 class ConfirmacionScreen(Screen):
     ''' Pantalla para mostrar una confirmación de compra '''
-    
+
     def __init__ (self, cantidad, **kwargs):
         self.cantidad = cantidad
         self.data = {}
@@ -873,7 +903,7 @@ class AnularScreen(Screen):
                         self.ticket_vencido()
                         self.ids.id_ticket.text = ""
                         self.ids.id_ticket.focus = True
-                        mensaje = "\rNo puede anular un ticket\r\n despues de la fecha\r\n de servicio."
+                        mensaje = "\rNo puede anular un ticket\r\n despues de la fecha\r\n de servicio.\r\n\r\n Su ticket se venció."
                         WarningPopup(mensaje).open()
                 else:
                     self.ids.id_ticket.text = ""
@@ -933,7 +963,10 @@ class AnularScreen(Screen):
             if fecha.month == ahora.month:
                 if fecha.day == ahora.day:
                     if ahora.hour >= hora:
-                        return 0 # Hora invalida
+                        if ahora.hour < 15:
+                            return 0 # Hora invalida para anular
+                        else:
+                            return 2 # Hora posterior al día de servicio
                     else:
                         return 1 # Ok
                 elif fecha.day < ahora.day:
@@ -962,7 +995,7 @@ class AnularScreen(Screen):
     def cancel(self):
         '''Vuelve a una pantalla anterior'''
         self.manager.current = 'opciones'
-        
+
 
 class CargaScreen(Screen):
 
@@ -1162,7 +1195,7 @@ class SplashScreen(Screen):
         else:
             mensaje = u"\rNo hay conexión a internet\r\n Intente nuevamente más tarde."
             WarningPopup(mensaje).open()
-        
+
 
 class FormScreen(Screen):
     '''Pantalla de registro del sistema'''
@@ -1179,7 +1212,7 @@ class FormScreen(Screen):
 
         super(FormScreen, self).__init__(**kwargs)
         self.ids.provincia.text = 'Salta'
-    
+
     def mailvalidator(self, email):
         '''Valida que el mail esté bien formado'''
         if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
@@ -1443,7 +1476,7 @@ class LoginScreen(Screen):
             if self.manager.has_screen('compra_2'):
                 self.manager.remove_widget(self.manager.get_screen('compra_2'))
             self.manager.current = 'splash'
-        
+
     def clear(self):
         '''Limpia los campos de texto y libera el teclado virtual'''
         self.ids.dni.text = ""
@@ -1556,7 +1589,7 @@ class ServiceScreen(Screen):
                                                                         UNIDAD)
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(target=impresora.imprimir_ticket_cierre, 
+                print_thread = Thread(target=impresora.imprimir_ticket_cierre,
                             args=(user['nombre'], id_ticket, UNIDAD, hora,
                                             bills, total, ticket['barcode']))
                 print_thread.start()
@@ -1575,7 +1608,7 @@ class ServiceScreen(Screen):
                                                                         UNIDAD)
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(target=impresora.imprimir_ticket_cierre, 
+                print_thread = Thread(target=impresora.imprimir_ticket_cierre,
                             args=(user['nombre'], id_ticket, UNIDAD, hora,
                                              bills, total, ticket['barcode']))
                 print_thread.start()
@@ -1609,7 +1642,7 @@ class ServiceScreen(Screen):
 
 
 class CierreScreen(Screen):
-    
+
     def __init__(self, **kwargs):
         ''' Pantalla para reimprimir tickets de cierre antiguos. '''
         super(CierreScreen, self).__init__(**kwargs)
@@ -1647,11 +1680,11 @@ class CierreScreen(Screen):
         self.popup.dismiss()
 
     def check_fecha(self):
-        ''' Verifica que la fecha sea correcta y menor o igaul a la actual. '''
+        ''' Verifica que la fecha sea correcta y menor o igual a la actual. '''
         year = self.ids.year.text
         mes = self.ids.mes.values.index(self.ids.mes.text) + 1
         dia = self.ids.dia.text
-        
+
         unidad = controlador.get_maquina_ubicacion(
                                         self.unidades[self.ids.unidad.text])
         if mes < 10:
@@ -1693,8 +1726,8 @@ class CierreScreen(Screen):
                                                                         unidad)
             ticket = controlador.get_ticket_cierre(id_ticket)
             hora = controlador.get_hora_inicio(unidad, date)
-            print_thread = Thread(target=impresora.imprimir_ticket_cierre, 
-                        args=(user['nombre'], id_ticket, unidad, hora, bills, 
+            print_thread = Thread(target=impresora.imprimir_ticket_cierre,
+                        args=(user['nombre'], id_ticket, unidad, hora, bills,
                                         total, ticket['barcode'], self.day))
             print_thread.start()
         else:
@@ -1837,7 +1870,7 @@ class InfoScreen(Screen):
             self.pressed = True
             self.ids.try_billetes.state = 'down'
             self.cargar_threads()
-        
+
     def cancel(self):
         '''Vuelve a la pantalla anterior'''
         try:

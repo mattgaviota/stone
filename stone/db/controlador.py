@@ -116,7 +116,7 @@ def update_activo(user, valor):
     '''
     Actualiza el campo activo de un usuario(user) con el valor dado.
     valor = 1 -> usuario activo(logueado en el sistema)
-    valor = 0 -> usuario inactivo(no está logueado en el sistema) 
+    valor = 0 -> usuario inactivo(no está logueado en el sistema)
     '''
     db(db.usuarios.dni == user['dni']).update(activo = valor)
     db.commit()
@@ -262,8 +262,8 @@ def get_select_tickets(user, state=2, accion=3):
 
 def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
     '''
-    Retorna True si hay un ticket activo de ese usuario para ese día,
-    en caso contrario retorna False.'''
+    Retorna la fila de un ticket si hay un ticket activo de ese usuario para
+    ese día, en caso contrario retorna False.'''
     tickets = db((db.tickets.id_dia == db.dias.id) &
             (db.tickets.id == db.tickets_log_usuarios.id_ticket) &
             (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
@@ -292,7 +292,7 @@ def has_ticket(user, id_ticket, state=0):
             (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
             (db.log_usuarios.dni == db.usuarios.dni) &
             (db.usuarios.dni == user['dni']))
-    rows = tickets((db.tickets.id == id_ticket) & 
+    rows = tickets((db.tickets.id == id_ticket) &
             ((db.tickets.estado == 1) |
             (db.tickets.estado == 2))).select(db.dias.fecha)
     if rows:
@@ -347,7 +347,7 @@ def update_ticket(id_ticket, user, unidad, state):
         insert_ticket_log(id_ticket, id_log)
     else:
         pass
-    
+
 def anular_ticket(id_ticket, user, unidad):
     '''
     Anula el ticket a traves de su id actualizando el estado.
@@ -371,21 +371,25 @@ def insert_tickets(user, dias, id_log, unit):
     usuario. '''
     data = {}
     for dia in dias:
-        data['id_dia'] = get_id_dia(dia)
-        data['importe'] = get_categoria_importe(user['id_categoria'])
-        data['unidad'] = unit # terminal o web
-        data['estado'] = 2 # activo e impreso
-        fecha = str(int(time()))
-        data['barcode'] = fecha
-        update_tickets_dia(data['id_dia'])
-        id_ticket = db.tickets.insert(**data)
-        db.commit()
-        insert_ticket_log(id_ticket, id_log)
-        id_ticket = str(id_ticket)
-        codigo = fecha + '0' * (10 - len(id_ticket)) + id_ticket
-        db(db.tickets.id == id_ticket).update(barcode = codigo)
-        db.commit()
-        
+        if not get_ticket(user, date=dia):
+            data['id_dia'] = get_id_dia(dia)
+            data['importe'] = get_categoria_importe(user['id_categoria'])
+            data['unidad'] = unit # terminal o web
+            data['estado'] = 2 # activo e impreso
+            fecha = str(int(time()))
+            data['barcode'] = fecha
+            update_tickets_dia(data['id_dia'])
+            id_ticket = db.tickets.insert(**data)
+            db.commit()
+            insert_ticket_log(id_ticket, id_log)
+            id_ticket = str(id_ticket)
+            codigo = fecha + '0' * (10 - len(id_ticket)) + id_ticket
+            db(db.tickets.id == id_ticket).update(barcode = codigo)
+            db.commit()
+            data = {}
+        else:
+            data = {}
+
 ##############
 # Tabla dias #
 ##############
@@ -445,15 +449,15 @@ def get_id_dia(dia):
 def update_tickets_dia(id_dia, cant=1, band=1):
     '''
     Actualiza la cantidad de tickets vendidos de acuerdo a band en cant veces.
-        
+
         band = 1 -> compra aumenta la cantidad de tickets vendidos
         band = 0 -> anulación disminuye la cantidad de tickets vendidos
     '''
     if band:
-        db(db.dias.id == id_dia).update(tickets_vendidos = 
+        db(db.dias.id == id_dia).update(tickets_vendidos =
                                             db.dias.tickets_vendidos + cant)
     else:
-        db(db.dias.id == id_dia).update(tickets_vendidos = 
+        db(db.dias.id == id_dia).update(tickets_vendidos =
                                             db.dias.tickets_vendidos - cant)
     db.commit()
 

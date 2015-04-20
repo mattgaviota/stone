@@ -54,6 +54,7 @@ target/
 
 # conf
 .config/
+config/
 .json
 .sql
 dump.py

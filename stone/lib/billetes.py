@@ -130,6 +130,9 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
         elif resp == '46':
             valor = -1
             cola_billetes.put(valor)
+        elif resp == '49':
+            valor = -1
+            cola_billetes.put(valor)
         else:
             resp = manager.get_status()
 
