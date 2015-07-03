@@ -1,4 +1,4 @@
 stone
 =====
 
-Ticket app
+Ticket app para el comedor universitario.
