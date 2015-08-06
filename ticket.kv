@@ -148,11 +148,11 @@
             text: 'Servicios'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         GridLayout:
-            cols: 4
-            rows: 1
-            padding: 175
+            cols: 3
+            rows: 2
+            padding: 125
             spacing: 10
             size_hint: 1, 0.8
             ButtonU:
@@ -215,6 +215,36 @@
                         allow_stretch: True
                     LabelU:
                         text: 'Tickets de Cierre'
+            ButtonU:
+                on_press: root.tickets_grupales()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/grupales.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Tickets Grupales'
+            ButtonU:
+                on_press: root.anular_grupal()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/anular.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Anular Tickets Grupales'
         BoxLayout:
             size_hint: 0.2, 0.1
             ButtonU:
@@ -246,7 +276,7 @@
             text: 'Información'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         BoxLayout:
             orientation: 'vertical'
             canvas.before:
@@ -259,10 +289,16 @@
             size_hint: 1, 0.7
             GridLayout:
                 cols:2
-                rows:4
+                rows:5
                 padding: 30
                 spacing: 10
                 size_hint: 0.7, 0.4
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Versión"
+                LabelU:
+                    font_size: '20sp'
+                    id: version
                 LabelUA:
                     font_size: '20sp'
                     text: "Ubicación"
@@ -361,7 +397,7 @@
             text: 'Tickets de Cierre'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         BoxLayout:
             orientation: 'vertical'
             canvas.before:
@@ -435,6 +471,195 @@
                         size: 150, 150
                         allow_stretch: True
 
+# TODO GrupalesScreen
+<GrupalesScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Tickets Grupales'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        BoxLayout:
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.93, 0.94, 0.3
+                Rectangle:
+                    # self here refers to the widget i.e BoxLayout
+                    pos: self.pos
+                    size: self.size
+            size_hint: 1, 0.7
+            LabelU:
+                text: "Selecciona día , delegación y cantidad"
+                font_size: '40sp'
+                size_hint: 0.7, 0.1
+            BoxLayout:
+                size_hint: 1, 0.7
+                GridLayout:
+                    cols:2
+                    rows:5
+                    padding: 10
+                    spacing: 5
+                    size_hint: 0.5, 1
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Día - Més - Año"
+                    GridLayout:
+                        cols: 3
+                        rows: 1
+                        spacing: 10
+                        Spinner:
+                            id: dia
+                            values: []
+                        Spinner:
+                            id: mes
+                            values: []
+                        Spinner:
+                            id: year
+                            values: []
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Delegación"
+                    Input:
+                        id: delegacion
+                        hint_text: "Grupo para el cual se solicita"
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Cantidad"
+                    Input:
+                        id: cantidad
+                        hint_text: '# Cantidad de tickets'
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Nro de Recibo"
+                    Input:
+                        id: recibo
+                        hint_text: '# de recibo a entregar.'
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Importe"
+                    Spinner:
+                        id: categorias
+                        values: []
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint: 0.5, 1
+                    BoxLayout:
+                        size_hint: 1, 0.2
+                    BoxLayout:
+                        size_hint: 1, 0.3
+                        BoxLayout:
+                            size_hint: 0.2, 1
+                        BoxLayout:
+                            padding: 30
+                            size_hint: 0.6, 1
+                            ButtonUok:
+                                text: "Imprimir"
+                                on_press: root.confirmacion()
+                        BoxLayout:
+                            size_hint: 0.2, 1
+                    BoxLayout:
+                        size_hint: 1, 0.5
+            BoxLayout:
+                size_hint: 1, 0.2
+        BoxLayout:
+            size_hint: 1, 0.1
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True
+
+# TODO AnularGrupalScreen
+<AnularGrupalScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Anulación de Tickets Grupales'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.7
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                padding: 20
+                spacing: 30
+                size_hint: 0.5, 1
+                orientation: 'vertical'
+                GridLayout:
+                    cols: 2
+                    rows: 2
+                    padding: 60
+                    spacing: 15
+                    size_hint: 1, 0.5
+                    LabelU:
+                        text: 'Número'
+                    LabelU:
+                        text: ''
+                    Input:
+                        id: id_ticket
+                        hint_text: 'Nro ticket'
+                    ButtonUanular:
+                        text: 'Anular'
+                        on_press: root.confirmacion()
+                BoxLayout:
+                    size_hint: 1, 0.5
+            BoxLayout:
+                size_hint: 0.5, 1
+                AsyncImage:
+                    source: 'images/help/ticket_grupal.jpg'
+        BoxLayout:
+            size_hint: 1, 0.1
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True
+
 # TODO ControlScreen
 <ControlScreen>:
     canvas.before:
@@ -449,7 +674,7 @@
             text: '\rSistema de Tickets del Comedor Universitario\r\n Pantalla de Control'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         GridLayout:
             cols:4
             rows:1
@@ -531,7 +756,7 @@
             text: 'Sistema de Tickets del Comedor Universitario'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         GridLayout:
             cols:3
             rows:1
@@ -586,7 +811,7 @@
             id: disponibles
             text: ''
             font_size: '40sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
 
 
 <Input@TextInput>:
@@ -886,7 +1111,7 @@
             text: 'Menu Principal de Usuario'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         GridLayout:
             cols:3
             rows:1
@@ -952,7 +1177,7 @@
             text: 'Opciones'
             valign: 'top'
             font_size: '60sp'
-            size_hint: 1, 0.1 
+            size_hint: 1, 0.1
         GridLayout:
             cols:3
             rows:1
@@ -1299,7 +1524,7 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1                    
+                size_hint: 0.7, 1
                 BoxLayout:
                     size_hint: 1, 0.2
                     LabelU:
@@ -1409,7 +1634,7 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1                    
+                size_hint: 0.7, 1
                 BoxLayout:
                     size_hint: 1, 0.2
                     LabelU:
@@ -1519,7 +1744,7 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1                    
+                size_hint: 0.7, 1
                 BoxLayout:
                     size_hint: 1, 0.2
                     LabelU:
@@ -1621,7 +1846,7 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1                    
+                size_hint: 0.7, 1
                 BoxLayout:
                     size_hint: 1, 0.2
                     LabelU:
@@ -1737,7 +1962,7 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1                    
+                size_hint: 0.7, 1
                 BoxLayout:
                     size_hint: 1, 0.2
                     LabelU:
@@ -1842,7 +2067,7 @@
                 orientation: 'vertical'
                 padding: 20
                 spacing: 30
-                size_hint: 0.7, 1                    
+                size_hint: 0.7, 1
                 BoxLayout:
                     size_hint: 1, 0.2
                     LabelU:

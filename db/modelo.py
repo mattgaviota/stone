@@ -11,11 +11,11 @@ from os import path
 # Cargamos el archivo de configuración
 file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
                 '.config/db.json')
-with open(file_path) as data_file:    
+with open(file_path) as data_file:
     data = json.load(data_file)
 
-db = DAL("postgres://%s:%s@%s:%s/%s" % (data['user'], data['pass'], 
-                data['host'], data['port'], data['db']), pool_size=0)
+db = DAL("postgres://%s:%s@%s:%s/%s" % (data['user'], data['pass'],
+        data['host'], data['port'], data['db']), pool_size=0, lazy_tables=True)
 
 migrate = False
 
@@ -44,6 +44,13 @@ db.define_table('billetes',
     Field('dni', type='reference usuarios'),
     Field('id_maquina', type='reference maquinas'),
     Field('valor', type='double'),
+    migrate=migrate)
+
+db.define_table('billetes_tickets_carga',
+    Field('id', type='integer'),
+    Field('id_ticket_carga', type='reference tickets_carga'),
+    Field('id_billete', type='reference billetes'),
+    primarykey=['id'],
     migrate=migrate)
 
 db.define_table('calendario',
@@ -76,6 +83,13 @@ db.define_table('configuraciones',
     Field('hora_compra', type='integer'),
     Field('saldo_maximo', type='integer'),
     Field('session_time', type='integer'),
+    Field('max_lenght_pass', type='integer'),
+    Field('max_lenght_nombre', type='integer'),
+    Field('max_lenght_dni', type='integer'),
+    Field('max_lenght_lu', type='integer'),
+    Field('max_lenght_mail', type='integer'),
+    Field('caracteres_permitidos', type='string', length=100),
+    Field('clave', type='string', length=40),
     migrate=migrate)
 
 db.define_table('dias',
@@ -85,6 +99,7 @@ db.define_table('dias',
     Field('tickets_vendidos', type='integer'),
     Field('evento', type='string', length=200),
     Field('id_calendario', type='reference calendario', ondelete='SET DEFAULT'),
+    Field('estado', type='integer'),
     migrate=migrate)
 
 db.define_table('estados_maquina',
@@ -189,6 +204,14 @@ db.define_table('tickets',
     Field('barcode', type='string', length=20),
     migrate=migrate)
 
+db.define_table('tickets_carga',
+    Field('id', type='integer'),
+    Field('fecha', type='datetime'),
+    Field('barcode', type='string', length=20),
+    Field('id_log_usuario', type='reference tickets_log_usuarios'),
+    primarykey=['id'],
+    migrate=migrate)
+
 db.define_table('tickets_cierre',
     Field('id', type='id'),
     Field('fecha', type='datetime'),
@@ -198,10 +221,30 @@ db.define_table('tickets_cierre',
     Field('barcode', type='string', length=20),
     migrate=migrate)
 
+db.define_table('tickets_grupales',
+    Field('id', type='id'),
+    Field('barcode', type='string', length=20),
+    Field('cantidad', type='integer'),
+    Field('delegacion', type='string', length=200),
+    Field('id_categoria', type='reference categorias'),
+    Field('id_estado', type='reference estados_tickets'),
+    Field('id_dia', type='reference dias'),
+    Field('importe', type='double'),
+    Field('recibo', type='string', length=30),
+    primarykey=['id'],
+    migrate=migrate)
+
+db.define_table('tickets_grupales_log_usuarios',
+    Field('id', type='id'),
+    Field('id_log_usuario', type='reference log_usuarios'),
+    Field('id_ticket_grupal', type='reference tickets_grupales'),
+    primarykey=['id'],
+    migrate=migrate)
+
 db.define_table('tickets_log_usuarios',
     Field('id', type='id'),
-    Field('id_ticket', type='reference tickets', ondelete='SET DEFAULT'),
-    Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT'),
+    Field('id_ticket', type='reference tickets', ondelete='SET DEFAULT', unique=True),
+    Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT', unique=True),
     migrate=migrate)
 
 db.define_table('tipos_operaciones',
@@ -211,7 +254,7 @@ db.define_table('tipos_operaciones',
     Field('updated', type='datetime'),
     Field('controlador', type='string', length=50),
     Field('accion', type='string', length=50),
-    Field('orden', type='integer'),
+    Field('estado', type='integer'),
     Field('id_menu', type='reference menu', ondelete='SET NULL'),
     migrate=migrate)
 
@@ -224,11 +267,11 @@ db.define_table('usuarios',
     Field('estado', type='reference estados_usuarios', ondelete='SET DEFAULT'),
     Field('id_provincia', type='reference provincias', ondelete='SET DEFAULT'),
     Field('id_facultad', type='reference facultades', ondelete='SET DEFAULT'),
-    Field('id_perfil', type='reference perfiles', ondelete='SET DEFAULT'),
-    Field('id_categoria', type='reference categorias', ondelete='SET DEFAULT'),
+    Field('id_perfil', type='reference perfiles', default=4, ondelete='SET DEFAULT'),
+    Field('id_categoria', type='reference categorias', default=2, ondelete='SET DEFAULT'),
     Field('saldo', type='double', default=0),
     Field('ruta_foto', type='string', length=300),
-    Field('activo',type='integer'),
+    Field('activo', type='integer', default=0),
     primarykey=['dni'],
     migrate=migrate)
 

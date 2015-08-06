@@ -1,9 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2014
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
-#
+
 import smtplib
 import json
 from db import controlador
@@ -17,7 +17,7 @@ def send_mail(name, mail_to, code, data):
     un mensaje almacenado en la DB usando smtplib'''
     mail_from = data['email']
     mail_pass = data['password']
-    
+
     # Construimos el mensaje simple
     mensaje_crudo = data['mensaje_email']
     mensaje_crudo = mensaje_crudo.replace('<nombre>', name)
@@ -34,7 +34,7 @@ def send_mail(name, mail_to, code, data):
         smtpserver.ehlo()
         smtpserver.login(mail_from, mail_pass)
 
-        smtpserver.sendmail(mail_from, mail_to, mensaje.as_string())         
+        smtpserver.sendmail(mail_from, mail_to, mensaje.as_string())
         smtpserver.close()
         return 1
     except Exception as e:

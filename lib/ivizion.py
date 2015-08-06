@@ -1,9 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2014
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
-#
+
 from serial import Serial, EIGHTBITS, PARITY_EVEN, STOPBITS_ONE
 from time import sleep
 
@@ -38,11 +38,11 @@ class Ivizion():
 
     def flush_io(self):
         self.ser.flushInput()
-        self.ser.flushOutput();
+        self.ser.flushOutput()
 
     def send(self, bytelist):
-         self.ser.write(bytelist)
-         sleep(.2)
+        self.ser.write(bytelist)
+        sleep(.2)
 
     def recipe(self, byte_amount=1):
         out = ''

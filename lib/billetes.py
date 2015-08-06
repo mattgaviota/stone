@@ -1,9 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2014
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
-#
+
 from threading import Thread
 from Queue import Empty
 from message import Message
@@ -50,6 +50,7 @@ class Manager():
         answer = self.ivizion.recipe()
         return self.response.get_escrow(answer)
 
+
 def init():
     manager = Manager()
     count = 0
@@ -65,8 +66,14 @@ def init():
                 return
 
 
-def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
-            cola_estado, timeout):
+def pool(
+        cola_billetes,
+        cola_bool,
+        cola_stop,
+        a_ingresar,
+        cola_estado,
+        timeout
+        ):
     manager = Manager()
     total = 0
     stackbill = 0
@@ -92,38 +99,38 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
             else:
                 resp = manager.get_status()
             resp = manager.get_status()
-        elif resp in ['14', '15']: # stacking and vend_valid
-            manager.send_command(cmd=ACK) # send ack response to vend valid
+        elif resp in ['14', '15']:  # stacking and vend_valid
+            manager.send_command(cmd=ACK)  # send ack response to vend valid
             resp = manager.get_status()
             manager.send_command(cmd=INHIBIT, data1='01')
-        elif resp == '16': # stacked
-            resp = manager.get_status() # status request
-        elif resp == '19': # added to keep holding
+        elif resp == '16':  # stacked
+            resp = manager.get_status()  # status request
+        elif resp == '19':  # added to keep holding
             elapsed_time = time()
             if int(elapsed_time - sent_time) >= timeout:
                 if stackbill == 1:
-                    manager.send_command(cmd=STACK_1) # stack 1
+                    manager.send_command(cmd=STACK_1)  # stack 1
                     total += valor
                     timeout = 10
                     stackbill = 0
                     valor = 0
                 elif stackbill == 2:
-                    manager.send_command(cmd=STACK_2) # stack 2
+                    manager.send_command(cmd=STACK_2)  # stack 2
                     total += valor
                     timeout = 10
                     stackbill = 0
                     valor = 0
                 elif stackbill == 0:
                     cola_billetes.put(0)
-                    manager.send_command(cmd=RETURN) # return bill
+                    manager.send_command(cmd=RETURN)  # return bill
                     timeout = 10
                     valor = 0
                 else:
-                    resp = manager.get_status() # else ask for status
+                    resp = manager.get_status()  # else ask for status
             else:
                 manager.send_command(cmd=HOLD)
-        elif resp == '4a': # communication error
-            resp = manager.get_status() # status request
+        elif resp == '4a':  # communication error
+            resp = manager.get_status()  # status request
         elif resp == '45':
             valor = -1
             cola_billetes.put(valor)
@@ -135,7 +142,6 @@ def pool(cola_billetes, cola_bool, cola_stop, a_ingresar,
             cola_billetes.put(valor)
         else:
             resp = manager.get_status()
-
 
         if resp == '13':
             valor = manager.get_escrow()

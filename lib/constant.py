@@ -13,23 +13,23 @@ SYNC = 'FC'
 LNG_5 = '05'
 LNG_6 = '06'
 LNG_7 = '07'
-## Operation command
+# Operation command
 RESET = '40'
 STACK_1 = '41'
 STACK_2 = '42'
 RETURN = '43'
 HOLD = '44'
 WAIT = '45'
-## ACK
+# ACK
 ACK = '50'
-## Setting Command
+# Setting Command
 ENABLE = 'C0'
 SECURITY = 'C1'
 COMMUNICATION = 'C2'
 INHIBIT = 'C3'
 DIRECTION = 'C4'
 OPTIONAL = 'C5'
-## Setting status request
+# Setting status request
 REQ_STATUS = '11'
 REQ_ENABLE = '80'
 REQ_SECURITY = '81'

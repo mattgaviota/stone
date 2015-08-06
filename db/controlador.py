@@ -5,7 +5,10 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 #
 from modelo import db
-from time import strftime, localtime, time
+from psycopg2 import IntegrityError
+from time import time
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 
 ####################
@@ -84,6 +87,17 @@ def get_categoria_limite(id_categoria):
     row = db(db.categorias.id == id_categoria).select(
                                             db.categorias.dias_maximos).first()
     return row.dias_maximos
+
+def get_categorias():
+    ''' Retorna todas las categorias (id, nombre) '''
+    rows = db().select(db.categorias.importe, db.categorias.nombre)
+    categorias = {}
+    if rows:
+        for row in rows:
+            categorias[row['nombre']] = row['importe']
+    else:
+        return None
+    return categorias
 
 ##################
 # Tabla usuarios #
@@ -164,36 +178,40 @@ def insert_log(user, accion, unidad, desc=''):
     '''inserta una entrada en el log, de acuerdo a la acción realizada'''
     data = {}
     data['id_accion'] = get_id_accion(accion)
-    data['fecha'] = strftime('%Y-%m-%d %H:%M:%S', localtime())
+    data['fecha'] = datetime.now()
     data['dni'] = user['dni']
     data['lugar'] = unidad
     data['descripcion'] = "%s %s" %(get_nombre_accion(data['id_accion']), desc)
     id_log = db.log_usuarios.insert(**data)
     db.commit()
-    return id_log
+    if id_log:
+        return id_log
+    else:
+        return None
 
-def get_hora_inicio(unidad, date=strftime('%Y-%m-%d', localtime())):
+def get_hora_inicio(unidad, date=datetime.now()):
     ''' Obtiene la hora de inicio de la maquina. '''
     rows = db((db.log_usuarios.id_accion == get_id_accion('iniciar')) &
               (db.log_usuarios.lugar == unidad)).select(db.log_usuarios.ALL)
     for row in rows:
-        if row.fecha.strftime('%Y-%m-%d') == date and "1er" in row.descripcion:
+        if (row.fecha.strftime('%Y-%m-%d') == date.strftime('%Y-%m-%d')
+                                                and "1er" in row.descripcion):
             return row.fecha.strftime('%H:%M:%S')
 
-def get_hora_cierre(unidad, date=strftime('%Y-%m-%d', localtime())):
+def get_hora_cierre(unidad, date=datetime.now()):
     ''' Obtiene la hora de cierre de la maquina. '''
     rows = db((db.log_usuarios.id_accion == get_id_accion('retiro')) &
               (db.log_usuarios.lugar == unidad)).select(db.log_usuarios.ALL)
     for row in rows:
-        if row.fecha.strftime('%Y-%m-%d') == date:
+        if row.fecha.strftime('%Y-%m-%d') == date.strftime('%Y-%m-%d'):
             return row.fecha.strftime('%H:%M:%S')
 
-def get_log(unidad, accion, date=strftime('%Y-%m-%d', localtime())):
+def get_log(unidad, accion, date=datetime.now()):
     ''' Obtiene el log de cierta accion en cierta maquina el dia de hoy. '''
     rows = db((db.log_usuarios.id_accion == get_id_accion(accion)) &
               (db.log_usuarios.lugar == unidad)).select(db.log_usuarios.ALL)
     for row in rows:
-        if row.fecha.strftime('%Y-%m-%d') == date:
+        if row.fecha.strftime('%Y-%m-%d') == date.strftime('%Y-%m-%d'):
             return row
 
 ##############################
@@ -201,17 +219,43 @@ def get_log(unidad, accion, date=strftime('%Y-%m-%d', localtime())):
 ##############################
 def insert_ticket_log(id_ticket, id_log_usuario):
     '''inserta una entrada en el log de tickets'''
-    data = {}
-    data['id_ticket'] = id_ticket
-    data['id_log_usuario'] = id_log_usuario
-    id_log = db.tickets_log_usuarios.insert(**data)
-    db.commit()
-    return id_log
+    try:
+        data = {}
+        data['id_ticket'] = id_ticket
+        data['id_log_usuario'] = id_log_usuario
+        id_log = db.tickets_log_usuarios.insert(**data)
+        db.commit()
+        if id_log:
+            return id_log
+        else:
+            return None
+    except IntegrityError:
+        db.rollback()
+        return None
+
+#######################################
+# Tabla tickets_grupales_log_usuarios #
+#######################################
+def insert_ticket_grupal_log(id_ticket, id_log_usuario):
+    '''inserta una entrada en el log de tickets grupales'''
+    try:
+        data = {}
+        data['id_ticket_grupal'] = id_ticket
+        data['id_log_usuario'] = id_log_usuario
+        id_log = db.tickets_grupales_log_usuarios.insert(**data)
+        db.commit()
+        if id_log:
+            return id_log
+        else:
+            return None
+    except IntegrityError:
+        db.rollback()
+        return None
 
 #################
 # Tabla tickets #
 #################
-def get_tickets(user, cant=5, date=strftime('%Y-%m-%d', localtime()), state=0):
+def get_tickets(user, cant=5, date=datetime.now(), state=2):
     '''
     Obtiene cant números de tickets de un usuario a partir de la fecha date
     inclusive, siempre que estos estén tengan el estado = state
@@ -222,7 +266,7 @@ def get_tickets(user, cant=5, date=strftime('%Y-%m-%d', localtime()), state=0):
             (db.log_usuarios.dni == db.usuarios.dni))
     rows = tickets((db.usuarios.dni == user['dni']) &
                 (db.dias.fecha >= date) &
-                (db.tickets.estado != state)).select(db.dias.fecha,
+                (db.tickets.estado == state)).select(db.dias.fecha,
                         db.tickets.importe, db.tickets.estado, db.tickets.id,
                         db.tickets.barcode, limitby=(0, cant),
                         orderby=db.dias.fecha)
@@ -260,7 +304,25 @@ def get_select_tickets(user, state=2, accion=3):
             (db.log_usuarios.id_accion == accion)).select()
     return cantidad
 
-def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
+def get_ticket_by_id(id_ticket):
+    ''' Retorna la fila de un ticket de acuerdo al id_ticket '''
+    rows = db((db.tickets.id == id_ticket) &
+            (db.tickets.id_dia == db.dias.id)).select(db.dias.fecha,
+                                 db.tickets.importe, db.tickets.estado,
+                                 db.tickets.id, db.tickets.barcode)
+    if rows:
+        row = rows.first()
+        fila = {}
+        fila['fecha'] = row['dias']['fecha']
+        fila['importe'] = row['tickets']['importe']
+        fila['estado'] = row['tickets']['estado']
+        fila['id'] = row['tickets']['id']
+        fila['barcode'] = row['tickets']['barcode']
+        return fila
+    else:
+        return None
+
+def get_ticket(user, date):
     '''
     Retorna la fila de un ticket si hay un ticket activo de ese usuario para
     ese día, en caso contrario retorna False.'''
@@ -270,7 +332,8 @@ def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
             (db.log_usuarios.dni == db.usuarios.dni))
     rows = tickets((db.usuarios.dni == user['dni']) &
             (db.dias.fecha == date) &
-            (db.tickets.estado != state)).select(db.dias.fecha,
+            ((db.tickets.estado == 2) |
+            (db.tickets.estado == 1))).select(db.dias.fecha,
                             db.tickets.importe, db.tickets.estado,
                             db.tickets.id, db.tickets.barcode)
     if rows:
@@ -283,7 +346,7 @@ def get_ticket(user, date=strftime('%Y-%m-%d', localtime()), state=0):
         fila['barcode'] = row['tickets']['barcode']
         return fila
     else:
-        return False
+        return None
 
 def has_ticket(user, id_ticket, state=0):
     ''' Retorna la fecha de un ticket, si es que existe para el usuario user.'''
@@ -297,9 +360,9 @@ def has_ticket(user, id_ticket, state=0):
             (db.tickets.estado == 2))).select(db.dias.fecha)
     if rows:
         row = rows.first()
-        return row['fecha'].strftime('%d/%m/%Y')
+        return row['fecha']
     else:
-        return ''
+        return None
 
 def get_importe_ticket(id_ticket):
     '''
@@ -328,7 +391,7 @@ def update_ticket(id_ticket, user, unidad, state):
     estado = 4 -> vencido
     estado = 3 -> consumido
     estado = 2 -> impreso
-    estado = 1 -> activo
+    estado = 1 -> reservado
     estado = 0 -> anulado
     '''
     db(db.tickets.id == id_ticket).update(estado = state)
@@ -366,29 +429,56 @@ def anular_ticket(id_ticket, user, unidad):
     update_saldo(user, importe, 0)
     update_tickets_dia(get_dia_ticket(id_ticket), band=0)
 
-def insert_tickets(user, dias, id_log, unit):
-    ''' Inserta tickets de acuerdo a los días pasados como parametros para ese
+def reservar_tickets(user, dias, id_log, unit):
+    ''' Reserva tickets de acuerdo a los días pasados como parametros para ese
     usuario. '''
     data = {}
+    tickets_reservados = []
+    dias_full = []
     for dia in dias:
-        if not get_ticket(user, date=dia):
+        disponibles = get_tickets_disponibles(dia)
+        if disponibles:
             data['id_dia'] = get_id_dia(dia)
             data['importe'] = get_categoria_importe(user['id_categoria'])
             data['unidad'] = unit # terminal o web
-            data['estado'] = 2 # activo e impreso
+            data['estado'] = 1 # reservado
             fecha = str(int(time()))
             data['barcode'] = fecha
-            update_tickets_dia(data['id_dia'])
+            update_tickets_dia(data['id_dia']) # tickets_vendidos + 1
             id_ticket = db.tickets.insert(**data)
             db.commit()
+            # agregar el ticket y el día como reservado
+            tickets_reservados.append((id_ticket, data['id_dia']));
             insert_ticket_log(id_ticket, id_log)
             id_ticket = str(id_ticket)
             codigo = fecha + '0' * (10 - len(id_ticket)) + id_ticket
             db(db.tickets.id == id_ticket).update(barcode = codigo)
             db.commit()
-            data = {}
         else:
-            data = {}
+            # agregar el día como no disponible
+            dias_full.append(dia)
+        data = {}
+    if len(dias) == (len(tickets_reservados) + len(dias_full)):
+        return tickets_reservados, dias_full, 1
+    else:
+        return tickets_reservados, dias_full, 0
+
+def comprar_tickets(tickets_reservados, id_log):
+    ''' compra los tickets reservados al cambiarles el estado de reservado(1)
+    a impresos(2) e inserta el log de compra para cada ticket.'''
+    for id_ticket, dia in tickets_reservados:
+        insert_ticket_log(id_ticket, id_log)
+        db(db.tickets.id == id_ticket).update(estado = 2)
+        db.commit()
+
+def cancelar_tickets(tickets_reservados):
+    ''' Cancela los tickets pasados como parametro cambiando el estado de
+    reservado(1) a cancelado (5) y aumenta los tickets disponibles para ese
+    día.'''
+    for id_ticket, id_dia in tickets_reservados:
+        db(db.tickets.id == id_ticket).update(estado = 5)
+        db.commit()
+        update_tickets_dia(id_dia, band=0)
 
 ##############
 # Tabla dias #
@@ -403,39 +493,32 @@ def  get_dias(user, limit):
     lista_dias = []
     if limit > cantidad:
         limit -= cantidad
-        today = localtime()
         hora = get_hora_compra()
-        if today.tm_hour < hora:
-            date = strftime('%Y-%m-%d', today)
-        else:
-            date = '%d-%d-%d' % (today.tm_year, today.tm_mon, today.tm_mday + 1)
+        date = datetime.now()
+        if date.hour > hora:
+            date = date + relativedelta(days=1)
+
         rows = db((db.dias.tickets_vendidos < db.dias.tickets_totales) &
                 (db.dias.fecha >= date)).select(db.dias.fecha,
                                         orderby=db.dias.fecha)
         for row in rows:
-            date = row.fecha.strftime('%d/%m/%Y')
-            if ((not get_ticket(user, date)) and (len(lista_dias) < limit)):
-                fecha = row.fecha
-                fecha = "%s %s" % (weekdays[fecha.weekday()], date)
+            if ((not get_ticket(user, row.fecha)) and (len(lista_dias) < limit)):
+                fecha = "%s %s" % (weekdays[row.fecha.weekday()],
+                                                row.fecha.strftime('%d/%m/%Y'))
                 lista_nombres.append(fecha)
-                lista_dias.append(date)
+                lista_dias.append(row.fecha)
         return lista_dias, lista_nombres
     else:
         return lista_dias, lista_nombres
 
-def get_tickets_disponibles(date=strftime('%Y-%m-%d', localtime())):
+def get_tickets_disponibles(date=datetime.now()):
     '''Devuelve los tickets disponibles para cierto día. Por defecto para
     el día de hoy. '''
     row = db(db.dias.fecha == date).select(db.dias.ALL).first()
-    today = localtime()
-    hora = get_hora_compra()
     if row:
         disponibles = row.tickets_totales - row.tickets_vendidos
-        if disponibles >= 0:
-            if today.tm_hour <= hora:
-                return disponibles
-            else:
-                return 0
+        if disponibles > 0:
+            return disponibles
         else:
             return 0
     else:
@@ -445,6 +528,22 @@ def get_id_dia(dia):
     '''Retorna el id de un día de acuerdo a la fecha'''
     row = db(db.dias.fecha == dia).select(db.dias.id).first()
     return row.id
+
+def update_totales_dia(id_dia, cantidad=1, band=1):
+    '''
+    Actualiza la cantidad de tickets totales de acuerdo a band en cantidad
+    de veces:
+
+        band = 1 -> aumenta la cantidad de tickets totales
+        band = 0 -> disminuye la cantidad de tickets totales
+    '''
+    if band:
+        db(db.dias.id == id_dia).update(tickets_totales =
+                                        db.dias.tickets_totales + cantidad)
+    else:
+        db(db.dias.id == id_dia).update(tickets_totales =
+                                        db.dias.tickets_totales - cantidad)
+    db.commit()
 
 def update_tickets_dia(id_dia, cant=1, band=1):
     '''
@@ -570,21 +669,21 @@ def update_estado_maquina(id_maquina, state):
 def insert_billete(user, valor, id_maquina):
     ''' Registra el ingreso de billetes, indicando el valor y la maquina. '''
     data = {}
-    data['fecha'] = strftime('%Y-%m-%d %H:%M:%S', localtime())
+    data['fecha'] = datetime.now()
     data['dni'] = user['dni']
     data['valor'] = valor
     data['id_maquina'] = id_maquina
     db.billetes.insert(**data)
     db.commit()
 
-def get_total(unidad, date=strftime('%Y-%m-%d', localtime())):
+def get_total(unidad, date=datetime.now()):
     ''' Obtiene el total de billetes ingresados en una maquina'''
     rows = db((db.billetes.id_maquina == db.maquinas.id) &
               (db.maquinas.id == unidad)).select(db.billetes.ALL)
     total = 0
     billetes = {2: 0, 5: 0, 10: 0, 20: 0, 50: 0, 100: 0}
     for row in rows:
-        if row.fecha.strftime('%Y-%m-%d') == date:
+        if row.fecha.strftime('%Y-%m-%d') == date.strftime('%Y-%m-%d'):
             total += row.valor
             try:
                 billetes[row.valor] += 1
@@ -599,7 +698,7 @@ def insert_ticket_cierre(id_log, total, unidad):
     ''' Registra el ticket de cierre de acuerdo al total de dinero retirado y
     la maquina donde se hace. '''
     data = {}
-    data['fecha'] = strftime('%Y-%m-%d %H:%M:%S', localtime())
+    data['fecha'] = datetime.now()
     data['total'] = total
     data['id_log_usuario'] = id_log
     data['id_maquina'] = unidad
@@ -621,11 +720,130 @@ def get_ticket_cierre(id_ticket):
     else:
         return None
 
-def get_id_ticket_cierre(unidad, date=strftime('%Y-%m-%d', localtime())):
+def get_id_ticket_cierre(unidad, date=datetime.now()):
     ''' Obtiene el id del ticket de  cierre de acuerdo al día
     y a la unidad. '''
     rows = db(db.tickets_cierre.id_maquina == unidad).select()
     for row in rows:
-        if row.fecha.strftime('%Y-%m-%d') == date:
+        if row.fecha.strftime('%Y-%m-%d') == date.strftime('%Y-%m-%d'):
             return row.id
     return None
+
+##########################
+# Tabla tickets_grupales #
+##########################
+def comprar_ticket_grupal(cant, delegacion, categoria, date, recibo, id_log):
+    '''Compra un ticket grupal agregando la cant extra de días necesarios
+    para la fecha date, indicando la delegación.'''
+    data = {}
+    data['id_dia'] = get_id_dia(date)
+    data['importe'] = categoria[0] # 0 -> importe
+    data['id_categoria'] = get_categoria_id(categoria[1]) # 1 -> nombre
+    data['cantidad'] = cant
+    data['id_estado'] = 2 # impreso
+    data['delegacion'] = delegacion
+    data['recibo'] = recibo
+    fecha = str(int(time()))
+    data['barcode'] = fecha
+    update_tickets_dia(data['id_dia'], cant, 1) # tickets_vendidos + cant
+    update_totales_dia(data['id_dia'], cant, 1) # tickets_totales + cant
+    id_ticket = db.tickets_grupales.insert(**data)
+    db.commit()
+    insert_ticket_grupal_log(id_ticket['id'], id_log)
+    id_ticket = str(id_ticket['id'])
+    codigo = 'G' + fecha[1:] + '0' * (10 - len(id_ticket)) + id_ticket
+    db(db.tickets_grupales.id == id_ticket).update(barcode = codigo)
+    db.commit()
+    return id_ticket
+
+def get_ticket_grupal_by_id(id_ticket):
+    ''' Retorna la fila de un ticket grupal de acuerdo al id_ticket '''
+    rows = db(
+            (db.tickets_grupales.id == id_ticket) &
+            (db.tickets_grupales.id_dia == db.dias.id)).select(
+                                                db.dias.fecha,
+                                                db.tickets_grupales.importe,
+                                                db.tickets_grupales.id,
+                                                db.tickets_grupales.cantidad,
+                                                db.tickets_grupales.delegacion,
+                                                db.tickets_grupales.recibo,
+                                                db.tickets_grupales.barcode
+            )
+    if rows:
+        row = rows.first()
+        fila = {}
+        fila['fecha'] = row['dias']['fecha']
+        fila['importe'] = row['tickets_grupales']['importe']
+        fila['delegacion'] = row['tickets_grupales']['delegacion']
+        fila['recibo'] = row['tickets_grupales']['recibo']
+        fila['cantidad'] = row['tickets_grupales']['cantidad']
+        fila['id'] = row['tickets_grupales']['id']
+        fila['barcode'] = row['tickets_grupales']['barcode']
+        return fila
+    else:
+        return None
+
+def has_ticket_grupal(id_ticket, state=0):
+    ''' Retorna la fecha de un ticket grupal, si es que existe.'''
+    tickets = db((db.tickets_grupales.id_dia == db.dias.id) &
+            (db.tickets_grupales.id == id_ticket) &
+            ((db.tickets.estado == 1) |
+            (db.tickets.estado == 2))).select(db.dias.fecha)
+    if tickets:
+        ticket = tickets.first()
+        return ticket['fecha']
+    else:
+        return None
+
+def get_dia_ticket_grupal(id_ticket):
+    '''
+    Retorna el id del día del ticket grupal a traves de su id, en caso de no
+    encontrar ninguno retorna None
+    '''
+    row = db(db.tickets_grupales.id == id_ticket).select().first()
+    if row:
+        return row.id_dia
+    else:
+        return None
+
+def get_cant_ticket_grupal(id_ticket):
+    '''
+    Retorna la cantidad del día del ticket grupal a traves de su id,
+    en caso de no encontrar ninguno retorna None
+    '''
+    row = db(db.tickets_grupales.id == id_ticket).select().first()
+    if row:
+        return row.cantidad
+    else:
+        return None
+
+def update_ticket_grupal(id_ticket, user, unidad, state):
+    ''' Actualiza el estado del ticket por su id.
+    estado = 4 -> vencido
+    estado = 3 -> consumido
+    estado = 2 -> impreso
+    estado = 1 -> reservado
+    estado = 0 -> anulado
+    '''
+    db(db.tickets_grupales.id == id_ticket).update(id_estado = state)
+    db.commit()
+    if state == 2:
+        id_log = insert_log(user, 'imprimir_grupal', unidad)
+        insert_ticket_grupal_log(id_ticket, id_log)
+    elif state == 0:
+        id_log = insert_log(user, 'anular_grupal', unidad)
+        insert_ticket_grupal_log(id_ticket, id_log)
+    else:
+        pass
+
+def anular_ticket_grupal(id_ticket, user, unidad):
+    '''
+    Anula el ticket grupal a traves de su id actualizando el estado.
+    estado = 0 -> anulado
+    Además inserta en el log el ticket anulado y los tickets vendidos de ese día.
+    '''
+    update_ticket_grupal(id_ticket, user, unidad, 0)
+    dia = get_dia_ticket_grupal(id_ticket)
+    cant = get_cant_ticket_grupal(id_ticket)
+    update_tickets_dia(dia, cant, 0) # tickets_vendidos - cant
+    update_totales_dia(dia, cant, 0) # tickets_totales - cant
