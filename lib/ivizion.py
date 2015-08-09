@@ -23,8 +23,8 @@ class Ivizion():
     def connect(self):
         try:
             self.ser.open()
-        except Exception, e:
-            print "error open serial port: " + str(e)
+        except Exception as e:
+            print(("error open serial port: " + str(e)))
 
     def is_connected(self):
         return self.ser.isOpen()

@@ -50,8 +50,8 @@ class CRC16Kermit(object):
             crcValue = low_byte | high_byte
 
             return crcValue
-        except Exception, e:
-            print "EXCEPTION(calculate): {}".format(e)
+        except Exception as e:
+            print(("EXCEPTION(calculate): {}".format(e)))
 
     def get_crc(self, string=''):
         '''return a list of string with de low byte and the high byte of

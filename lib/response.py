@@ -16,7 +16,7 @@ class Response():
         data = answer[6:-4]
         escrow = BILL_VALUE[data]
         return escrow
-        
+
     def show_response(self, answer, opt):
         if opt in (RESET, STACK_1, STACK_2, HOLD, WAIT, RETURN):
             resp = answer[4:6]
@@ -41,18 +41,18 @@ class Response():
             else:
                 respuesta = self.resolve_data(resp, answer[6:-4])
             mensaje = ''
-        
+
         print mensaje + respuesta
 
     def resolve_data(self, resp, data):
         if resp == '13':
-            return '%s: %d pesos' %(STATUS_RESULT[resp], BILL_VALUE[data])
+            return '%s: %d pesos' % (STATUS_RESULT[resp], BILL_VALUE[data])
         elif resp == '83':
-            return 'Inhibit: %s' %(bool(int(data, 16)),)
+            return 'Inhibit: %s' % (bool(int(data, 16)),)
         elif resp == '17':
-            return '%s: %s' %(STATUS_RESULT[resp], REJECT_DATA[data])
+            return '%s: %s' % (STATUS_RESULT[resp], REJECT_DATA[data])
         elif resp == '49':
-            return '%s: %s' %(STATUS_RESULT[resp], FAILURE_DATA[data])
+            return '%s: %s' % (STATUS_RESULT[resp], FAILURE_DATA[data])
         elif resp == '88':
             return self.resolve_version(data)
         elif resp == '89':
@@ -74,7 +74,7 @@ class Response():
         respuesta = """
             Version
             =======
-            
+
             Machine code:     %s
             Country code:     %s
             Model number:     %s
@@ -82,7 +82,7 @@ class Response():
             Interface type:   %s
             Software version: %s
             Date:             %s
-        """ %(mc, cc, mn, st, it, sv, date)
+        """ % (mc, cc, mn, st, it, sv, date)
         return respuesta
 
     def resolve_currency(self, data):
@@ -101,7 +101,7 @@ class Response():
         respuesta = """
             Currency
             ========
-            
+
             Escrow    Country code    Denomination
             ------    ------------    ------------
               %s           %s              %s

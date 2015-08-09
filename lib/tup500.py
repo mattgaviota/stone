@@ -21,8 +21,8 @@ class Tup500():
     def connect(self):
         try:
             self.ser.open()
-        except Exception, e:
-            print "error open serial port: " + str(e)
+        except Exception as e:
+            print(("error open serial port: " + str(e)))
 
     def is_connected(self):
         return self.ser.isOpen()
@@ -36,10 +36,10 @@ class Tup500():
 
     def flush_io(self):
         self.ser.flushInput()
-        self.ser.flushOutput();
+        self.ser.flushOutput()
 
     def send(self, bytelist):
-         self.ser.write(bytelist)
+        self.ser.write(bytelist)
 
     def recipe(self, byte_amount=1):
         out = ''

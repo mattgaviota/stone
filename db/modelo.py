@@ -98,7 +98,11 @@ db.define_table('dias',
     Field('tickets_totales', type='integer'),
     Field('tickets_vendidos', type='integer'),
     Field('evento', type='string', length=200),
-    Field('id_calendario', type='reference calendario', ondelete='SET DEFAULT'),
+    Field(
+        'id_calendario',
+        type='reference calendario',
+        ondelete='SET DEFAULT'
+    ),
     Field('estado', type='integer'),
     migrate=migrate)
 
@@ -183,7 +187,11 @@ db.define_table('perfiles',
 db.define_table('perfiles_tipos_operaciones',
     Field('id', type='id'),
     Field('id_perfil', type='reference perfiles', ondelete='SET NULL'),
-    Field('id_tipo_operacion', type='reference tipos_operaciones', ondelete='SET NULL'),
+    Field(
+        'id_tipo_operacion',
+        type='reference tipos_operaciones',
+        ondelete='SET NULL'
+    ),
     Field('created', type='datetime'),
     Field('updated', type='datetime'),
     migrate=migrate)
@@ -243,8 +251,18 @@ db.define_table('tickets_grupales_log_usuarios',
 
 db.define_table('tickets_log_usuarios',
     Field('id', type='id'),
-    Field('id_ticket', type='reference tickets', ondelete='SET DEFAULT', unique=True),
-    Field('id_log_usuario', type='reference log_usuarios', ondelete='SET DEFAULT', unique=True),
+    Field(
+        'id_ticket',
+        type='reference tickets',
+        ondelete='SET DEFAULT',
+        unique=True
+    ),
+    Field(
+        'id_log_usuario',
+        type='reference log_usuarios',
+        ondelete='SET DEFAULT',
+        unique=True
+    ),
     migrate=migrate)
 
 db.define_table('tipos_operaciones',
@@ -267,8 +285,18 @@ db.define_table('usuarios',
     Field('estado', type='reference estados_usuarios', ondelete='SET DEFAULT'),
     Field('id_provincia', type='reference provincias', ondelete='SET DEFAULT'),
     Field('id_facultad', type='reference facultades', ondelete='SET DEFAULT'),
-    Field('id_perfil', type='reference perfiles', default=4, ondelete='SET DEFAULT'),
-    Field('id_categoria', type='reference categorias', default=2, ondelete='SET DEFAULT'),
+    Field(
+        'id_perfil',
+        type='reference perfiles',
+        default=4,
+        ondelete='SET DEFAULT'
+    ),
+    Field(
+        'id_categoria',
+        type='reference categorias',
+        default=2,
+        ondelete='SET DEFAULT'
+    ),
     Field('saldo', type='double', default=0),
     Field('ruta_foto', type='string', length=300),
     Field('activo', type='integer', default=0),

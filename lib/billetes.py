@@ -4,7 +4,6 @@
 # Año: 2014
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 
-from threading import Thread
 from Queue import Empty
 from message import Message
 from ivizion import Ivizion

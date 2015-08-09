@@ -18,7 +18,6 @@ from db import controlador
 from lib import mailserver, session, utils, impresora, billetes
 # Kivy related imports
 from kivy.app import App
-from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen, WipeTransition
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
@@ -41,12 +40,13 @@ with open(path) as file_data:
     version_file = json.load(file_data)
     VERSION = version_file['Version']['numero']
 
+
 class ConfirmPopup(GridLayout):
     text = StringProperty()
 
-    def __init__(self,**kwargs):
+    def __init__(self, **kwargs):
         self.register_event_type('on_answer')
-        super(ConfirmPopup,self).__init__(**kwargs)
+        super(ConfirmPopup, self).__init__(**kwargs)
 
     def on_answer(self, *args):
         pass
@@ -1946,7 +1946,7 @@ class InfoScreen(Screen):
         else:
             self.ids.hora_inicio.text = u"El sistema no ha iniciado"
         if hora_cierre:
-            self.ids.hora_cierre.text = hora_ciere
+            self.ids.hora_cierre.text = hora_cierre
         else:
             self.ids.hora_cierre.text = u"El sistema no ha cerrado"
         self.try_conexion()

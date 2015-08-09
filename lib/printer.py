@@ -8,7 +8,7 @@
 # las páginas se refieren al archivo comandos de impresora en la carpeta doc/
 
 from tup500 import Tup500
-from time import sleep, strftime, localtime, mktime
+from time import sleep, strftime, localtime
 
 
 class Printer():
@@ -59,8 +59,8 @@ class Printer():
         sleep(0.8)
         status = self.tup.recipe()
         offline = int(status[4:6], 16)
-        error_mech = int(status[6:8], 16)
-        error_jam = int(status[8:10], 16)
+        # error_mech = int(status[6:8], 16)
+        # error_jam = int(status[8:10], 16)
         paper = int(status[10:12], 16)
         if not offline:
             if not paper:

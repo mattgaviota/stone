@@ -5,11 +5,7 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 
 import smtplib
-import json
-from db import controlador
-from os import path
 from email.MIMEText import MIMEText
-from email.Encoders import encode_base64
 
 
 def send_mail(name, mail_to, code, data):
@@ -38,5 +34,5 @@ def send_mail(name, mail_to, code, data):
         smtpserver.close()
         return 1
     except Exception as e:
-        print str(e)
+        print((str(e)))
         return 0
