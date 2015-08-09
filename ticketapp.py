@@ -4,7 +4,7 @@
 # Autor: Matias Novoa
 # Año: 2014
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
-#
+
 # Utility import
 import re
 from threading import Thread, Event
