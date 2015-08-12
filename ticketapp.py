@@ -53,7 +53,7 @@ class ConfirmPopup(GridLayout):
 
 
 class WarningPopup(Popup):
-    '''Ventana Popup para mostrar los mensajes'''
+    """Ventana Popup para mostrar los mensajes"""
     def __init__(self, mensaje, **kwargs):
         self.mensaje = mensaje
         super(WarningPopup, self).__init__(**kwargs)
@@ -62,7 +62,7 @@ class WarningPopup(Popup):
 class PasswordScreen(Screen):
 
     def __init__(self, screen_accept, screen_cancel, name):
-        '''Pantalla para cambiar el password actual'''
+        """Pantalla para cambiar el password actual"""
         self.scr_accept = screen_accept
         self.scr_cancel = screen_cancel
         self.data = {}
@@ -74,7 +74,7 @@ class PasswordScreen(Screen):
         Screen.__init__(self)
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de anulación'''
+        """Carga los datos del usuario dentro de la pantalla de anulación"""
         try:
             user_session.update(controlador.get_usuario(self.data['dni']))
             self.user = user_session.get_user()
@@ -89,7 +89,7 @@ class PasswordScreen(Screen):
         self.data['ruta_foto'] = self.user['ruta_foto']
 
     def validar(self):
-        '''Valida las entradas y llama al metodo que cambia el password'''
+        """Valida las entradas y llama al metodo que cambia el password"""
         if not self.ids.old_pass.text:
             mensaje = u"Debe ingresar el password actual"
             self.ids.old_pass.focus = True
@@ -129,10 +129,10 @@ class PasswordScreen(Screen):
 
 
     def cancel(self):
-        '''
+        """
         Limpia los campos y regresa a la pantalla scr_cancel.
         Si el usuario no esta activo cierra la sesión.
-        '''
+        """
         self.clear()
         user = user_session.get_user()
         if user['estado'] == 1:
@@ -140,7 +140,7 @@ class PasswordScreen(Screen):
         self.manager.current = self.scr_cancel
 
     def clear(self):
-        '''Limpia los campos de texto y libera el teclado virtual'''
+        """Limpia los campos de texto y libera el teclado virtual"""
         self.ids.old_pass.text = ''
         self.ids.new_pass.text = ''
         self.ids.re_new_pass.text = ''
@@ -148,10 +148,10 @@ class PasswordScreen(Screen):
         Window.release_all_keyboards()
 
     def check_pass(self, new_pass):
-        '''
+        """
         Chequea que los caracteres de la contraseña esten dentro del grupo y
         que la longitud no exceda los 15 caracteres.
-        '''
+        """
         caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#$%&?.-_"
         if len(new_pass) <= 64:
             for char in new_pass:
@@ -162,9 +162,9 @@ class PasswordScreen(Screen):
             return 0
 
     def cambiar_pass(self, user):
-        '''Chequea que el password ingresado sea igual al almacenado y revisa
+        """Chequea que el password ingresado sea igual al almacenado y revisa
         que los password nuevos coincidan. Si es así, actualiza el password
-        del usuario.'''
+        del usuario."""
         old_pass = utils.md5_pass(self.ids.old_pass.text)
         pass_db = user['password']
         pass_db = pass_db[4:-4] # control interno
@@ -187,22 +187,22 @@ class PasswordScreen(Screen):
 
 
 class MenuScreen(Screen):
-    '''Pantalla de menu de usuario'''
+    """Pantalla de menu de usuario"""
 
     def __init__(self, **kwargs):
         super(MenuScreen, self).__init__(**kwargs)
 
     def options(self):
-        '''Crea y accede a la pantalla de opciones'''
+        """Crea y accede a la pantalla de opciones"""
         if not self.manager.has_screen('opciones'):
             self.manager.add_widget(OptionScreen(name='opciones'))
         self.manager.current = 'opciones'
 
     def comprar(self):
-        '''
+        """
         Crea y accede a la pantalla de compra de tickets siempre y cuando
         haya papel en la impresora.
-        '''
+        """
         estado = impresora.check_status()
         if estado == 1:
             controlador.update_estado_maquina(UNIDAD, 1)
@@ -219,8 +219,8 @@ class MenuScreen(Screen):
             WarningPopup(mensaje).open()
 
     def logout(self):
-        '''Cierra la sesion, libera las pantallas que no se van a usar y
-        vuelve a la pantalla principal'''
+        """Cierra la sesion, libera las pantallas que no se van a usar y
+        vuelve a la pantalla principal"""
         user = user_session.get_user()
         controlador.insert_log(user, 'salir', UNIDAD)
         controlador.update_activo(user, 0)
@@ -235,16 +235,16 @@ class MenuScreen(Screen):
 
 
 class OptionScreen(Screen):
-    '''Pantalla de opciones de usuario'''
+    """Pantalla de opciones de usuario"""
 
     def anular(self):
-        '''Crea y accede a la pantalla de anulación de tickets'''
+        """Crea y accede a la pantalla de anulación de tickets"""
         if not self.manager.has_screen('anular'):
             self.manager.add_widget(AnularScreen(name='anular'))
         self.manager.current = 'anular'
 
     def cargar(self):
-        '''Crea y accede a la pantalla de carga de saldo'''
+        """Crea y accede a la pantalla de carga de saldo"""
         self.user = user_session.get_user()
         if self.user['saldo'] >= 100:
             mensaje = "No puede cargar más de $ 100"
@@ -255,13 +255,13 @@ class OptionScreen(Screen):
             self.manager.current = 'carga'
 
     def perfil(self):
-        '''Crea y accede a la pantalla de perfil'''
+        """Crea y accede a la pantalla de perfil"""
         if not self.manager.has_screen('profile'):
             self.manager.add_widget(ProfileScreen(name='profile'))
         self.manager.current = 'profile'
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior'''
+        """Vuelve a la pantalla anterior"""
         if self.manager.has_screen('anular'):
             self.manager.remove_widget(self.manager.get_screen('anular'))
         if self.manager.has_screen('profile'):
@@ -274,7 +274,7 @@ class OptionScreen(Screen):
 class Compra1Screen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para elegir los días de compra de tickets'''
+        """Pantalla para elegir los días de compra de tickets"""
         self.data = {}
         self.user = user_session.get_user()
         self.data['nombre'] = self.user['nombre']
@@ -289,7 +289,7 @@ class Compra1Screen(Screen):
         self.cargar_datos()
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         user_session.update(controlador.get_usuario(self.data['dni']))
         self.user = user_session.get_user()
         self.cargar_datos()
@@ -300,7 +300,7 @@ class Compra1Screen(Screen):
         self.ids.hasta.text = self.dias_hasta[0]
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de compra'''
+        """Carga los datos del usuario dentro de la pantalla de compra"""
         limite = controlador.get_categoria_limite(self.user['id_categoria'])
         self.dias_desde, self.d_name = controlador.get_dias(self.user, limite)
         if not self.dias_desde:
@@ -328,12 +328,12 @@ class Compra1Screen(Screen):
             self.ids.posibles.text = str(self.tickets_posibles)
 
     def controlar_dias(self):
-        '''
+        """
         Controla los días elegidos para que no hayan problemas de rango
         Retorna:
             None si el rango está mal.
             Una lista si el rango está bien o es un solo día.
-        '''
+        """
         desde = self.d_name.index(self.ids.desde.text)
         if self.ids.hasta.text:
             if self.ids.hasta.text != u"Solo para este día":
@@ -350,14 +350,14 @@ class Compra1Screen(Screen):
             return [self.dias_desde[desde]]
 
     def medio_de_pago(self):
-        '''
+        """
         Función que se ejecuta al presionar continuar. Decide en base al saldo
         disponible a que pantalla saltar.
         Si el saldo es mayor al importe necesario para realizar la compra va a
         la pantalla de confirmación.
         Si el saldo es menor o insuficiente para realizar la compra va a la
         pantalla de ingreso de billetes.
-        '''
+        """
         sleep(1)
         dias = self.controlar_dias()
         if dias:
@@ -380,14 +380,14 @@ class Compra1Screen(Screen):
             WarningPopup(mensaje).open()
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         self.manager.current = 'menu'
         self.manager.remove_widget(self.manager.get_screen('compra_1'))
 
 class Compra2Screen(Screen):
 
     def __init__(self, dias, saldo, **kwargs):
-        '''Pantalla para comprar usando efectivo.'''
+        """Pantalla para comprar usando efectivo."""
         self.user = user_session.get_user()
         id_log = controlador.insert_log(self.user, 'reservar', UNIDAD)
         self.reserva, full, state = controlador.reservar_tickets(self.user,
@@ -414,7 +414,7 @@ class Compra2Screen(Screen):
         super(Compra2Screen, self).__init__(**kwargs)
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         user_session.update(controlador.get_usuario(self.data['dni']))
         self.user = user_session.get_user()
         self.cargar_datos()
@@ -424,20 +424,20 @@ class Compra2Screen(Screen):
 
     @mainthread
     def update_ingreso(self, valor, disabled):
-        '''
+        """
         Muestra la imagen del billete ingresado y habilita el botón de
         confirmación.
-        '''
+        """
         source = "./images/billetes/%sp.jpg" % (valor)
         self.ids.ingresado.source = source
         self.ids.btn_confirmar.disabled = disabled
 
     def leer_billetes(self, cola_billetes):
-        '''
+        """
         Inicia el proceso de lectura de billetes. Cuando detecta un billete
         actualiza la pantalla para mostrar lo ingresado y permite que el
         billete se cargue en la maquina.
-        '''
+        """
         while True:
             try:
                 self.valor = cola_billetes.get(False)
@@ -462,7 +462,7 @@ class Compra2Screen(Screen):
         self.manager.current = 'bloqueo'
 
     def billete_trabado(self):
-        ''' Registra los billetes trabados. '''
+        """ Registra los billetes trabados. """
         self.update_ingreso("jam", True)
         controlador.insert_log(self.user, 'jam', UNIDAD)
         self.stop.set()
@@ -476,10 +476,10 @@ class Compra2Screen(Screen):
         self.bloquear()
 
     def cargar_billetes(self):
-        '''
+        """
         Inicia el hilo que se encarga de almacenar el billete en la maquina.
         Comprueba el dinero faltante.
-        '''
+        """
         Thread(target=self.stack, args=(self.cola_bool,)).start()
         sleep(1)
         self.update_ingreso("no", True)
@@ -501,10 +501,10 @@ class Compra2Screen(Screen):
         self.update_ingreso("no", True)
 
     def comprar_tickets(self, excedente):
-        '''
+        """
         Realiza la inserción de los tickets en la db y cambia a la
         siguiente pantalla.
-        '''
+        """
         if self.bandera:
             id_log = controlador.insert_log(self.user, 'comprar', UNIDAD)
             if id_log:
@@ -535,9 +535,9 @@ class Compra2Screen(Screen):
                 self.cancel()
 
     def imprimir_todos(self):
-        '''
+        """
         Imprime todos los tickets que se hayan comprado.
-        '''
+        """
         id_log = controlador.insert_log(self.user, 'imprimir', UNIDAD)
         ticket_list = []
         for ticket, id_dia in self.reserva:
@@ -566,11 +566,11 @@ class Compra2Screen(Screen):
         print_thread.start()
 
     def stack(self, cola_bool):
-        '''Envía la orden para almacenar el billete en la lectora.'''
+        """Envía la orden para almacenar el billete en la lectora."""
         cola_bool.put(1)
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de compra'''
+        """Carga los datos del usuario dentro de la pantalla de compra"""
         self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
         self.data['saldo'] = "$ %.0f" % (self.user['saldo'])
@@ -588,10 +588,10 @@ class Compra2Screen(Screen):
         self.data['faltante'] = "$ %.0f" % (self.faltante)
 
     def cargar_threads(self):
-        '''
+        """
         Carga e inicia los hilos que manejan la maquina verificadora de
         billetes.
-        '''
+        """
         self.cola_bool = Queue()
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
@@ -610,7 +610,7 @@ class Compra2Screen(Screen):
         bill_thread.start()
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         self.stop.set()
         self.cola_stop.put(True)
         if self.total_parcial:
@@ -643,7 +643,7 @@ class Compra2Screen(Screen):
 class Compra3Screen(Screen):
 
     def __init__(self, dias, titulo, **kwargs):
-        '''Pantalla para confirmar e imprimir los tickets'''
+        """Pantalla para confirmar e imprimir los tickets"""
         self.user = user_session.get_user()
         id_log = controlador.insert_log(self.user, 'reservar', UNIDAD)
         self.reserva, full, state = controlador.reservar_tickets(self.user,
@@ -666,7 +666,7 @@ class Compra3Screen(Screen):
         super(Compra3Screen, self).__init__(**kwargs)
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         user_session.update(controlador.get_usuario(self.data['dni']))
         self.user = user_session.get_user()
         self.cargar_datos()
@@ -674,7 +674,7 @@ class Compra3Screen(Screen):
         self.ids.nombre.text = self.data['nombre']
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de compra'''
+        """Carga los datos del usuario dentro de la pantalla de compra"""
         self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
         self.data['saldo'] = '$ %.0f' % (self.user['saldo'])
@@ -692,7 +692,7 @@ class Compra3Screen(Screen):
         self.data['titulo'] = self.titulo
 
     def confirmar_tickets(self):
-        '''Confirma la compra y verifica que haya saldo suficiente.'''
+        """Confirma la compra y verifica que haya saldo suficiente."""
         content = ConfirmPopup(text='Seguro deseas comprar?')
         content.bind(on_answer=self._on_answer)
         self.popup = Popup(title="Advertencia",
@@ -708,9 +708,9 @@ class Compra3Screen(Screen):
         self.popup.dismiss()
 
     def imprimir_todos(self):
-        '''
+        """
         Imprime todos los tickets que se hayan comprado.
-        '''
+        """
         id_log = controlador.insert_log(self.user, 'imprimir', UNIDAD)
         ticket_list = []
         for ticket, id_dia in self.reserva:
@@ -739,10 +739,10 @@ class Compra3Screen(Screen):
         print_thread.start()
 
     def comprar_tickets(self):
-        '''
+        """
         Realiza la inserción de los tickets en la db y cambia a la
         siguiente pantalla.
-        '''
+        """
         if self.bandera:
             id_log = controlador.insert_log(self.user, 'comprar', UNIDAD)
             if id_log:
@@ -763,14 +763,14 @@ class Compra3Screen(Screen):
 
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         controlador.cancelar_tickets(self.reserva)
         self.manager.current = 'compra_1'
         self.manager.remove_widget(self.manager.get_screen('compra_3'))
 
 
 class ConfirmacionScreen(Screen):
-    ''' Pantalla para mostrar una confirmación de compra '''
+    """ Pantalla para mostrar una confirmación de compra """
 
     def __init__ (self, cantidad, **kwargs):
         self.cantidad = cantidad
@@ -779,7 +779,7 @@ class ConfirmacionScreen(Screen):
         super(ConfirmacionScreen, self).__init__(**kwargs)
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de compra'''
+        """Carga los datos del usuario dentro de la pantalla de compra"""
         self.user = user_session.get_user()
         self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
@@ -793,14 +793,14 @@ class ConfirmacionScreen(Screen):
         self.saldo = self.user['saldo']
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         user_session.update(controlador.get_usuario(self.data['dni']))
         self.cargar_datos()
         self.ids.saldo.text = self.data['saldo']
         self.ids.nombre.text = self.data['nombre']
 
     def cancel(self):
-        '''Regresa a la pantalla principal'''
+        """Regresa a la pantalla principal"""
         self.manager.current = 'menu'
         self.manager.remove_widget(self.manager.get_screen('confirmacion'))
 
@@ -808,45 +808,45 @@ class ConfirmacionScreen(Screen):
 class AyudaScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para mostrar la ayuda'''
+        """Pantalla para mostrar la ayuda"""
         self.data = {}
         self.cargar_datos()
         super(AyudaScreen, self).__init__(**kwargs)
 
     def cargar_datos(self):
-        '''Carga los datos de los videos dentro de la pantalla de ayuda.'''
+        """Carga los datos de los videos dentro de la pantalla de ayuda."""
         self.data['titulo'] = 'Ningún video cargado'
         self.playlist = controlador.get_videos()
 
     def play(self, source):
-        '''Reproduce el video del playlist correspondiente al source.'''
+        """Reproduce el video del playlist correspondiente al source."""
         self.ids.player.play = False
         self.ids.titulo.text = self.playlist[source][1]
         self.ids.player.source = self.playlist[source][0]
         self.ids.player.play = True
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         self.manager.current = 'splash'
 
 
 class ProfileScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para ver/modificar el perfil del usuario'''
+        """Pantalla para ver/modificar el perfil del usuario"""
         self.data = {}
         self.provincias = controlador.get_all_provincias()
         self.cargar_datos()
         super(ProfileScreen, self).__init__(**kwargs)
 
     def cambiar_pass(self):
-        '''Llama a la pantalla de cambiar password'''
+        """Llama a la pantalla de cambiar password"""
         if not self.manager.has_screen('pass'):
             self.manager.add_widget(PasswordScreen('profile', 'profile', 'pass'))
         self.manager.current = 'pass'
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de perfil'''
+        """Carga los datos del usuario dentro de la pantalla de perfil"""
         try:
             user_session.update(controlador.get_usuario(self.data['dni']))
             self.user = user_session.get_user()
@@ -866,7 +866,7 @@ class ProfileScreen(Screen):
         self.data['ruta_foto'] = self.user['ruta_foto']
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         self.cargar_datos()
         self.ids.nombre.text = self.data['nombre']
         self.ids.email.text = self.data['email']
@@ -874,7 +874,7 @@ class ProfileScreen(Screen):
         self.ids.saldo.text = self.data['saldo']
 
     def update_profile(self):
-        '''Actualiza el perfil con los cambios realizados por el usuario'''
+        """Actualiza el perfil con los cambios realizados por el usuario"""
         self.updata = {}
         self.updata['nombre'] = self.ids.nombre.text
         self.updata['email'] = self.ids.email.text
@@ -885,19 +885,19 @@ class ProfileScreen(Screen):
         self.cargar_datos()
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior'''
+        """Vuelve a la pantalla anterior"""
         self.manager.current = 'opciones'
 
     def mailvalidator(self, email):
-        '''Valida que el mail esté bien formado'''
+        """Valida que el mail esté bien formado"""
         if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
                         email) != None:
             return 1
         return 0
 
     def validar(self):
-        '''Valida las entradas de texto y actualiza el perfil de usuario si
-         todo esta bien.'''
+        """Valida las entradas de texto y actualiza el perfil de usuario si
+         todo esta bien."""
         if not self.ids.nombre.text:
             mensaje = u"Su NOMBRE no puede estar vacío"
             self.ids.nombre.focus = True
@@ -934,14 +934,14 @@ class ProfileScreen(Screen):
 class AnularScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para anular los tickets del usuario'''
+        """Pantalla para anular los tickets del usuario"""
         self.data = {}
         self.cargar_datos()
         super(AnularScreen, self).__init__(**kwargs)
 
     def validar_anulacion(self):
-        '''Verifica que el numero ingresado corresponda a un ticket valido
-        para el usuario y que sea antes de la hora máxima permitida.'''
+        """Verifica que el numero ingresado corresponda a un ticket valido
+        para el usuario y que sea antes de la hora máxima permitida."""
         if self.ids.id_ticket.text:
             if not self.ids.id_ticket.text.isdigit():
                 self.ids.id_ticket.text = ""
@@ -1002,25 +1002,25 @@ class AnularScreen(Screen):
         self.popup.dismiss()
 
     def ticket_vencido(self):
-        ''' Anula el ticket vencido poniendo el estado vencido. '''
+        """ Anula el ticket vencido poniendo el estado vencido. """
         id_ticket = int(self.ids.id_ticket.text)
         controlador.update_ticket(id_ticket, self.user, UNIDAD, 4)
 
     def anular_ticket(self):
-        '''Anula el ticket de acuerdo al id ingresado'''
+        """Anula el ticket de acuerdo al id ingresado"""
         id_ticket = int(self.ids.id_ticket.text)
         controlador.anular_ticket(id_ticket, self.user, UNIDAD)
         self.update_datos()
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         user_session.update(controlador.get_usuario(self.data['dni']))
         self.cargar_datos()
         self.ids.saldo.text = self.data['saldo']
         self.ids.nombre.text = self.data['nombre']
 
     def check_hora(self, fecha, hora):
-        '''Verifica que no se pueda anular un ticket despues de la hora'''
+        """Verifica que no se pueda anular un ticket despues de la hora"""
         ahora = datetime.now()
         if ahora.date() < fecha.date():
             return 1 # Ok (anular)
@@ -1035,7 +1035,7 @@ class AnularScreen(Screen):
                 return 2 # Hora posterior al permitido.(vencer)
 
     def cargar_datos(self):
-        '''Carga los datos del usuario dentro de la pantalla de anulación'''
+        """Carga los datos del usuario dentro de la pantalla de anulación"""
         self.user = user_session.get_user()
         self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
@@ -1045,14 +1045,14 @@ class AnularScreen(Screen):
         self.data['ruta_foto'] = self.user['ruta_foto']
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         self.manager.current = 'opciones'
 
 
 class CargaScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para comprar usando efectivo.'''
+        """Pantalla para comprar usando efectivo."""
         self.data = {}
         self.stop = Event()
         self.cargar_datos()
@@ -1061,7 +1061,7 @@ class CargaScreen(Screen):
         super(CargaScreen, self).__init__(**kwargs)
 
     def update_datos(self):
-        '''Actualiza los datos de la pantalla para plasmar cambios'''
+        """Actualiza los datos de la pantalla para plasmar cambios"""
         user_session.update(controlador.get_usuario(self.data['dni']))
         self.cargar_datos()
         self.ids.saldo.text = self.data['saldo']
@@ -1069,20 +1069,20 @@ class CargaScreen(Screen):
 
     @mainthread
     def update_ingreso(self, valor, disabled):
-        '''
+        """
         Muestra la imagen del billete ingresado y habilita el botón de
         confirmación.
-        '''
+        """
         source = "./images/billetes/%sp.jpg" % (valor)
         self.ids.ingresado.source = source
         self.ids.btn_confirmar.disabled = disabled
 
     def leer_billetes(self, cola_billetes):
-        '''
+        """
         Inicia el proceso de lectura de billetes. Cuando detecta un billete
         actualiza la pantalla para mostrar lo ingresado y permite que el
         billete se cargue en la maquina.
-        '''
+        """
         while True:
             try:
                 self.valor = cola_billetes.get(False)
@@ -1113,7 +1113,7 @@ class CargaScreen(Screen):
         self.manager.current = 'bloqueo'
 
     def billete_trabado(self):
-        ''' Registra los billetes trabados. '''
+        """ Registra los billetes trabados. """
         self.update_ingreso("jam", True)
         controlador.insert_log(self.user, 'jam', UNIDAD)
         self.stop.set()
@@ -1127,10 +1127,10 @@ class CargaScreen(Screen):
         self.bloquear()
 
     def cargar_billetes(self):
-        '''
+        """
         Inicia el hilo que se encarga de almacenar el billete en la maquina
         una vez que se presiona el boton de confirmar.
-        '''
+        """
         Thread(target=self.stack, args=(self.cola_bool, 1)).start()
         sleep(1)
         self.update_ingreso("", True)
@@ -1139,21 +1139,21 @@ class CargaScreen(Screen):
         self.cargar_saldo()
 
     def cargar_saldo(self):
-        '''
+        """
         Actualiza el saldo de acuerdo a los billetes que vayan ingresando.
-        '''
+        """
         controlador.update_saldo(self.user, self.valor, 0)
         self.total += self.valor
         self.update_datos()
 
     def stack(self, cola_bool, value):
-        '''Envía la orden para almacenar el billete en la lectora.'''
+        """Envía la orden para almacenar el billete en la lectora."""
         cola_bool.put(value)
 
     def cargar_datos(self):
-        '''
+        """
         Carga los datos del usuario dentro de la pantalla de carga.
-        '''
+        """
         self.user = user_session.get_user()
         self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
@@ -1165,10 +1165,10 @@ class CargaScreen(Screen):
         self.data['ruta_foto'] = self.user['ruta_foto']
 
     def cargar_threads(self):
-        '''
+        """
         Carga e inicia los hilos que manejan la maquina verificadora de
         billetes.
-        '''
+        """
         self.cola_bool = Queue()
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
@@ -1189,7 +1189,7 @@ class CargaScreen(Screen):
         bill_thread.start()
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         if self.total:
             if impresora.check_status() == 1:
                 log = controlador.insert_log(self.user, 'cargar', UNIDAD,
@@ -1230,30 +1230,30 @@ class CargaScreen(Screen):
 class SplashScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla de acceso - Pantalla principal'''
+        """Pantalla de acceso - Pantalla principal"""
         self.disponibles = StringProperty()
         super(SplashScreen, self).__init__(**kwargs)
         Clock.schedule_interval(self.update_disponibles, 60)
 
     def update_disponibles(self, dt):
-        '''
+        """
         Revisa la cantidad de tickets disponibles y llama a la función que
         muestra el cartel.
-        '''
+        """
         tickets_disponibles = controlador.get_tickets_disponibles()
         self.update_label(tickets_disponibles)
 
     def update_label(self, tickets):
-        '''Actualiza el cartel con los tickets disponibles para el día.'''
+        """Actualiza el cartel con los tickets disponibles para el día."""
         self.disponibles = u"Tickets disponibles para hoy : %s" % (tickets)
         self.ids.disponibles.text = self.disponibles
 
     def login(self):
-        ''' Ingresa a la pantalla de login '''
+        """ Ingresa a la pantalla de login """
         self.manager.current = "login"
 
     def registro(self):
-        ''' Ingresa a la pantalla de registro si hay internet. '''
+        """ Ingresa a la pantalla de registro si hay internet. """
         if utils.internet_on():
             self.manager.current = "formulario"
         else:
@@ -1262,7 +1262,7 @@ class SplashScreen(Screen):
 
 
 class FormScreen(Screen):
-    '''Pantalla de registro del sistema'''
+    """Pantalla de registro del sistema"""
 
     def __init__(self, **kwargs):
         self.facultades = controlador.get_all_facultades()
@@ -1278,19 +1278,19 @@ class FormScreen(Screen):
         self.ids.provincia.text = 'Salta'
 
     def mailvalidator(self, email):
-        '''Valida que el mail esté bien formado'''
+        """Valida que el mail esté bien formado"""
         if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
                                                                 email) != None:
             return 1
         return 0
 
     def chequear_alumno(self, lu, dni):
-        '''
+        """
         Chequea los datos ingresados para ver que correspondan con un alumno.
         Retorna 1 -> Si los datos están bien y tiene 2 o más materias.
         Retorna 2 -> Si los datos están bien pero no tiene 2 o más materias.
         Retorna 0 -> Si los datos no se corresponden con un alumno.
-        '''
+        """
         id_alumno = controlador.get_alumno(lu, dni)
         if id_alumno:
             if controlador.get_materias(id_alumno) >=2:
@@ -1301,8 +1301,8 @@ class FormScreen(Screen):
             return 0
 
     def validar(self):
-        '''Valida las entradas de texto y manda a registrar al usuario
-        si todo esta bien.'''
+        """Valida las entradas de texto y manda a registrar al usuario
+        si todo esta bien."""
         if self.ids.dni.text:
             if not self.ids.dni.text.isdigit():
                 mensaje = u"Su DNI solo puede contenter números"
@@ -1381,7 +1381,7 @@ class FormScreen(Screen):
             WarningPopup(mensaje).open()
 
     def clear(self):
-        '''Limpia los campos de texto y libera el teclado virtual'''
+        """Limpia los campos de texto y libera el teclado virtual"""
         self.ids.dni.text = ""
         self.ids.nombre.text = ""
         self.ids.lu.text = ""
@@ -1391,8 +1391,8 @@ class FormScreen(Screen):
         Window.release_all_keyboards()
 
     def registrar_usuario(self, estado=1):
-        '''Registra los usuarios de acuerdo a lo ingresado en el formulario.
-        Llamando a los metodos insert_usuario y a send_mail'''
+        """Registra los usuarios de acuerdo a lo ingresado en el formulario.
+        Llamando a los metodos insert_usuario y a send_mail"""
         user = controlador.get_usuario(self.ids.dni.text)
         if not user:
             data = {}
@@ -1422,13 +1422,13 @@ class FormScreen(Screen):
             WarningPopup(mensaje).open()
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior.'''
+        """Vuelve a la pantalla anterior."""
         self.clear()
         self.manager.current = 'splash'
 
 
 class LoginScreen(Screen):
-    '''Pantalla para ingresar al sistema'''
+    """Pantalla para ingresar al sistema"""
 
     def __init__(self, **kwargs):
         self.data = {}
@@ -1438,8 +1438,8 @@ class LoginScreen(Screen):
         super(LoginScreen, self).__init__(**kwargs)
 
     def validar(self):
-        '''Valida las entradas y chequea en la base de datos por el par
-        dni - password'''
+        """Valida las entradas y chequea en la base de datos por el par
+        dni - password"""
         if self.ids.dni.text:
             if not self.ids.dni.text.isdigit():
                 self.ids.dni.text = ""
@@ -1502,19 +1502,19 @@ class LoginScreen(Screen):
             WarningPopup(mensaje).open()
 
     def clear(self):
-        '''Limpia los campos de texto y libera el teclado virtual'''
+        """Limpia los campos de texto y libera el teclado virtual"""
         self.ids.dni.text = ""
         self.ids.passw.text = ""
         Window.release_all_keyboards()
 
     def validar_login(self, dni, password):
-        '''Revisa el password de acuerdo al dni ingresado y devuelve los
+        """Revisa el password de acuerdo al dni ingresado y devuelve los
         siguientes estados:
             0: No existe el dni o no coincide con el password
             1: Existe el usuario pero no confirmó su registro(cambiar pass)
             2: Existe el usuario y está registrado(ingresar)
             3: Existe el usuario pero esta suspendido(cancelar ingreso)
-            6: Existe el usuario y es de control(pantalla de control)'''
+            6: Existe el usuario y es de control(pantalla de control)"""
         user = controlador.get_usuario(dni)
         if user:
             if self.comparar_pass(password, user):
@@ -1538,7 +1538,7 @@ class LoginScreen(Screen):
             return 0
 
     def comparar_pass(self, password, user):
-        '''compara el pass ingresado con el pass de la db'''
+        """compara el pass ingresado con el pass de la db"""
         pass_ingresado = utils.md5_pass(password)
         pass_db = utils.aclarar_pass(user['password']) # control interno
         if pass_ingresado == pass_db:
@@ -1552,10 +1552,10 @@ class LoginScreen(Screen):
 
 
 class ServiceScreen(Screen):
-    '''Pantalla de servicio de control'''
+    """Pantalla de servicio de control"""
 
     def imprimir(self):
-        '''imprime un ticket de control'''
+        """imprime un ticket de control"""
         estado = impresora.check_status()
         if estado == 1:
             user = user_session.get_user()
@@ -1597,10 +1597,10 @@ class ServiceScreen(Screen):
         self.popup.dismiss()
 
     def retirar(self):
-        '''
+        """
         Controla que se pueda hacer un ticket de cierre para poder
         retirar el dinero.
-        '''
+        """
         user = user_session.get_user()
         retiro = controlador.get_log(UNIDAD, 'retiro')
         hora = controlador.get_hora_inicio(UNIDAD)
@@ -1644,39 +1644,39 @@ class ServiceScreen(Screen):
             WarningPopup(mensaje).open()
 
     def informacion(self):
-        '''
+        """
         Crea y accede a la pantalla de información del estado de la maquina.
-        '''
+        """
         if not self.manager.has_screen('info'):
             self.manager.add_widget(InfoScreen(name='info'))
         self.manager.current = 'info'
 
     def tickets_cierre(self):
-        '''
+        """
         Crea y accede a la pantalla de impresión de tickets de cierre.
-        '''
+        """
         if not self.manager.has_screen('cierre'):
             self.manager.add_widget(CierreScreen(name='cierre'))
         self.manager.current = 'cierre'
 
     def tickets_grupales(self):
-        '''
+        """
         Crea y accede a la pantalla de impresión de tickets grupales.
-        '''
+        """
         if not self.manager.has_screen('grupales'):
             self.manager.add_widget(GrupalesScreen(name='grupales'))
         self.manager.current = 'grupales'
 
     def anular_grupal(self):
-        '''
+        """
         Crea y accede a la pantalla de anulación de tickets grupales.
-        '''
+        """
         if not self.manager.has_screen('anular_grupal'):
             self.manager.add_widget(AnularGrupalScreen(name='anular_grupal'))
         self.manager.current = 'anular_grupal'
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior'''
+        """Vuelve a la pantalla anterior"""
         self.manager.current = 'menu_control'
         self.manager.remove_widget(self.manager.get_screen('servicios'))
 
@@ -1684,12 +1684,12 @@ class ServiceScreen(Screen):
 class CierreScreen(Screen):
 
     def __init__(self, **kwargs):
-        ''' Pantalla para reimprimir tickets de cierre antiguos. '''
+        """ Pantalla para reimprimir tickets de cierre antiguos. """
         super(CierreScreen, self).__init__(**kwargs)
         self.cargar_datos()
 
     def cargar_datos(self):
-        ''' Carga los datos de los días. '''
+        """ Carga los datos de los días. """
         self.unidades = controlador.get_all_facultades()
         self.ids.year.values = ['2015', '2016', '2017', '2018', '2019']
         self.ids.mes.values = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',\
@@ -1720,7 +1720,7 @@ class CierreScreen(Screen):
         self.popup.dismiss()
 
     def check_fecha(self):
-        ''' Verifica que la fecha sea correcta y menor o igual a la actual. '''
+        """ Verifica que la fecha sea correcta y menor o igual a la actual. """
         year = int(self.ids.year.text)
         mes = self.ids.mes.values.index(self.ids.mes.text) + 1
         dia = int(self.ids.dia.text)
@@ -1738,7 +1738,7 @@ class CierreScreen(Screen):
             WarningPopup(mensaje).open()
 
     def print_ticket_cierre(self, unidad, date):
-        ''' Imprime el ticket de cierre de la unidad y del día(date) dado '''
+        """ Imprime el ticket de cierre de la unidad y del día(date) dado """
         total, bills = controlador.get_total(unidad, date)
         user = user_session.get_user()
         desc = 'Control - Cierre de la maquina %d del dia %s' % (unidad,
@@ -1756,7 +1756,7 @@ class CierreScreen(Screen):
         print_thread.start()
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior'''
+        """Vuelve a la pantalla anterior"""
         self.manager.current = 'servicios'
         self.manager.remove_widget(self.manager.get_screen('cierre'))
 
@@ -1764,12 +1764,12 @@ class CierreScreen(Screen):
 class GrupalesScreen(Screen):
 
     def __init__(self, **kwargs):
-        ''' Pantalla para reimprimir tickets de cierre antiguos. '''
+        """ Pantalla para reimprimir tickets de cierre antiguos. """
         super(GrupalesScreen, self).__init__(**kwargs)
         self.cargar_datos()
 
     def cargar_datos(self):
-        ''' Carga los datos de los días. '''
+        """ Carga los datos de los días. """
         self.categorias = controlador.get_categorias()
         self.unidades = controlador.get_all_facultades()
         self.ids.year.values = ['2015', '2016', '2017', '2018', '2019']
@@ -1801,7 +1801,7 @@ class GrupalesScreen(Screen):
         self.popup.dismiss()
 
     def check_fecha(self):
-        ''' Verifica que la fecha sea correcta y menor o igual a la actual. '''
+        """ Verifica que la fecha sea correcta y menor o igual a la actual. """
         year = int(self.ids.year.text)
         mes = self.ids.mes.values.index(self.ids.mes.text) + 1
         dia = int(self.ids.dia.text)
@@ -1822,10 +1822,10 @@ class GrupalesScreen(Screen):
             WarningPopup(mensaje).open()
 
     def print_ticket_grupal(self, cant, delegacion, cat, date, recibo):
-        '''
+        """
         Imprime el ticket grupal para el día(date), para la delegación
         dada y la cantidad solicitada.
-        '''
+        """
         user = user_session.get_user()
         id_log = controlador.insert_log(user, 'comprar_grupal', UNIDAD)
         ticket_grupal = controlador.comprar_ticket_grupal(cant, delegacion,
@@ -1852,7 +1852,7 @@ class GrupalesScreen(Screen):
         self.cancel()
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior'''
+        """Vuelve a la pantalla anterior"""
         self.manager.current = 'servicios'
         self.manager.remove_widget(self.manager.get_screen('grupales'))
 
@@ -1860,14 +1860,14 @@ class GrupalesScreen(Screen):
 class AnularGrupalScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para anular los tickets del usuario'''
+        """Pantalla para anular los tickets del usuario"""
         self.data = {}
         self.user = user_session.get_user()
         super(AnularGrupalScreen, self).__init__(**kwargs)
 
     def validar_anulacion(self):
-        '''Verifica que el numero ingresado corresponda a un ticket valido
-        para el usuario y que sea antes de la hora máxima permitida.'''
+        """Verifica que el numero ingresado corresponda a un ticket valido
+        para el usuario y que sea antes de la hora máxima permitida."""
         if self.ids.id_ticket.text:
             if not self.ids.id_ticket.text.isdigit():
                 self.ids.id_ticket.text = ""
@@ -1911,12 +1911,12 @@ class AnularGrupalScreen(Screen):
         self.popup.dismiss()
 
     def anular_ticket_grupal(self):
-        '''Anula el ticket de acuerdo al id ingresado'''
+        """Anula el ticket de acuerdo al id ingresado"""
         id_ticket = int(self.ids.id_ticket.text)
         controlador.anular_ticket_grupal(id_ticket, self.user, UNIDAD)
 
     def cancel(self):
-        '''Vuelve a una pantalla anterior'''
+        """Vuelve a una pantalla anterior"""
         self.manager.current = 'servicios'
         self.manager.remove_widget(self.manager.get_screen('anular_grupal'))
 
@@ -1924,7 +1924,7 @@ class AnularGrupalScreen(Screen):
 class InfoScreen(Screen):
 
     def __init__(self, **kwargs):
-        '''Pantalla para revisar la información referida a la maquina'''
+        """Pantalla para revisar la información referida a la maquina"""
         self.stop = Event()
         self.pressed = False
         super(InfoScreen, self).__init__(**kwargs)
@@ -1933,7 +1933,7 @@ class InfoScreen(Screen):
         carga_thread.start()
 
     def cargar_datos(self):
-        '''Carga los datos de la maquina'''
+        """Carga los datos de la maquina"""
         ubicacion = controlador.get_ubicacion(UNIDAD)
         self.ids.ubicacion.text = ubicacion
         self.ids.unidad.text = str(UNIDAD)
@@ -1976,7 +1976,7 @@ class InfoScreen(Screen):
                 controlador.update_estado_maquina(UNIDAD, 5)
 
     def try_papel(self):
-        '''Verifica el estado del papel en la maquina.'''
+        """Verifica el estado del papel en la maquina."""
         self.ids.papel.text = "probando..."
         sleep(0.5)
         estado = impresora.check_status()
@@ -1992,19 +1992,19 @@ class InfoScreen(Screen):
 
     @mainthread
     def update_ingreso(self, valor):
-        '''
+        """
         Muestra la imagen del billete ingresado y habilita el botón de
         confirmación.
-        '''
+        """
         source = "./images/billetes/%sp.jpg" % (valor)
         self.ids.ingresado.source = source
 
     def leer_billetes(self, cola_billetes):
-        '''
+        """
         Inicia el proceso de lectura de billetes. Cuando detecta un billete
         actualiza la pantalla para mostrar lo ingresado y permite que el
         billete se cargue en la maquina.
-        '''
+        """
         while True:
             try:
                 self.valor = cola_billetes.get(False)
@@ -2020,10 +2020,10 @@ class InfoScreen(Screen):
             sleep(0.1)
 
     def cargar_threads(self):
-        '''
+        """
         Carga e inicia los hilos que manejan la maquina verificadora de
         billetes.
-        '''
+        """
         self.cola_bool = Queue()
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
@@ -2043,7 +2043,7 @@ class InfoScreen(Screen):
         bill_thread.start()
 
     def try_billetes(self):
-        '''Activa la impresora para probar su funcionamiento'''
+        """Activa la impresora para probar su funcionamiento"""
         if self.pressed:
             self.stop.set()
             self.cola_stop.put(True)
@@ -2056,7 +2056,7 @@ class InfoScreen(Screen):
             self.cargar_threads()
 
     def cancel(self):
-        '''Vuelve a la pantalla anterior'''
+        """Vuelve a la pantalla anterior"""
         try:
             self.stop.set()
             self.cola_stop.put(True)
@@ -2067,10 +2067,10 @@ class InfoScreen(Screen):
 
 
 class ControlScreen(Screen):
-    '''Pantalla de menú de control'''
+    """Pantalla de menú de control"""
 
     def iniciar(self):
-        '''Accede a la pantalla principal del sistema'''
+        """Accede a la pantalla principal del sistema"""
         user = user_session.get_user()
         hora = controlador.get_hora_inicio(UNIDAD)
         retiro = controlador.get_log(UNIDAD, 'retiro')
@@ -2082,7 +2082,7 @@ class ControlScreen(Screen):
         self.manager.current = 'splash'
 
     def servicios(self):
-        '''Crea y accede a la pantalla de servicios'''
+        """Crea y accede a la pantalla de servicios"""
         if not self.manager.has_screen('servicios'):
             self.manager.add_widget(ServiceScreen(name='servicios'))
         self.manager.current = 'servicios'
@@ -2120,7 +2120,7 @@ class ControlScreen(Screen):
         self.popup.dismiss()
 
     def reiniciar(self):
-        '''Cierra la sesion y apaga la maquina'''
+        """Cierra la sesion y apaga la maquina"""
         user = user_session.get_user()
         controlador.insert_log(user, 'apagar', UNIDAD, 'Control - reinicio')
         user_session.close()
@@ -2128,7 +2128,7 @@ class ControlScreen(Screen):
         system("/sbin/shutdown -r now")
 
     def apagar(self):
-        '''Cierra la sesion y apaga la maquina'''
+        """Cierra la sesion y apaga la maquina"""
         user = user_session.get_user()
         controlador.insert_log(user, 'apagar', UNIDAD, 'Control')
         user_session.close()
@@ -2139,8 +2139,8 @@ class ControlScreen(Screen):
 class BloqueoScreen(Screen):
 
     def validar(self):
-        '''Valida las entradas y chequea en la base de datos por el par
-        dni - password'''
+        """Valida las entradas y chequea en la base de datos por el par
+        dni - password"""
         if self.ids.dni.text:
             if not self.ids.dni.text.isdigit():
                 self.ids.dni.text = ""
@@ -2181,13 +2181,13 @@ class BloqueoScreen(Screen):
             WarningPopup(mensaje).open()
 
     def validar_login(self, dni, password):
-        '''Revisa el password de acuerdo al dni ingresado y devuelve los
+        """Revisa el password de acuerdo al dni ingresado y devuelve los
         siguientes estados:
             0: No existe el dni o no coincide con el password
             1: Existe el usuario pero no confirmó su registro(cambiar pass)
             2: Existe el usuario y está registrado(ingresar)
             3: Existe el usuario pero esta suspendido(cancelar ingreso)
-            6: Existe el usuario y es de control(pantalla de control)'''
+            6: Existe el usuario y es de control(pantalla de control)"""
         user = controlador.get_usuario(dni)
         if user:
             if self.comparar_pass(password, user):
@@ -2201,7 +2201,7 @@ class BloqueoScreen(Screen):
             return 0
 
     def comparar_pass(self, password, user):
-        '''compara el pass ingresado con el pass de la db'''
+        """compara el pass ingresado con el pass de la db"""
         pass_ingresado = utils.md5_pass(password)
         pass_db = utils.aclarar_pass(user['password']) # control interno
         if pass_ingresado == pass_db:
@@ -2210,7 +2210,7 @@ class BloqueoScreen(Screen):
             return 0
 
     def clear(self):
-        '''Limpia los campos de texto y libera el teclado virtual'''
+        """Limpia los campos de texto y libera el teclado virtual"""
         self.ids.dni.text = ""
         self.ids.passw.text = ""
         Window.release_all_keyboards()
