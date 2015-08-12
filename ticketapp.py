@@ -119,7 +119,7 @@ class PasswordScreen(Screen):
                 WarningPopup(mensaje).open()
                 self.clear()
             elif response == 3:
-                mensaje = u"\rEL password actual\r\n no debe superar los 15 caracteres\r\n y no puede contener símbolos extraños."
+                mensaje = u"\rEl password actual\r\n no debe superar los 15 caracteres\r\n y no puede contener símbolos extraños."
                 WarningPopup(mensaje).open()
                 self.clear()
             else:
