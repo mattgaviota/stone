@@ -1,0 +1,95 @@
+<FormScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 20
+        BoxLayout:
+            size_hint: 0.2, 1
+            AsyncImage:
+                source: root.datos['aside']
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.8, 1
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 80
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'Formulario de Registro'
+                    valign: 'top'
+                    font_size: '40sp'
+                    size_hint: 1, 0.1
+                    padding: (40, 30)
+                GridLayout:
+                    cols: 4
+                    rows: 3
+                    padding: 10
+                    spacing: 10
+                    size_hint: 1, 0.7
+                    LabelU:
+                        text: 'Nombre'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: nombre
+                        hint_text: 'Nombre y Apellido'
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'Facultad'
+                        size_hint: 0.2, 1
+                    Spinner:
+                        id: facultad
+                        values: root.facultades_nombre
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'DNI'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: dni
+                        hint_text: 'DNI sin puntos'
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'Provincia'
+                        size_hint: 0.2, 1
+                    Spinner:
+                        id: provincia
+                        values: root.provincias_nombre
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'LU'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: lu
+                        hint_text: 'Libreta Universitaria'
+                        size_hint: 0.4, 1
+                    LabelU:
+                        text: 'Email'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: mail
+                        hint_text: 'Correo Electronico'
+                        size_hint: 0.4, 1
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Aceptar'
+                        font_size: 20
+                        on_press: root.validar()
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel()
+            BoxLayout:
+                size_hint: 1, 0.4
+                AsyncImage:
+                    source: root.datos['footer']

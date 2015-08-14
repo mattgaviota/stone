@@ -1,0 +1,126 @@
+<ServiceScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Servicios'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        GridLayout:
+            cols: 3
+            rows: 2
+            padding: 125
+            spacing: 10
+            size_hint: 1, 0.8
+            ButtonU:
+                on_press: root.imprimir()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/printer.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Ticket de Prueba'
+            ButtonU:
+                on_press: root.confirmacion()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/billetes.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Retiro de Dinero'
+            ButtonU:
+                on_press: root.informacion()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/info.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Información'
+            ButtonU:
+                on_press: root.tickets_cierre()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/cierre.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Tickets de Cierre'
+            ButtonU:
+                on_press: root.tickets_grupales()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/control/grupales.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Tickets Grupales'
+            ButtonU:
+                on_press: root.anular_grupal()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/anular.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Anular Tickets Grupales'
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True

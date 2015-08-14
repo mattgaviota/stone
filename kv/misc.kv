@@ -1,0 +1,140 @@
+#:kivy 1.0
+#
+# Autor: Matias Novoa
+# Año: 2014
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+#
+
+<LabelU@Label>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    font_size: '30sp'
+    color: 0.2, 0.2, 0.2, 1
+
+<LabelUA@Label>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    font_size: '15sp'
+    color: 0.2, 0.2, 0.2, 1
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1]
+
+<ConfirmPopup>:
+    canvas.before:
+        Color:
+            rgba: 0.98, 0.76, 0.23, 1
+        Rectangle:
+            # self here refers to the widget i.e BoxLayout
+            pos: self.pos
+            size: self.size
+    cols:1
+    LabelU:
+        font_size: '20sp'
+        text: root.text
+    GridLayout:
+        cols: 2
+        size_hint_y: None
+        height: '44sp'
+        ButtonUok:
+            on_release: root.dispatch('on_answer', True)
+        ButtonUcancel:
+            on_release: root.dispatch('on_answer', False)
+
+<WarningPopup>:
+    title: "Advertencia"
+    size_hint: None, None
+    size: 400, 400
+    auto_dismiss: False
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba: 0.98, 0.76, 0.23, 1
+            Rectangle:
+                # self here refers to the widget i.e BoxLayout
+                pos: self.pos
+                size: self.size
+        orientation: 'vertical'
+        LabelU:
+            font_size: '20sp'
+            text: root.mensaje
+            size_hint: 1, 0.8
+        ButtonU:
+            text: 'Aceptar'
+            size_hint: 1, 0.2
+            on_press: root.dismiss()
+
+<ButtonUtoggle@ToggleButton>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+
+<ButtonU@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+
+<ButtonUok@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtnok.png'
+    background_down: 'images/buttons/downbtnok.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+    Image:
+        source: 'images/buttons/accept.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+<ButtonUnext@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtnok.png'
+    background_down: 'images/buttons/downbtnok.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+    Image:
+        source: 'images/buttons/next.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+<ButtonUback@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtn.png'
+    background_down: 'images/buttons/downbtn.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+    Image:
+        source: 'images/buttons/back.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+<ButtonUcancel@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtncancel.png'
+    background_down: 'images/buttons/downbtncancel.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+    Image:
+        source: 'images/buttons/cancel.png'
+        y: self.parent.y + self.parent.height - 38
+        x: self.parent.x + self.parent.width - 100
+        size: 32, 32
+        allow_stretch: True
+
+<ButtonUanular@Button>:
+    font_name: 'fonts/Ubuntu-R.ttf'
+    background_normal: 'images/buttons/normalbtncancel.png'
+    background_down: 'images/buttons/downbtncancel.png'
+    border: 20, 20, 20, 20
+    color: 0.2, 0.2, 0.2, 1
+
+<Input@TextInput>:
+    multiline: False
+    font_name: 'fonts/Ubuntu-R.ttf'

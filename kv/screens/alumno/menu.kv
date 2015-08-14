@@ -1,0 +1,64 @@
+<MenuScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Menu Principal de Usuario'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 200
+            spacing: 10
+            ButtonU:
+                on_press: root.comprar()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/comprar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Comprar'
+            ButtonU:
+                on_press: root.options()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/opciones.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Opciones'
+            ButtonU:
+                on_press: root.logout()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/menu/salir.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Salir'

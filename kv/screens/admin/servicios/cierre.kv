@@ -1,0 +1,86 @@
+<CierreScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Tickets de Cierre'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        BoxLayout:
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.93, 0.94, 0.3
+                Rectangle:
+                    # self here refers to the widget i.e BoxLayout
+                    pos: self.pos
+                    size: self.size
+            size_hint: 1, 0.7
+            LabelU:
+                text: "Selecciona día y unidad"
+                font_size: '40sp'
+                size_hint: 0.5, 0.2
+            GridLayout:
+                cols:4
+                rows:2
+                padding: 70
+                spacing: 10
+                size_hint: 1, 0.6
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Año"
+                Spinner:
+                    id: year
+                    values: []
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Mes"
+                Spinner:
+                    id: mes
+                    values: []
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Día"
+                Spinner:
+                    id: dia
+                    values: []
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Unidad"
+                Spinner:
+                    id: unidad
+                    values: []
+            BoxLayout:
+                padding: 20
+                spacing: 20
+                size_hint: 1, 0.2
+                BoxLayout:
+                    size_hint: 0.7, 1
+                ButtonUok:
+                    size_hint: 0.3, 1
+                    text: "Imprimir"
+                    on_press: root.confirmacion()
+        BoxLayout:
+            size_hint: 1, 0.2
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True

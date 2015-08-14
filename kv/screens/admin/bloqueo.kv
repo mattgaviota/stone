@@ -1,0 +1,51 @@
+<BloqueoScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 20
+        BoxLayout:
+            orientation: 'vertical'
+            LabelU:
+                text: 'Sistema Bloqueado'
+                valign: 'top'
+                font_size: '40sp'
+                size_hint: 1, 0.1
+                padding: (40, 30)
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.2
+                LabelU:
+                    text: 'Su sesión se ha cerrado por un billete trabado.'
+                    font_size: '20sp'
+                LabelU:
+                    text: 'Comuníquese con Oscar Salse(425-8664) para desbloquear la máquina.'
+                    font_size: '20sp'
+            BoxLayout:
+                size_hint: 1, 0.2
+                padding: 20
+                GridLayout:
+                    cols: 5
+                    rows: 1
+                    spacing: 10
+                    size_hint: 0.7, 0.5
+                    LabelU:
+                        text: 'DNI'
+                    Input:
+                        id: dni
+                        hint_text: 'DNI sin puntos'
+                    LabelU:
+                        text: 'Password'
+                    Input:
+                        id: passw
+                        hint_text: 'password'
+                        password: True
+                ButtonUok:
+                    size_hint: 0.3, 0.5
+                    text: 'Desbloquear'
+                    font_size: 20
+                    on_press: root.validar()
+            BoxLayout:
+                size_hint: 1, 0.5

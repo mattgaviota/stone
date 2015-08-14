@@ -39,7 +39,7 @@ def internet_on():
     """ Chequea la conexión a internet. Devuelve True si hay conexión y
     False en otro caso."""
     try:
-        response = urllib2.urlopen('http://74.125.228.100', timeout=3)
+        response = urllib2.urlopen('http://www.google.com.ar', timeout=5)
         return True
     except:
         pass

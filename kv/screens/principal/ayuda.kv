@@ -1,0 +1,88 @@
+<AyudaScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Ayuda'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                LabelU:
+                    text: 'Temas'
+                    size_hint: 1, 0.1
+                GridLayout:
+                    cols: 1
+                    rows: 6
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.6
+                    ButtonU:
+                        text: 'Ingreso'
+                        on_press: root.play('ingreso')
+                    ButtonU:
+                        text: 'Registro'
+                        on_press: root.play('registro')
+                    ButtonU:
+                        text: 'Compra'
+                        on_press: root.play('compra')
+                    ButtonU:
+                        text: 'Carga'
+                        on_press: root.play('carga')
+                    ButtonU:
+                        text: 'Anulación'
+                        on_press: root.play('anulacion')
+                    ButtonU:
+                        text: 'Perfil'
+                        on_press: root.play('perfil')
+                BoxLayout:
+                    size_hint: 1, 0.2
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    LabelU:
+                        id: titulo
+                        text: root.data['titulo']
+                Video:
+                    id: player
+                    size_hint: 1, 0.7
+                    source: ''
+                    allow_fullscreen: False
+                    thumbnail: 'images/home/ayuda.png'
+                BoxLayout:
+                    size_hint: 0.4, 0.1
+                    spacing: 150
+                    ButtonUback:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel();

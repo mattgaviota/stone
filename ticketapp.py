@@ -16,14 +16,20 @@ from os import path, system
 # intra-packages imports
 from db import controlador
 from lib import mailserver, session, utils, impresora, billetes
+from src.alerts import WarningPopup, ConfirmPopup
+## screens
+from src.screens.splash import SplashScreen
+from src.screens.login import LoginScreen
+from src.screens.ayuda import AyudaScreen
 # Kivy related imports
 from kivy.app import App
+from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, WipeTransition
 from kivy.core.window import Window
 from kivy.uix.popup import Popup
-from kivy.properties import StringProperty
 from kivy.uix.gridlayout import GridLayout
-from kivy.clock import Clock, mainthread
+from kivy.properties import StringProperty
+from kivy.clock import mainthread
 
 #session
 user_session = session.Session()
@@ -39,24 +45,6 @@ path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
 with open(path) as file_data:
     version_file = json.load(file_data)
     VERSION = version_file['Version']['numero']
-
-
-class ConfirmPopup(GridLayout):
-    text = StringProperty()
-
-    def __init__(self, **kwargs):
-        self.register_event_type('on_answer')
-        super(ConfirmPopup, self).__init__(**kwargs)
-
-    def on_answer(self, *args):
-        pass
-
-
-class WarningPopup(Popup):
-    """Ventana Popup para mostrar los mensajes"""
-    def __init__(self, mensaje, **kwargs):
-        self.mensaje = mensaje
-        super(WarningPopup, self).__init__(**kwargs)
 
 
 class PasswordScreen(Screen):
@@ -805,29 +793,6 @@ class ConfirmacionScreen(Screen):
         self.manager.remove_widget(self.manager.get_screen('confirmacion'))
 
 
-class AyudaScreen(Screen):
-
-    def __init__(self, **kwargs):
-        """Pantalla para mostrar la ayuda"""
-        self.data = {}
-        self.cargar_datos()
-        super(AyudaScreen, self).__init__(**kwargs)
-
-    def cargar_datos(self):
-        """Carga los datos de los videos dentro de la pantalla de ayuda."""
-        self.data['titulo'] = 'Ningún video cargado'
-        self.playlist = controlador.get_videos()
-
-    def play(self, source):
-        """Reproduce el video del playlist correspondiente al source."""
-        self.ids.player.play = False
-        self.ids.titulo.text = self.playlist[source][1]
-        self.ids.player.source = self.playlist[source][0]
-        self.ids.player.play = True
-
-    def cancel(self):
-        """Vuelve a una pantalla anterior"""
-        self.manager.current = 'splash'
 
 
 class ProfileScreen(Screen):
@@ -1227,40 +1192,6 @@ class CargaScreen(Screen):
         self.manager.remove_widget(self.manager.get_screen('carga'))
 
 
-class SplashScreen(Screen):
-
-    def __init__(self, **kwargs):
-        """Pantalla de acceso - Pantalla principal"""
-        self.disponibles = StringProperty()
-        super(SplashScreen, self).__init__(**kwargs)
-        Clock.schedule_interval(self.update_disponibles, 60)
-
-    def update_disponibles(self, dt):
-        """
-        Revisa la cantidad de tickets disponibles y llama a la función que
-        muestra el cartel.
-        """
-        tickets_disponibles = controlador.get_tickets_disponibles()
-        self.update_label(tickets_disponibles)
-
-    def update_label(self, tickets):
-        """Actualiza el cartel con los tickets disponibles para el día."""
-        self.disponibles = u"Tickets disponibles para hoy : %s" % (tickets)
-        self.ids.disponibles.text = self.disponibles
-
-    def login(self):
-        """ Ingresa a la pantalla de login """
-        self.manager.current = "login"
-
-    def registro(self):
-        """ Ingresa a la pantalla de registro si hay internet. """
-        if utils.internet_on():
-            self.manager.current = "formulario"
-        else:
-            mensaje = u"\rNo hay conexión a internet\r\n Intente nuevamente más tarde."
-            WarningPopup(mensaje).open()
-
-
 class FormScreen(Screen):
     """Pantalla de registro del sistema"""
 
@@ -1427,128 +1358,128 @@ class FormScreen(Screen):
         self.manager.current = 'splash'
 
 
-class LoginScreen(Screen):
-    """Pantalla para ingresar al sistema"""
-
-    def __init__(self, **kwargs):
-        self.data = {}
-        self.data['fondo'] = controlador.get_images('fondo')
-        self.data['aside'] = controlador.get_images('aside')
-        self.data['footer'] = controlador.get_images('footer')
-        super(LoginScreen, self).__init__(**kwargs)
-
-    def validar(self):
-        """Valida las entradas y chequea en la base de datos por el par
-        dni - password"""
-        if self.ids.dni.text:
-            if not self.ids.dni.text.isdigit():
-                self.ids.dni.text = ""
-                self.ids.dni.focus = True
-                mensaje = u"Su DNI solo puede contenter números"
-                WarningPopup(mensaje).open()
-            elif len(self.ids.dni.text) >= 10:
-                mensaje = u"\rSu DNI no puede tener\r\n más de 10 caracteres."
-                self.ids.dni.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.ids.passw.text:
-                mensaje = u"Su PASSWORD no puede estar vacío"
-                self.ids.passw.focus = True
-                WarningPopup(mensaje).open()
-            elif len(self.ids.passw.text) >= 64:
-                mensaje = u"\rSu PASSWORD no puede tener\r\n más de 64 caracteres."
-                self.ids.passw.focus = True
-                WarningPopup(mensaje).open()
-            else:
-                dni = self.ids.dni.text
-                password = self.ids.passw.text
-                login = self.validar_login(dni, password)
-                if login:
-                    if login == 2:
-                        self.clear()
-                        user_session.init(controlador.get_usuario(dni), time())
-                        user = user_session.get_user()
-                        controlador.insert_log(user, 'ingresar', UNIDAD)
-                        controlador.update_activo(user, 1)
-                        self.manager.current = 'menu'
-                    elif login == 1:
-                        self.clear()
-                        user_session.init(controlador.get_usuario(dni), time())
-                        user = user_session.get_user()
-                        controlador.insert_log(user, 'ingresar', UNIDAD)
-                        self.manager.add_widget(PasswordScreen('splash',
-                                                            'splash', 'pass'))
-                        self.manager.current = 'pass'
-                    elif login == 6:
-                        self.clear()
-                        user_session.init(controlador.get_usuario(dni), time())
-                        user = user_session.get_user()
-                        controlador.insert_log(user, 'ingresar', UNIDAD, 'control')
-                        self.manager.current = 'menu_control'
-                    elif login == 5:
-                        self.clear()
-                        mensaje = u"\rYa has iniciado sesión\r\n en otra maquina."
-                        WarningPopup(mensaje).open()
-                    else:
-                        self.clear()
-                        mensaje = u"\rSu cuenta esta bloqueada.\r\n Dirijase a la Administracoón \r\n del Comedor Universitario."
-                        WarningPopup(mensaje).open()
-                else:
-                    self.ids.passw.text = ""
-                    mensaje = u"DNI o PASSWORD incorrecto"
-                    WarningPopup(mensaje).open()
-        else:
-            mensaje = u"Su DNI no puede estar vacío"
-            self.ids.dni.focus = True
-            WarningPopup(mensaje).open()
-
-    def clear(self):
-        """Limpia los campos de texto y libera el teclado virtual"""
-        self.ids.dni.text = ""
-        self.ids.passw.text = ""
-        Window.release_all_keyboards()
-
-    def validar_login(self, dni, password):
-        """Revisa el password de acuerdo al dni ingresado y devuelve los
-        siguientes estados:
-            0: No existe el dni o no coincide con el password
-            1: Existe el usuario pero no confirmó su registro(cambiar pass)
-            2: Existe el usuario y está registrado(ingresar)
-            3: Existe el usuario pero esta suspendido(cancelar ingreso)
-            6: Existe el usuario y es de control(pantalla de control)"""
-        user = controlador.get_usuario(dni)
-        if user:
-            if self.comparar_pass(password, user):
-                if user['id_perfil'] == 4: # usuario alumno
-                    if not user['activo']:
-                        if user['estado'] == 1: # wait / login & cambiar pass
-                            return 1
-                        elif user['estado'] == 2: # activo / login & menu
-                            return 2
-                        else: # suspendido / cancel
-                            return 3
-                    else:
-                        return 5 # usuario logueado en otra maquina
-                elif user['id_perfil'] in [3, 5]: # usuario administrativo
-                    return 6
-                else:
-                    return 0
-            else:
-                return 0
-        else:
-            return 0
-
-    def comparar_pass(self, password, user):
-        """compara el pass ingresado con el pass de la db"""
-        pass_ingresado = utils.md5_pass(password)
-        pass_db = utils.aclarar_pass(user['password']) # control interno
-        if pass_ingresado == pass_db:
-            return 1
-        else:
-            return 0
-
-    def cancel(self):
-        self.clear()
-        self.manager.current = 'splash'
+# class LoginScreen(Screen):
+#     """Pantalla para ingresar al sistema"""
+#
+#     def __init__(self, **kwargs):
+#         self.data = {}
+#         self.data['fondo'] = controlador.get_images('fondo')
+#         self.data['aside'] = controlador.get_images('aside')
+#         self.data['footer'] = controlador.get_images('footer')
+#         super(LoginScreen, self).__init__(**kwargs)
+#
+#     def validar(self):
+#         """Valida las entradas y chequea en la base de datos por el par
+#         dni - password"""
+#         if self.ids.dni.text:
+#             if not self.ids.dni.text.isdigit():
+#                 self.ids.dni.text = ""
+#                 self.ids.dni.focus = True
+#                 mensaje = u"Su DNI solo puede contenter números"
+#                 WarningPopup(mensaje).open()
+#             elif len(self.ids.dni.text) >= 10:
+#                 mensaje = u"\rSu DNI no puede tener\r\n más de 10 caracteres."
+#                 self.ids.dni.focus = True
+#                 WarningPopup(mensaje).open()
+#             elif not self.ids.passw.text:
+#                 mensaje = u"Su PASSWORD no puede estar vacío"
+#                 self.ids.passw.focus = True
+#                 WarningPopup(mensaje).open()
+#             elif len(self.ids.passw.text) >= 64:
+#                 mensaje = u"\rSu PASSWORD no puede tener\r\n más de 64 caracteres."
+#                 self.ids.passw.focus = True
+#                 WarningPopup(mensaje).open()
+#             else:
+#                 dni = self.ids.dni.text
+#                 password = self.ids.passw.text
+#                 login = self.validar_login(dni, password)
+#                 if login:
+#                     if login == 2:
+#                         self.clear()
+#                         user_session.init(controlador.get_usuario(dni), time())
+#                         user = user_session.get_user()
+#                         controlador.insert_log(user, 'ingresar', UNIDAD)
+#                         controlador.update_activo(user, 1)
+#                         self.manager.current = 'menu'
+#                     elif login == 1:
+#                         self.clear()
+#                         user_session.init(controlador.get_usuario(dni), time())
+#                         user = user_session.get_user()
+#                         controlador.insert_log(user, 'ingresar', UNIDAD)
+#                         self.manager.add_widget(PasswordScreen('splash',
+#                                                             'splash', 'pass'))
+#                         self.manager.current = 'pass'
+#                     elif login == 6:
+#                         self.clear()
+#                         user_session.init(controlador.get_usuario(dni), time())
+#                         user = user_session.get_user()
+#                         controlador.insert_log(user, 'ingresar', UNIDAD, 'control')
+#                         self.manager.current = 'menu_control'
+#                     elif login == 5:
+#                         self.clear()
+#                         mensaje = u"\rYa has iniciado sesión\r\n en otra maquina."
+#                         WarningPopup(mensaje).open()
+#                     else:
+#                         self.clear()
+#                         mensaje = u"\rSu cuenta esta bloqueada.\r\n Dirijase a la Administracoón \r\n del Comedor Universitario."
+#                         WarningPopup(mensaje).open()
+#                 else:
+#                     self.ids.passw.text = ""
+#                     mensaje = u"DNI o PASSWORD incorrecto"
+#                     WarningPopup(mensaje).open()
+#         else:
+#             mensaje = u"Su DNI no puede estar vacío"
+#             self.ids.dni.focus = True
+#             WarningPopup(mensaje).open()
+#
+#     def clear(self):
+#         """Limpia los campos de texto y libera el teclado virtual"""
+#         self.ids.dni.text = ""
+#         self.ids.passw.text = ""
+#         Window.release_all_keyboards()
+#
+#     def validar_login(self, dni, password):
+#         """Revisa el password de acuerdo al dni ingresado y devuelve los
+#         siguientes estados:
+#             0: No existe el dni o no coincide con el password
+#             1: Existe el usuario pero no confirmó su registro(cambiar pass)
+#             2: Existe el usuario y está registrado(ingresar)
+#             3: Existe el usuario pero esta suspendido(cancelar ingreso)
+#             6: Existe el usuario y es de control(pantalla de control)"""
+#         user = controlador.get_usuario(dni)
+#         if user:
+#             if self.comparar_pass(password, user):
+#                 if user['id_perfil'] == 4: # usuario alumno
+#                     if not user['activo']:
+#                         if user['estado'] == 1: # wait / login & cambiar pass
+#                             return 1
+#                         elif user['estado'] == 2: # activo / login & menu
+#                             return 2
+#                         else: # suspendido / cancel
+#                             return 3
+#                     else:
+#                         return 5 # usuario logueado en otra maquina
+#                 elif user['id_perfil'] in [3, 5]: # usuario administrativo
+#                     return 6
+#                 else:
+#                     return 0
+#             else:
+#                 return 0
+#         else:
+#             return 0
+#
+#     def comparar_pass(self, password, user):
+#         """compara el pass ingresado con el pass de la db"""
+#         pass_ingresado = utils.md5_pass(password)
+#         pass_db = utils.aclarar_pass(user['password']) # control interno
+#         if pass_ingresado == pass_db:
+#             return 1
+#         else:
+#             return 0
+#
+#     def cancel(self):
+#         self.clear()
+#         self.manager.current = 'splash'
 
 
 class ServiceScreen(Screen):
@@ -2219,6 +2150,7 @@ class BloqueoScreen(Screen):
 class TicketApp(App):
 
     def build(self):
+        Builder.load_file('kv/ticket.kv')
         # Creamos el screen manager con la WipeTransition
         sm = ScreenManager(transition=WipeTransition())
         # Agregamos las pantallas fijas del sistema

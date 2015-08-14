@@ -1,0 +1,115 @@
+<GrupalesScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Tickets Grupales'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        BoxLayout:
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.93, 0.94, 0.3
+                Rectangle:
+                    # self here refers to the widget i.e BoxLayout
+                    pos: self.pos
+                    size: self.size
+            size_hint: 1, 0.7
+            LabelU:
+                text: "Selecciona día , delegación y cantidad"
+                font_size: '40sp'
+                size_hint: 0.7, 0.1
+            BoxLayout:
+                size_hint: 1, 0.7
+                GridLayout:
+                    cols:2
+                    rows:5
+                    padding: 10
+                    spacing: 5
+                    size_hint: 0.5, 1
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Día - Més - Año"
+                    GridLayout:
+                        cols: 3
+                        rows: 1
+                        spacing: 10
+                        Spinner:
+                            id: dia
+                            values: []
+                        Spinner:
+                            id: mes
+                            values: []
+                        Spinner:
+                            id: year
+                            values: []
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Delegación"
+                    Input:
+                        id: delegacion
+                        hint_text: "Grupo para el cual se solicita"
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Cantidad"
+                    Input:
+                        id: cantidad
+                        hint_text: '# Cantidad de tickets'
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Nro de Recibo"
+                    Input:
+                        id: recibo
+                        hint_text: '# de recibo a entregar.'
+                    LabelUA:
+                        font_size: '20sp'
+                        text: "Importe"
+                    Spinner:
+                        id: categorias
+                        values: []
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint: 0.5, 1
+                    BoxLayout:
+                        size_hint: 1, 0.2
+                    BoxLayout:
+                        size_hint: 1, 0.3
+                        BoxLayout:
+                            size_hint: 0.2, 1
+                        BoxLayout:
+                            padding: 30
+                            size_hint: 0.6, 1
+                            ButtonUok:
+                                text: "Imprimir"
+                                on_press: root.confirmacion()
+                        BoxLayout:
+                            size_hint: 0.2, 1
+                    BoxLayout:
+                        size_hint: 1, 0.5
+            BoxLayout:
+                size_hint: 1, 0.2
+        BoxLayout:
+            size_hint: 1, 0.1
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True

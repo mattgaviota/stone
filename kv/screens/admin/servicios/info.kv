@@ -1,0 +1,119 @@
+<InfoScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Información'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        BoxLayout:
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.93, 0.94, 0.3
+                Rectangle:
+                    # self here refers to the widget i.e BoxLayout
+                    pos: self.pos
+                    size: self.size
+            size_hint: 1, 0.7
+            GridLayout:
+                cols:2
+                rows:5
+                padding: 30
+                spacing: 10
+                size_hint: 0.7, 0.4
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Versión"
+                LabelU:
+                    font_size: '20sp'
+                    id: version
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Ubicación"
+                LabelU:
+                    font_size: '20sp'
+                    id: ubicacion
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Unidad"
+                LabelU:
+                    font_size: '20sp'
+                    id: unidad
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Hora de Inicio"
+                LabelU:
+                    font_size: '20sp'
+                    id: hora_inicio
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Hora de Cierre"
+                LabelU:
+                    font_size: '20sp'
+                    id: hora_cierre
+            LabelU:
+                text: "Hardware"
+                font_size: '40sp'
+                size_hint: 0.7, 0.1
+            GridLayout:
+                cols:3
+                rows:3
+                padding: 20
+                spacing: 20
+                size_hint: 0.7, 0.5
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Conexion"
+                LabelUA:
+                    font_size: '20sp'
+                    id: conexion
+                ButtonU:
+                    text: "Probar"
+                    id: try_conexion
+                    on_press: root.try_conexion()
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Papel"
+                LabelUA:
+                    font_size: '20sp'
+                    id: papel
+                ButtonU:
+                    text: "Probar"
+                    id: try_papel
+                    on_press: root.try_papel()
+                LabelUA:
+                    font_size: '20sp'
+                    text: "Billetes\r\n"
+                AsyncImage:
+                    id: ingresado
+                    source: ""
+                ButtonUtoggle:
+                    text: "Probar"
+                    state: 'normal'
+                    id: try_billetes
+                    on_press: root.try_billetes()
+        BoxLayout:
+            size_hint: 1, 0.1
+        BoxLayout:
+            size_hint: 0.2, 0.1
+            ButtonU:
+                on_press: root.cancel()
+                BoxLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 20
+                    LabelU:
+                        text: 'Volver'
+                    Image:
+                        source: 'images/buttons/back.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 70
+                        size: 150, 150
+                        allow_stretch: True

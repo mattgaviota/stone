@@ -1,0 +1,104 @@
+#:kivy 1.0
+# Componentes generales
+#:include kv/misc.kv
+# Pantallas de menu principal
+#:include kv/screens/principal/login.kv
+#:include kv/screens/principal/form.kv
+#:include kv/screens/principal/ayuda.kv
+#:include kv/screens/principal/password.kv
+## Pantallas de Menu de alumno
+#:include kv/screens/alumno/menu.kv
+### Pantallas de Menu de opciones de Alumno
+#:include kv/screens/alumno/opciones/option.kv
+#:include kv/screens/alumno/opciones/anular.kv
+#:include kv/screens/alumno/opciones/carga.kv
+#:include kv/screens/alumno/opciones/profile.kv
+### Pantallas de Compra
+#:include kv/screens/alumno/compra/compra1.kv
+#:include kv/screens/alumno/compra/compra2.kv
+#:include kv/screens/alumno/compra/compra3.kv
+#:include kv/screens/alumno/compra/confirmacion.kv
+## Pantallas de Menu administrativo
+#:include kv/screens/admin/control.kv
+#:include kv/screens/admin/bloqueo.kv
+### Pantallas de Menu de Servicios
+#:include kv/screens/admin/servicios/service.kv
+#:include kv/screens/admin/servicios/info.kv
+#:include kv/screens/admin/servicios/cierre.kv
+#:include kv/screens/admin/servicios/grupales.kv
+#:include kv/screens/admin/servicios/anulargrupal.kv
+#
+# Autor: Matias Novoa
+# Año: 2014/15
+# Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+
+# Pantalla principal
+<SplashScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 30
+        LabelU:
+            text: 'Sistema de Tickets del Comedor Universitario'
+            valign: 'top'
+            font_size: '60sp'
+            size_hint: 1, 0.1
+        GridLayout:
+            cols:3
+            rows:1
+            padding: 200
+            spacing: 10
+            ButtonU:
+                on_press: root.login()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/home/entrar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Ingresar'
+            ButtonU:
+                on_press: root.registro()
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/home/registrar.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Registrarse'
+            ButtonU:
+                on_press: # root.manager.current = 'ayuda'
+                BoxLayout:
+                    orientation: 'vertical'
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    padding: 40
+                    Image:
+                        source: 'images/home/ayuda.png'
+                        y: self.parent.y + self.parent.height - 150
+                        x: self.parent.x + self.parent.width - 170
+                        size: 100, 100
+                        allow_stretch: True
+                    LabelU:
+                        text: 'Ayuda'
+        LabelU:
+            id: disponibles
+            text: ''
+            font_size: '40sp'
+            size_hint: 1, 0.1

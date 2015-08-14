@@ -1,0 +1,66 @@
+<LoginScreen>:
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 20
+        BoxLayout:
+            size_hint: 0.2, 1
+            AsyncImage:
+                source: root.data['aside']
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.8, 1
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 80
+                size_hint: 1, 0.6
+                LabelU:
+                    text: 'Ingresar'
+                    valign: 'top'
+                    font_size: '40sp'
+                    size_hint: 1, 0.1
+                    padding: (40, 30)
+                GridLayout:
+                    cols: 2
+                    rows: 2
+                    padding: 40
+                    spacing: 10
+                    size_hint: 1, 0.7
+                    LabelU:
+                        text: 'DNI'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: dni
+                        hint_text: 'DNI sin puntos'
+                    LabelU:
+                        text: 'Password'
+                        size_hint: 0.2, 1
+                    Input:
+                        id: passw
+                        hint_text: 'Tu password'
+                        password: True
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    spacing: 150
+                    ButtonUok:
+                        text: 'Aceptar'
+                        font_size: 20
+                        on_press: root.validar()
+                    ButtonUcancel:
+                        text: 'Cancelar'
+                        font_size: 20
+                        on_press: root.cancel()
+            BoxLayout:
+                size_hint: 1, 0.4
+                AsyncImage:
+                    source: root.data['footer']

@@ -1,0 +1,108 @@
+<Compra2Screen>:
+    on_enter: root.update_datos()
+    canvas.before:
+        BorderImage:
+            source: 'images/misc/background.png'
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        padding: 40
+        orientation: 'vertical'
+        LabelU:
+            text: 'Compra de Tickets'
+            valign: 'top'
+            font_size: '40sp'
+            size_hint: 1, 0.1
+            padding: (40, 30)
+        BoxLayout:
+            size_hint: 1, 0.9
+            spacing: 30
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                size_hint: 0.3, 1
+                AsyncImage:
+                    source: root.data['ruta_foto']
+                    size_hint: 1, 0.4
+                GridLayout:
+                    cols: 2
+                    rows: 4
+                    padding: 40
+                    spacing: 20
+                    size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'Nombre'
+                    LabelUA:
+                        id: nombre
+                        text: root.data['nombre']
+                    LabelUA:
+                        text: 'DNI'
+                    LabelUA:
+                        text: root.data['dni']
+                    LabelUA:
+                        text: 'Categoria'
+                    LabelUA:
+                        text: root.data['categoria']
+                    LabelUA:
+                        text: 'Saldo'
+                    LabelUA:
+                        id: saldo
+                        text: root.data['saldo']
+                BoxLayout:
+                    size_hint: 1, 0.4
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.3
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                orientation: 'vertical'
+                padding: 20
+                spacing: 30
+                size_hint: 0.7, 1
+                BoxLayout:
+                    size_hint: 1, 0.2
+                    LabelU:
+                        text: 'PASO 2: Ingreso de efectivo'
+                GridLayout:
+                    cols: 2
+                    rows: 2
+                    size_hint: 1, 0.6
+                    padding: 60
+                    spacing: 30
+                    LabelU:
+                        font_size: 30
+                        text: 'Dinero faltante para\r\n realizar la compra'
+                    LabelU:
+                        id: faltante
+                        font_size: 30
+                        text: root.data['faltante']
+                    LabelU:
+                        font_size: 30
+                        text: 'Dinero ingresado'
+                    AsyncImage:
+                        id: ingresado
+                        source: ''
+                BoxLayout:
+                    size_hint: 0.4, 0.1
+                    ButtonUok:
+                        id: btn_confirmar
+                        text: 'Confirmar'
+                        disabled: True
+                        on_press: root.cargar_billetes()
+                BoxLayout:
+                    size_hint: 0.4, 0.1
+                    spacing: 150
+                    ButtonUback:
+                        text: 'Volver'
+                        font_size: 20
+                        on_press: root.cancel();
