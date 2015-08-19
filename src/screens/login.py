@@ -5,7 +5,9 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 from lib.utils import aclarar_pass, md5_pass
 from db import controlador
+from src.settings import user_session, UNIDAD
 from src.alerts import WarningPopup
+from time import time
 from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 

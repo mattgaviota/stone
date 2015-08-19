@@ -6,21 +6,22 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 
 # Utility import
-import re
 from threading import Thread, Event
 from Queue import Queue, Empty
 from datetime import datetime
 from time import sleep, time
-import json
-from os import path, system
+from os import system
 # intra-packages imports
 from db import controlador
-from lib import mailserver, session, utils, impresora, billetes
+from lib import session, utils, impresora, billetes
 from src.alerts import WarningPopup, ConfirmPopup
+from src.settings import UNIDAD
 ## screens
 from src.screens.splash import SplashScreen
 from src.screens.login import LoginScreen
 from src.screens.ayuda import AyudaScreen
+from src.screens.form import FormScreen
+from src.screens.control import ControlScreen
 # Kivy related imports
 from kivy.app import App
 from kivy.lang import Builder
@@ -30,21 +31,6 @@ from kivy.uix.popup import Popup
 from kivy.uix.gridlayout import GridLayout
 from kivy.properties import StringProperty
 from kivy.clock import mainthread
-
-#session
-user_session = session.Session()
-# Cargamos el archivo de configuración
-file_path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
-                'stone/.config/parametros.json')
-with open(file_path) as data_file:
-    parametros = json.load(data_file)
-    UNIDAD = controlador.get_maquina(parametros['terminal'])
-# Cargamos el archivo de versión
-path = path.join(path.split(path.abspath(path.dirname(__file__)))[0],
-                'stone/VERSION')
-with open(path) as file_data:
-    version_file = json.load(file_data)
-    VERSION = version_file['Version']['numero']
 
 
 class PasswordScreen(Screen):
@@ -1192,296 +1178,6 @@ class CargaScreen(Screen):
         self.manager.remove_widget(self.manager.get_screen('carga'))
 
 
-class FormScreen(Screen):
-    """Pantalla de registro del sistema"""
-
-    def __init__(self, **kwargs):
-        self.facultades = controlador.get_all_facultades()
-        self.provincias = controlador.get_all_provincias()
-        self.facultades_nombre = sorted(self.facultades.keys())
-        self.provincias_nombre = sorted(self.provincias.keys())
-        self.datos = {}
-        self.datos['fondo'] = controlador.get_images('fondo')
-        self.datos['aside'] = controlador.get_images('aside')
-        self.datos['footer'] = controlador.get_images('footer')
-
-        super(FormScreen, self).__init__(**kwargs)
-        self.ids.provincia.text = 'Salta'
-
-    def mailvalidator(self, email):
-        """Valida que el mail esté bien formado"""
-        if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
-                                                                email) != None:
-            return 1
-        return 0
-
-    def chequear_alumno(self, lu, dni):
-        """
-        Chequea los datos ingresados para ver que correspondan con un alumno.
-        Retorna 1 -> Si los datos están bien y tiene 2 o más materias.
-        Retorna 2 -> Si los datos están bien pero no tiene 2 o más materias.
-        Retorna 0 -> Si los datos no se corresponden con un alumno.
-        """
-        id_alumno = controlador.get_alumno(lu, dni)
-        if id_alumno:
-            if controlador.get_materias(id_alumno) >=2:
-                return 1
-            else:
-                return 2
-        else:
-            return 0
-
-    def validar(self):
-        """Valida las entradas de texto y manda a registrar al usuario
-        si todo esta bien."""
-        if self.ids.dni.text:
-            if not self.ids.dni.text.isdigit():
-                mensaje = u"Su DNI solo puede contenter números"
-                self.ids.dni.text = ""
-                self.ids.dni.focus = True
-                WarningPopup(mensaje).open()
-            elif len(self.ids.dni.text) >= 10:
-                mensaje = u"\rSu DNI no puede tener\r\n más de 10 caracteres."
-                self.ids.dni.text = ""
-                self.ids.dni.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.ids.nombre.text:
-                mensaje = u"Su NOMBRE no puede estar vacío"
-                self.ids.nombre.focus = True
-                WarningPopup(mensaje).open()
-            elif len(self.ids.nombre.text) >= 45:
-                mensaje = u"\rSu NOMBRE no puede tener\r\n más de 45 caracteres."
-                self.ids.nombre.text = ""
-                self.ids.nombre.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.ids.lu.text:
-                mensaje = u"Su LU no puede estar vacía"
-                self.ids.lu.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.ids.lu.text.isdigit():
-                mensaje = u"Su LU solo puede contenter números"
-                self.ids.lu.text = ""
-                self.ids.lu.focus = True
-                WarningPopup(mensaje).open()
-            elif len(self.ids.lu.text) >= 8:
-                mensaje = u"\rSu LU no puede tener\r\n más de 8 caracteres."
-                self.ids.lu.text = ""
-                self.ids.lu.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.ids.mail.text:
-                mensaje = u"Su EMAIL no puede estar vacío"
-                self.ids.mail.focus = True
-                WarningPopup(mensaje).open()
-            elif len(self.ids.mail.text) >= 64:
-                mensaje = u"\rSu EMAIL no puede tener\r\n más de 64 caracteres."
-                self.ids.mail.text = ""
-                self.ids.mail.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.mailvalidator(self.ids.mail.text):
-                mensaje = u"\rSu EMAIL está mal formado.\r\n Recuerde que este mail se usará\r\n para confirmar su registro."
-                self.ids.mail.text = ""
-                self.ids.mail.focus = True
-                WarningPopup(mensaje).open()
-            elif not self.ids.facultad.text:
-                mensaje = u"Debe especificar una FACULTAD"
-                WarningPopup(mensaje).open()
-            elif not self.ids.provincia.text:
-                mensaje = u"Debe especificar una PROVINCIA"
-                WarningPopup(mensaje).open()
-            else:
-                if utils.internet_on():
-                    chequeo = self.chequear_alumno(self.ids.lu.text,
-                                                            self.ids.dni.text)
-                    if chequeo == 1:
-                        self.registrar_usuario()
-                        self.clear()
-                        self.manager.current = 'splash'
-                    elif chequeo == 2:
-                        self.registrar_usuario(0)
-                        self.clear()
-                        self.manager.current = 'splash'
-                    else:
-                        mensaje = u"Su DNI o LU es incorrecto"
-                        WarningPopup(mensaje).open()
-                else:
-                    mensaje = u"\rNo hay conexión a internet\r\n Intente nuevamente más tarde."
-                    WarningPopup(mensaje).open()
-        else:
-            mensaje = u"Su DNI no puede estar vacío"
-            self.ids.dni.focus = True
-            WarningPopup(mensaje).open()
-
-    def clear(self):
-        """Limpia los campos de texto y libera el teclado virtual"""
-        self.ids.dni.text = ""
-        self.ids.nombre.text = ""
-        self.ids.lu.text = ""
-        self.ids.mail.text = ""
-        self.ids.facultad.text = ""
-        self.ids.provincia.text = ""
-        Window.release_all_keyboards()
-
-    def registrar_usuario(self, estado=1):
-        """Registra los usuarios de acuerdo a lo ingresado en el formulario.
-        Llamando a los metodos insert_usuario y a send_mail"""
-        user = controlador.get_usuario(self.ids.dni.text)
-        if not user:
-            data = {}
-            data['dni'] = self.ids.dni.text
-            data['nombre'] = self.ids.nombre.text
-            data['lu'] = self.ids.lu.text
-            data['email'] = self.ids.mail.text
-            data['id_facultad'] = self.facultades[self.ids.facultad.text]
-            data['id_provincia'] = self.provincias[self.ids.provincia.text]
-            password = utils.generar_pass()
-            data['password'] = utils.ofuscar_pass(password)
-            data['estado'] = estado # 0 bloqueado / 1 registrado
-            data['id_perfil'] = controlador.get_perfil('Alumno')
-            data['id_categoria'] = controlador.get_categoria_id('Regular')
-            # insertamos el usuario en la db
-            controlador.insert_usuario(data, UNIDAD)
-            # Enviamos el mail de confirmación
-            datos_mail = controlador.get_configuracion()
-            mail_thread = Thread(target=mailserver.send_mail,
-                            args=(data['nombre'], data['email'],
-                                    password, datos_mail))
-            mail_thread.start()
-            mensaje = "\rGracias por registrarte!!\r\n\r\n Comprueba tu mail\r\n para completar el registro"
-            WarningPopup(mensaje).open()
-        else:
-            mensaje = "Ya existe un usario con ese DNI"
-            WarningPopup(mensaje).open()
-
-    def cancel(self):
-        """Vuelve a la pantalla anterior."""
-        self.clear()
-        self.manager.current = 'splash'
-
-
-# class LoginScreen(Screen):
-#     """Pantalla para ingresar al sistema"""
-#
-#     def __init__(self, **kwargs):
-#         self.data = {}
-#         self.data['fondo'] = controlador.get_images('fondo')
-#         self.data['aside'] = controlador.get_images('aside')
-#         self.data['footer'] = controlador.get_images('footer')
-#         super(LoginScreen, self).__init__(**kwargs)
-#
-#     def validar(self):
-#         """Valida las entradas y chequea en la base de datos por el par
-#         dni - password"""
-#         if self.ids.dni.text:
-#             if not self.ids.dni.text.isdigit():
-#                 self.ids.dni.text = ""
-#                 self.ids.dni.focus = True
-#                 mensaje = u"Su DNI solo puede contenter números"
-#                 WarningPopup(mensaje).open()
-#             elif len(self.ids.dni.text) >= 10:
-#                 mensaje = u"\rSu DNI no puede tener\r\n más de 10 caracteres."
-#                 self.ids.dni.focus = True
-#                 WarningPopup(mensaje).open()
-#             elif not self.ids.passw.text:
-#                 mensaje = u"Su PASSWORD no puede estar vacío"
-#                 self.ids.passw.focus = True
-#                 WarningPopup(mensaje).open()
-#             elif len(self.ids.passw.text) >= 64:
-#                 mensaje = u"\rSu PASSWORD no puede tener\r\n más de 64 caracteres."
-#                 self.ids.passw.focus = True
-#                 WarningPopup(mensaje).open()
-#             else:
-#                 dni = self.ids.dni.text
-#                 password = self.ids.passw.text
-#                 login = self.validar_login(dni, password)
-#                 if login:
-#                     if login == 2:
-#                         self.clear()
-#                         user_session.init(controlador.get_usuario(dni), time())
-#                         user = user_session.get_user()
-#                         controlador.insert_log(user, 'ingresar', UNIDAD)
-#                         controlador.update_activo(user, 1)
-#                         self.manager.current = 'menu'
-#                     elif login == 1:
-#                         self.clear()
-#                         user_session.init(controlador.get_usuario(dni), time())
-#                         user = user_session.get_user()
-#                         controlador.insert_log(user, 'ingresar', UNIDAD)
-#                         self.manager.add_widget(PasswordScreen('splash',
-#                                                             'splash', 'pass'))
-#                         self.manager.current = 'pass'
-#                     elif login == 6:
-#                         self.clear()
-#                         user_session.init(controlador.get_usuario(dni), time())
-#                         user = user_session.get_user()
-#                         controlador.insert_log(user, 'ingresar', UNIDAD, 'control')
-#                         self.manager.current = 'menu_control'
-#                     elif login == 5:
-#                         self.clear()
-#                         mensaje = u"\rYa has iniciado sesión\r\n en otra maquina."
-#                         WarningPopup(mensaje).open()
-#                     else:
-#                         self.clear()
-#                         mensaje = u"\rSu cuenta esta bloqueada.\r\n Dirijase a la Administracoón \r\n del Comedor Universitario."
-#                         WarningPopup(mensaje).open()
-#                 else:
-#                     self.ids.passw.text = ""
-#                     mensaje = u"DNI o PASSWORD incorrecto"
-#                     WarningPopup(mensaje).open()
-#         else:
-#             mensaje = u"Su DNI no puede estar vacío"
-#             self.ids.dni.focus = True
-#             WarningPopup(mensaje).open()
-#
-#     def clear(self):
-#         """Limpia los campos de texto y libera el teclado virtual"""
-#         self.ids.dni.text = ""
-#         self.ids.passw.text = ""
-#         Window.release_all_keyboards()
-#
-#     def validar_login(self, dni, password):
-#         """Revisa el password de acuerdo al dni ingresado y devuelve los
-#         siguientes estados:
-#             0: No existe el dni o no coincide con el password
-#             1: Existe el usuario pero no confirmó su registro(cambiar pass)
-#             2: Existe el usuario y está registrado(ingresar)
-#             3: Existe el usuario pero esta suspendido(cancelar ingreso)
-#             6: Existe el usuario y es de control(pantalla de control)"""
-#         user = controlador.get_usuario(dni)
-#         if user:
-#             if self.comparar_pass(password, user):
-#                 if user['id_perfil'] == 4: # usuario alumno
-#                     if not user['activo']:
-#                         if user['estado'] == 1: # wait / login & cambiar pass
-#                             return 1
-#                         elif user['estado'] == 2: # activo / login & menu
-#                             return 2
-#                         else: # suspendido / cancel
-#                             return 3
-#                     else:
-#                         return 5 # usuario logueado en otra maquina
-#                 elif user['id_perfil'] in [3, 5]: # usuario administrativo
-#                     return 6
-#                 else:
-#                     return 0
-#             else:
-#                 return 0
-#         else:
-#             return 0
-#
-#     def comparar_pass(self, password, user):
-#         """compara el pass ingresado con el pass de la db"""
-#         pass_ingresado = utils.md5_pass(password)
-#         pass_db = utils.aclarar_pass(user['password']) # control interno
-#         if pass_ingresado == pass_db:
-#             return 1
-#         else:
-#             return 0
-#
-#     def cancel(self):
-#         self.clear()
-#         self.manager.current = 'splash'
-
-
 class ServiceScreen(Screen):
     """Pantalla de servicio de control"""
 
@@ -1997,74 +1693,74 @@ class InfoScreen(Screen):
         self.manager.current = 'servicios'
 
 
-class ControlScreen(Screen):
-    """Pantalla de menú de control"""
+#class ControlScreen(Screen):
+    #"""Pantalla de menú de control"""
 
-    def iniciar(self):
-        """Accede a la pantalla principal del sistema"""
-        user = user_session.get_user()
-        hora = controlador.get_hora_inicio(UNIDAD)
-        retiro = controlador.get_log(UNIDAD, 'retiro')
-        if not hora:
-            controlador.insert_log(user, 'iniciar', UNIDAD, '1er control')
-        else:
-            controlador.insert_log(user, 'iniciar', UNIDAD, 'control')
-        user_session.close()
-        self.manager.current = 'splash'
+    #def iniciar(self):
+        #"""Accede a la pantalla principal del sistema"""
+        #user = user_session.get_user()
+        #hora = controlador.get_hora_inicio(UNIDAD)
+        #retiro = controlador.get_log(UNIDAD, 'retiro')
+        #if not hora:
+            #controlador.insert_log(user, 'iniciar', UNIDAD, '1er control')
+        #else:
+            #controlador.insert_log(user, 'iniciar', UNIDAD, 'control')
+        #user_session.close()
+        #self.manager.current = 'splash'
 
-    def servicios(self):
-        """Crea y accede a la pantalla de servicios"""
-        if not self.manager.has_screen('servicios'):
-            self.manager.add_widget(ServiceScreen(name='servicios'))
-        self.manager.current = 'servicios'
+    #def servicios(self):
+        #"""Crea y accede a la pantalla de servicios"""
+        #if not self.manager.has_screen('servicios'):
+            #self.manager.add_widget(ServiceScreen(name='servicios'))
+        #self.manager.current = 'servicios'
 
-    def confirmacion_apagar(self):
-        content = ConfirmPopup(
-                    text='\rSeguro deseas salir y apagar\r\n la maquina?')
-        content.bind(on_answer=self._on_answer_apagar)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
-        self.popup.open()
+    #def confirmacion_apagar(self):
+        #content = ConfirmPopup(
+                    #text='\rSeguro deseas salir y apagar\r\n la maquina?')
+        #content.bind(on_answer=self._on_answer_apagar)
+        #self.popup = Popup(title="Advertencia",
+                                #content=content,
+                                #size_hint=(None, None),
+                                #size=(400,400),
+                                #auto_dismiss= False)
+        #self.popup.open()
 
-    def _on_answer_apagar(self, instance, answer):
-        if answer:
-            self.apagar()
-        self.popup.dismiss()
+    #def _on_answer_apagar(self, instance, answer):
+        #if answer:
+            #self.apagar()
+        #self.popup.dismiss()
 
-    def confirmacion_reiniciar(self):
-        content = ConfirmPopup(
-                    text='\rSeguro deseas salir y reiniciar\r\n la maquina?')
-        content.bind(on_answer=self._on_answer_reiniciar)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
-        self.popup.open()
+    #def confirmacion_reiniciar(self):
+        #content = ConfirmPopup(
+                    #text='\rSeguro deseas salir y reiniciar\r\n la maquina?')
+        #content.bind(on_answer=self._on_answer_reiniciar)
+        #self.popup = Popup(title="Advertencia",
+                                #content=content,
+                                #size_hint=(None, None),
+                                #size=(400,400),
+                                #auto_dismiss= False)
+        #self.popup.open()
 
-    def _on_answer_reiniciar(self, instance, answer):
-        if answer:
-            self.reiniciar()
-        self.popup.dismiss()
+    #def _on_answer_reiniciar(self, instance, answer):
+        #if answer:
+            #self.reiniciar()
+        #self.popup.dismiss()
 
-    def reiniciar(self):
-        """Cierra la sesion y apaga la maquina"""
-        user = user_session.get_user()
-        controlador.insert_log(user, 'apagar', UNIDAD, 'Control - reinicio')
-        user_session.close()
-        controlador.update_all_activos()
-        system("/sbin/shutdown -r now")
+    #def reiniciar(self):
+        #"""Cierra la sesion y apaga la maquina"""
+        #user = user_session.get_user()
+        #controlador.insert_log(user, 'apagar', UNIDAD, 'Control - reinicio')
+        #user_session.close()
+        #controlador.update_all_activos()
+        #system("/sbin/shutdown -r now")
 
-    def apagar(self):
-        """Cierra la sesion y apaga la maquina"""
-        user = user_session.get_user()
-        controlador.insert_log(user, 'apagar', UNIDAD, 'Control')
-        user_session.close()
-        controlador.update_all_activos()
-        system("/sbin/shutdown -h now")
+    #def apagar(self):
+        #"""Cierra la sesion y apaga la maquina"""
+        #user = user_session.get_user()
+        #controlador.insert_log(user, 'apagar', UNIDAD, 'Control')
+        #user_session.close()
+        #controlador.update_all_activos()
+        #system("/sbin/shutdown -h now")
 
 
 class BloqueoScreen(Screen):
