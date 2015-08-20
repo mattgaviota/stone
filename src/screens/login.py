@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -33,7 +33,7 @@ class LoginScreen(Screen):
                 mensaje = u"Su DNI solo puede contenter números"
                 WarningPopup(mensaje).open()
             elif len(self.ids.dni.text) >= 10:
-                mensaje = u"\rSu DNI no puede tener\r\n más de 10 caracteres."
+                mensaje = u"\rSu DNI no puede exceder\r\n los 10 caracteres."
                 self.ids.dni.focus = True
                 WarningPopup(mensaje).open()
             elif not self.ids.passw.text:
@@ -41,9 +41,9 @@ class LoginScreen(Screen):
                 self.ids.passw.focus = True
                 WarningPopup(mensaje).open()
             elif len(self.ids.passw.text) >= 64:
-                mensaje = u"\rSu PASSWORD no puede tener\r\n más de 64 caracteres."
+                msje = u"\rSu PASSWORD no puede exceder\r\n los 64 caracteres."
                 self.ids.passw.focus = True
-                WarningPopup(mensaje).open()
+                WarningPopup(msje).open()
             else:
                 dni = self.ids.dni.text
                 password = self.ids.passw.text
@@ -61,22 +61,27 @@ class LoginScreen(Screen):
                         user_session.init(controlador.get_usuario(dni), time())
                         user = user_session.get_user()
                         controlador.insert_log(user, 'ingresar', UNIDAD)
-                        self.manager.add_widget(PasswordScreen('splash',
-                                                            'splash', 'pass'))
+                        self.manager.add_widget(
+                            PasswordScreen('splash', 'splash', 'pass')
+                        )
                         self.manager.current = 'pass'
                     elif login == 6:
                         self.clear()
                         user_session.init(controlador.get_usuario(dni), time())
                         user = user_session.get_user()
-                        controlador.insert_log(user, 'ingresar', UNIDAD, 'control')
+                        controlador.insert_log(
+                            user, 'ingresar', UNIDAD, 'control'
+                        )
                         self.manager.current = 'menu_control'
                     elif login == 5:
                         self.clear()
-                        mensaje = u"\rYa has iniciado sesión\r\n en otra maquina."
-                        WarningPopup(mensaje).open()
+                        msje = u"\rYa has iniciado sesión\r\n en otra maquina."
+                        WarningPopup(msje).open()
                     else:
                         self.clear()
-                        mensaje = u"\rSu cuenta esta bloqueada.\r\n Dirijase a la Administracoón \r\n del Comedor Universitario."
+                        mensaje = u"\rSu cuenta esta bloqueada.\r\n Dirijase"
+                        mensaje += u"a la Administración \r\n del Comedor"
+                        mensaje += u"Universitario."
                         WarningPopup(mensaje).open()
                 else:
                     self.ids.passw.text = ""
@@ -104,17 +109,17 @@ class LoginScreen(Screen):
         user = controlador.get_usuario(dni)
         if user:
             if self.comparar_pass(password, user):
-                if user['id_perfil'] == 4: # usuario alumno
+                if user['id_perfil'] == 4:  # usuario alumno
                     if not user['activo']:
-                        if user['estado'] == 1: # wait / login & cambiar pass
+                        if user['estado'] == 1:  # wait / login & cambiar pass
                             return 1
-                        elif user['estado'] == 2: # activo / login & menu
+                        elif user['estado'] == 2:  # activo / login & menu
                             return 2
-                        else: # suspendido / cancel
+                        else:  # suspendido / cancel
                             return 3
                     else:
-                        return 5 # usuario logueado en otra maquina
-                elif user['id_perfil'] in [3, 5]: # usuario administrativo
+                        return 5  # usuario logueado en otra maquina
+                elif user['id_perfil'] in [3, 5]:  # usuario administrativo
                     return 6
                 else:
                     return 0
@@ -126,7 +131,7 @@ class LoginScreen(Screen):
     def comparar_pass(self, password, user):
         """compara el pass ingresado con el pass de la db"""
         pass_ingresado = utils.md5_pass(password)
-        pass_db = utils.aclarar_pass(user['password']) # control interno
+        pass_db = utils.aclarar_pass(user['password'])  # control interno
         if pass_ingresado == pass_db:
             return 1
         else:

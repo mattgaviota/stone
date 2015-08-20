@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -23,7 +23,12 @@ class ServiceScreen(Screen):
         estado = impresora.check_status()
         if estado == 1:
             user = user_session.get_user()
-            controlador.insert_log(user, 'imprimir', UNIDAD, 'Ticket de prueba')
+            controlador.insert_log(
+                user,
+                'imprimir',
+                UNIDAD,
+                'Ticket de prueba'
+            )
             fecha = "dd/mm/aaaa"
             code = str(int(time())) + "0000000000"
             nom = user['nombre']
@@ -34,8 +39,10 @@ class ServiceScreen(Screen):
             msj = u"Ticket NO VALIDO"
             sdo = 0
             ticket = "XXX"
-            print_thread = Thread(target=impresora.imprimir_ticket_alumno,
-                args=(nom, dni, fac, cat, code, unit, ticket, fecha, msj, sdo))
+            print_thread = Thread(
+                target=impresora.imprimir_ticket_alumno,
+                args=(nom, dni, fac, cat, code, unit, ticket, fecha, msj, sdo)
+            )
             print_thread.start()
         elif estado == 2:
             mensaje = u"No hay papel"
@@ -46,13 +53,15 @@ class ServiceScreen(Screen):
 
     def confirmacion(self):
         content = ConfirmPopup(
-                    text='\rSeguro deseas retirar el dinero\r\n e imprimir el ticket de cierre?')
+            text='\rSeguro deseas retirar\r\n e imprimir el ticket de cierre?')
         content.bind(on_answer=self._on_answer)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
+        self.popup = Popup(
+            title="Advertencia",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 400),
+            auto_dismiss=False
+        )
         self.popup.open()
 
     def _on_answer(self, instance, answer):
@@ -73,13 +82,23 @@ class ServiceScreen(Screen):
             if total:
                 desc = 'Control - 1er Cierre'
                 id_log = controlador.insert_log(user, 'retiro', UNIDAD, desc)
-                id_ticket = controlador.insert_ticket_cierre(id_log, total,
-                                                                        UNIDAD)
+                id_ticket = controlador.insert_ticket_cierre(
+                    id_log, total, UNIDAD
+                )
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(target=impresora.imprimir_ticket_cierre,
-                            args=(user['nombre'], id_ticket, UNIDAD, hora,
-                                            bills, total, ticket['barcode']))
+                print_thread = Thread(
+                    target=impresora.imprimir_ticket_cierre,
+                    args=(
+                        user['nombre'],
+                        id_ticket,
+                        UNIDAD,
+                        hora,
+                        bills,
+                        total,
+                        ticket['barcode']
+                    )
+                )
                 print_thread.start()
             else:
                 mensaje = u"No hay rergistros para hoy"
@@ -92,20 +111,30 @@ class ServiceScreen(Screen):
                 total, bills = controlador.get_total(UNIDAD)
                 id_ticket = controlador.get_id_ticket_cierre(UNIDAD)
                 if not id_ticket:
-                    id_ticket = controlador.insert_ticket_cierre(id_log, total,
-                                                                        UNIDAD)
+                    id_ticket = controlador.insert_ticket_cierre(
+                        id_log, total, UNIDAD
+                    )
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(target=impresora.imprimir_ticket_cierre,
-                            args=(user['nombre'], id_ticket, UNIDAD, hora,
-                                             bills, total, ticket['barcode']))
+                print_thread = Thread(
+                    target=impresora.imprimir_ticket_cierre,
+                    args=(
+                        user['nombre'],
+                        id_ticket,
+                        UNIDAD,
+                        hora,
+                        bills,
+                        total,
+                        ticket['barcode']
+                    )
+                )
                 print_thread.start()
             else:
                 mensaje = u"No hay rergistros para hoy"
                 WarningPopup(mensaje).open()
         else:
-            mensaje = u"\rNo se puede hacer cierre\r\n sin haber iniciado el sistema."
-            WarningPopup(mensaje).open()
+            msje = u"\rNo puede hacer cierre\r\n sin iniciar antes el sistema."
+            WarningPopup(msje).open()
 
     def informacion(self):
         """

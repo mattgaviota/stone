@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -53,7 +53,8 @@ class Compra1Screen(Screen):
             self.ids.hasta.values = []
             self.data['dia'] = ''
             self.ids.desde.text = self.data['dia']
-            self.ids.posibles.text = '\rNo hay días disponibles\r\n para la compra'
+            posibles = '\rNo hay días disponibles\r\n para la compra'
+            self.ids.posibles.text = posibles
             self.ids.btn_next.disabled = True
         else:
             self.ids.desde.values = self.d_name
@@ -108,16 +109,23 @@ class Compra1Screen(Screen):
             if self.user['saldo'] >= self.importe:
                 if len(dias) <= self.tickets_posibles:
                     titulo = "Paso 2: Confirmar Pago"
-                    self.manager.add_widget(Compra3Screen(dias, titulo,
-                                                            name='compra_3'))
+                    self.manager.add_widget(
+                        Compra3Screen(dias, titulo, name='compra_3')
+                    )
                     self.manager.current = 'compra_3'
                 else:
-                    self.manager.add_widget(Compra2Screen(dias,
-                                        self.user['saldo'], name='compra_2'))
+                    self.manager.add_widget(
+                        Compra2Screen(
+                            dias,
+                            self.user['saldo'],
+                            name='compra_2'
+                        )
+                    )
                     self.manager.current = 'compra_2'
             else:
-                self.manager.add_widget(Compra2Screen(dias,
-                                        self.user['saldo'], name='compra_2'))
+                self.manager.add_widget(
+                    Compra2Screen(dias, self.user['saldo'], name='compra_2')
+                )
                 self.manager.current = 'compra_2'
         else:
             mensaje = "La fecha DESDE debe ser menor a HASTA"
@@ -135,8 +143,9 @@ class Compra2Screen(Screen):
         """Pantalla para comprar usando efectivo."""
         self.user = user_session.get_user()
         id_log = controlador.insert_log(self.user, 'reservar', UNIDAD)
-        self.reserva, full, state = controlador.reservar_tickets(self.user,
-                                                        dias, id_log, UNIDAD)
+        self.reserva, full, state = controlador.reservar_tickets(
+            self.user, dias, id_log, UNIDAD
+        )
         self.data = {}
         self.saldo = saldo
         self.stop = Event()
@@ -213,8 +222,12 @@ class Compra2Screen(Screen):
         self.stop.set()
         self.cola_stop.put(True)
         user = user_session.get_user()
-        controlador.insert_log(user, 'salir', UNIDAD,
-                                                'Billete trabado - bloqueo')
+        controlador.insert_log(
+            user,
+            'salir',
+            UNIDAD,
+            'Billete trabado - bloqueo'
+        )
         controlador.update_activo(user, 0)
         user_session.close()
         sleep(2)
@@ -295,10 +308,12 @@ class Compra2Screen(Screen):
                 ticket_data['code'] = row['barcode']
                 ticket_data['nombre'] = self.data['nombre'].decode('utf8')
                 ticket_data['dni'] = self.data['dni'].decode('utf8')
-                ticket_data['categoria'] = self.data['categoria'].decode('utf8')
+                categoria = self.data['categoria'].decode('utf8')
+                ticket_data['categoria'] = categoria
                 ticket_data['facultad'] = self.data['facultad'].decode('utf8')
                 ticket_data['unidad'] = str(UNIDAD)
-                ticket_data['mensaje'] = u"Gracias por usar el Comedor Universitario"
+                mensaje = u"Gracias por usar el Comedor Universitario"
+                ticket_data['mensaje'] = mensaje
                 ticket_data['ticket'] = str(id_ticket)
                 ticket_data['saldo'] = self.user['saldo']
                 controlador.insert_ticket_log(id_ticket, id_log)
@@ -341,16 +356,25 @@ class Compra2Screen(Screen):
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
         self.valor = 0
-        get_bill_thread = Thread(target=self.leer_billetes,
-                                    args=(self.cola_billetes,))
+        get_bill_thread = Thread(
+            target=self.leer_billetes,
+            args=(self.cola_billetes,)
+        )
         get_bill_thread.daemon = True
         get_bill_thread.start()
         status = {'security': 0, 'enable': 0, 'communication': 0, 'inhibit': 0}
         self.cola_estado = Queue()
         self.cola_estado.put(status)
-        bill_thread = Thread(target=billetes.pool, args=(self.cola_billetes,
-                                self.cola_bool, self.cola_stop, self.faltante,
-                                self.cola_estado, 8))
+        bill_thread = Thread(
+            target=billetes.pool,
+            args=(
+                self.cola_billetes,
+                self.cola_bool,
+                self.cola_stop,
+                self.faltante,
+                self.cola_estado, 8
+            )
+        )
         bill_thread.daemon = True
         bill_thread.start()
 
@@ -360,8 +384,12 @@ class Compra2Screen(Screen):
         self.cola_stop.put(True)
         if self.total_parcial:
             total = self.total_parcial
-            log = controlador.insert_log(self.user, 'cargar', UNIDAD,
-                                                        str(self.total_parcial))
+            log = controlador.insert_log(
+                self.user,
+                'cargar',
+                UNIDAD,
+                str(self.total_parcial)
+            )
             controlador.update_saldo(self.user, self.total_parcial, 0)
             self.update_datos()
             if impresora.check_status() == 1:
@@ -376,8 +404,10 @@ class Compra2Screen(Screen):
                 code = fecha + '0' * (10 - len(log)) + log
                 msj = u"Gracias por usar el Comedor Universitario"
                 sdo = self.user['saldo']
-                print_thread = Thread(target=impresora.imprimir_ticket_carga,
-                    args=(nom, dni, fac, cat, code, unit, log, msj, pco, sdo))
+                print_thread = Thread(
+                    target=impresora.imprimir_ticket_carga,
+                    args=(nom, dni, fac, cat, code, unit, log, msj, pco, sdo)
+                )
                 print_thread.start()
         controlador.cancelar_tickets(self.reserva)
         self.manager.current = 'compra_1'
@@ -391,8 +421,9 @@ class Compra3Screen(Screen):
         """Pantalla para confirmar e imprimir los tickets"""
         self.user = user_session.get_user()
         id_log = controlador.insert_log(self.user, 'reservar', UNIDAD)
-        self.reserva, full, state = controlador.reservar_tickets(self.user,
-                                                        dias, id_log, UNIDAD)
+        self.reserva, full, state = controlador.reservar_tickets(
+            self.user, dias, id_log, UNIDAD
+        )
         if state:
             if full:
                 for dia in full:
@@ -440,11 +471,13 @@ class Compra3Screen(Screen):
         """Confirma la compra y verifica que haya saldo suficiente."""
         content = ConfirmPopup(text='Seguro deseas comprar?')
         content.bind(on_answer=self._on_answer)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
+        self.popup = Popup(
+            title="Advertencia",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 400),
+            auto_dismiss=False
+        )
         self.popup.open()
 
     def _on_answer(self, instance, answer):
@@ -468,10 +501,12 @@ class Compra3Screen(Screen):
                 ticket_data['code'] = row['barcode']
                 ticket_data['nombre'] = self.data['nombre'].decode('utf8')
                 ticket_data['dni'] = self.data['dni'].decode('utf8')
-                ticket_data['categoria'] = self.data['categoria'].decode('utf8')
+                categoria = self.data['categoria'].decode('utf8')
+                ticket_data['categoria'] = categoria
                 ticket_data['facultad'] = self.data['facultad'].decode('utf8')
                 ticket_data['unidad'] = str(UNIDAD)
-                ticket_data['mensaje'] = u"Gracias por usar el Comedor Universitario"
+                mensaje = u"Gracias por usar el Comedor Universitario"
+                ticket_data['mensaje'] = mensaje
                 ticket_data['ticket'] = str(id_ticket)
                 ticket_data['saldo'] = self.user['saldo']
                 controlador.insert_ticket_log(id_ticket, id_log)
@@ -496,16 +531,18 @@ class Compra3Screen(Screen):
                 controlador.update_saldo(self.user, self.total, 1)
                 self.update_datos()
                 self.imprimir_todos()
-                self.manager.add_widget(ConfirmacionScreen(len(self.reserva),
-                                                            name='confirmacion'))
+                self.manager.add_widget(
+                    ConfirmacionScreen(len(self.reserva), name='confirmacion')
+                )
                 self.manager.current = 'confirmacion'
                 if self.manager.has_screen('compra_2'):
-                    self.manager.remove_widget(self.manager.get_screen('compra_2'))
+                    self.manager.remove_widget(
+                        self.manager.get_screen('compra_2')
+                    )
                 self.manager.remove_widget(self.manager.get_screen('compra_1'))
                 self.manager.remove_widget(self.manager.get_screen('compra_3'))
             else:
                 self.cancel()
-
 
     def cancel(self):
         """Vuelve a una pantalla anterior"""
@@ -517,7 +554,7 @@ class Compra3Screen(Screen):
 class ConfirmacionScreen(Screen):
     """ Pantalla para mostrar una confirmación de compra """
 
-    def __init__ (self, cantidad, **kwargs):
+    def __init__(self, cantidad, **kwargs):
         self.cantidad = cantidad
         self.data = {}
         self.cargar_datos()

@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -29,8 +29,10 @@ class FormScreen(Screen):
 
     def mailvalidator(self, email):
         """Valida que el mail esté bien formado"""
-        if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
-                                                                email) != None:
+        if re.match(
+            "^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
+            email
+        ) != None:
             return 1
         return 0
 
@@ -43,7 +45,7 @@ class FormScreen(Screen):
         """
         id_alumno = controlador.get_alumno(lu, dni)
         if id_alumno:
-            if controlador.get_materias(id_alumno) >=2:
+            if controlador.get_materias(id_alumno) >= 2:
                 return 1
             else:
                 return 2
@@ -69,10 +71,10 @@ class FormScreen(Screen):
                 self.ids.nombre.focus = True
                 WarningPopup(mensaje).open()
             elif len(self.ids.nombre.text) >= 45:
-                mensaje = u"\rSu NOMBRE no puede tener\r\n más de 45 caracteres."
+                msje = u"\rSu NOMBRE no puede tener\r\n más de 45 caracteres."
                 self.ids.nombre.text = ""
                 self.ids.nombre.focus = True
-                WarningPopup(mensaje).open()
+                WarningPopup(msje).open()
             elif not self.ids.lu.text:
                 mensaje = u"Su LU no puede estar vacía"
                 self.ids.lu.focus = True
@@ -92,12 +94,13 @@ class FormScreen(Screen):
                 self.ids.mail.focus = True
                 WarningPopup(mensaje).open()
             elif len(self.ids.mail.text) >= 64:
-                mensaje = u"\rSu EMAIL no puede tener\r\n más de 64 caracteres."
+                msje = u"\rSu EMAIL no puede tener\r\n más de 64 caracteres."
                 self.ids.mail.text = ""
                 self.ids.mail.focus = True
-                WarningPopup(mensaje).open()
+                WarningPopup(msje).open()
             elif not self.mailvalidator(self.ids.mail.text):
-                mensaje = u"\rSu EMAIL está mal formado.\r\n Recuerde que este mail se usará\r\n para confirmar su registro."
+                mensaje = u"\rSu EMAIL está mal formado.\r\n Recuerde que este"
+                mensaje += u"mail se usará\r\n para confirmar su registro."
                 self.ids.mail.text = ""
                 self.ids.mail.focus = True
                 WarningPopup(mensaje).open()
@@ -109,8 +112,9 @@ class FormScreen(Screen):
                 WarningPopup(mensaje).open()
             else:
                 if utils.internet_on():
-                    chequeo = self.chequear_alumno(self.ids.lu.text,
-                                                            self.ids.dni.text)
+                    chequeo = self.chequear_alumno(
+                        self.ids.lu.text, self.ids.dni.text
+                    )
                     if chequeo == 1:
                         self.registrar_usuario()
                         self.clear()
@@ -123,8 +127,8 @@ class FormScreen(Screen):
                         mensaje = u"Su DNI o LU es incorrecto"
                         WarningPopup(mensaje).open()
                 else:
-                    mensaje = u"\rNo hay conexión a internet\r\n Intente nuevamente más tarde."
-                    WarningPopup(mensaje).open()
+                    msje = u"\rInternet no disponible\r\n Intente más tarde."
+                    WarningPopup(msje).open()
         else:
             mensaje = u"Su DNI no puede estar vacío"
             self.ids.dni.focus = True
@@ -154,18 +158,20 @@ class FormScreen(Screen):
             data['id_provincia'] = self.provincias[self.ids.provincia.text]
             password = utils.generar_pass()
             data['password'] = utils.ofuscar_pass(password)
-            data['estado'] = estado # 0 bloqueado / 1 registrado
+            data['estado'] = estado  # 0 bloqueado / 1 registrado
             data['id_perfil'] = controlador.get_perfil('Alumno')
             data['id_categoria'] = controlador.get_categoria_id('Regular')
             # insertamos el usuario en la db
             controlador.insert_usuario(data, UNIDAD)
             # Enviamos el mail de confirmación
             datos_mail = controlador.get_configuracion()
-            mail_thread = Thread(target=mailserver.send_mail,
-                            args=(data['nombre'], data['email'],
-                                    password, datos_mail))
+            mail_thread = Thread(
+                target=mailserver.send_mail,
+                args=(data['nombre'], data['email'], password, datos_mail)
+            )
             mail_thread.start()
-            mensaje = "\rGracias por registrarte!!\r\n\r\n Comprueba tu mail\r\n para completar el registro"
+            mensaje = "\rGracias por registrarte!!\r\n\r\n"
+            mensaje += "Comprueba tu mail\r\n para completar el registro"
             WarningPopup(mensaje).open()
         else:
             mensaje = "Ya existe un usario con ese DNI"

@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2014
@@ -9,7 +9,7 @@ from lib import session
 from db import controlador
 
 
-#session
+# session
 user_session = session.Session()
 # Cargamos el archivo de configuración
 file_path = os.path.join(

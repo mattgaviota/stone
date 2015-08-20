@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -23,7 +23,9 @@ class ProfileScreen(Screen):
     def cambiar_pass(self):
         """Llama a la pantalla de cambiar password"""
         if not self.manager.has_screen('pass'):
-            self.manager.add_widget(PasswordScreen('profile', 'profile', 'pass'))
+            self.manager.add_widget(
+                PasswordScreen('profile', 'profile', 'pass')
+            )
         self.manager.current = 'pass'
 
     def cargar_datos(self):
@@ -71,8 +73,10 @@ class ProfileScreen(Screen):
 
     def mailvalidator(self, email):
         """Valida que el mail esté bien formado"""
-        if re.match("^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
-                        email) != None:
+        if re.match(
+            "^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
+            email
+        ) != None:
             return 1
         return 0
 
@@ -98,7 +102,7 @@ class ProfileScreen(Screen):
             self.ids.email.focus = True
             WarningPopup(mensaje).open()
         elif not self.mailvalidator(self.ids.email.text):
-            mensaje = u"\rSu EMAIL está mal formado.\r\n Recuerde que este mail se usa\r\n para confirmaciones."
+            mensaje = u"Su EMAIL está mal formado."
             self.ids.email.text = ""
             self.ids.email.focus = True
             WarningPopup(mensaje).open()

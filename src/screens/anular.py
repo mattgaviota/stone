@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -8,6 +8,7 @@ from db import controlador
 from src.settings import user_session, UNIDAD
 from src.alerts import WarningPopup, ConfirmPopup
 from kivy.uix.screenmanager import Screen
+from kivy.core.window import Window
 
 
 class AnularScreen(Screen):
@@ -28,26 +29,31 @@ class AnularScreen(Screen):
                 mensaje = "\rEl código del ticket\r\n solo tiene números."
                 WarningPopup(mensaje).open()
             else:
-                fecha = controlador.has_ticket(self.user,
-                                                    self.ids.id_ticket.text)
+                fecha = controlador.has_ticket(
+                    self.user,
+                    self.ids.id_ticket.text
+                )
                 hora_max = controlador.get_hora_anulacion()
                 if fecha:
                     codigo = self.check_hora(fecha, hora_max)
                     if codigo == 1:
-                        return fecha.strftime('%d/%m/%Y') # anular
+                        return fecha.strftime('%d/%m/%Y')  # anular
                     elif codigo == 0:
                         self.ids.id_ticket.text = ""
                         self.ids.id_ticket.focus = True
-                        mensaje = "\rNo puede anular un ticket\r\n despues de las %d hs." % (hora_max)
+                        mensaje = "\rNo puede anular un ticket\r\n"
+                        mensaje += "despues de las %d hs." % (hora_max)
                         WarningPopup(mensaje).open()
-                        return 0 # nada
+                        return 0  # nada
                     else:
                         self.ticket_vencido()
                         self.ids.id_ticket.text = ""
                         self.ids.id_ticket.focus = True
-                        mensaje = "\rNo puede anular un ticket\r\n despues de la fecha\r\n de servicio.\r\n\r\n Su ticket se venció."
+                        mensaje = "\rNo puede anular un ticket\r\n despues"
+                        mensaje += "de la fecha\r\n de servicio.\r\n\r\n"
+                        mensaje += "Su ticket se venció."
                         WarningPopup(mensaje).open()
-                        return 0 # vencer
+                        return 0  # vencer
                 else:
                     self.ids.id_ticket.text = ""
                     self.ids.id_ticket.focus = True
@@ -67,11 +73,13 @@ class AnularScreen(Screen):
                     text='\rSeguro deseas anular el ticket\r\n del día %s?' %
                     (self.fecha))
             content.bind(on_answer=self._on_answer)
-            self.popup = Popup(title="Advertencia",
-                                    content=content,
-                                    size_hint=(None, None),
-                                    size=(400,400),
-                                    auto_dismiss= False)
+            self.popup = Popup(
+                title="Advertencia",
+                content=content,
+                size_hint=(None, None),
+                size=(400, 400),
+                auto_dismiss=False
+            )
             self.popup.open()
 
     def _on_answer(self, instance, answer):
@@ -102,16 +110,16 @@ class AnularScreen(Screen):
         """Verifica que no se pueda anular un ticket despues de la hora"""
         ahora = datetime.now()
         if ahora.date() < fecha.date():
-            return 1 # Ok (anular)
+            return 1  # Ok (anular)
         elif ahora.date() > fecha.date():
-            return 2 # Fecha anterior al día de hoy(vencer).
+            return 2  # Fecha anterior al día de hoy(vencer).
         else:
             if hora <= ahora.hour < 15:
-                return 0 # Hora invalida para anular (Nada)
+                return 0  # Hora invalida para anular (Nada)
             elif ahora.hour < hora:
-                return 1 # Ok (anular)
+                return 1  # Ok (anular)
             else:
-                return 2 # Hora posterior al permitido.(vencer)
+                return 2  # Hora posterior al permitido.(vencer)
 
     def cargar_datos(self):
         """Carga los datos del usuario dentro de la pantalla de anulación"""

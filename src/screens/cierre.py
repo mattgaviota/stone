@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -23,9 +23,11 @@ class CierreScreen(Screen):
         """ Carga los datos de los días. """
         self.unidades = controlador.get_all_facultades()
         self.ids.year.values = ['2015', '2016', '2017', '2018', '2019']
-        self.ids.mes.values = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',\
-                    'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',\
-                     'Noviembre', 'Diciembre']
+        self.ids.mes.values = [
+            'Enero', 'Febrero', 'Marzo', 'Abril',
+            'Mayo', 'Junio', 'Julio', 'Agosto',
+            'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ]
         self.ids.dia.values = [str(i) for i in range(1, 32)]
         self.ids.unidad.values = sorted(self.unidades.keys())
         self.ids.unidad.text = controlador.get_ubicacion(UNIDAD)
@@ -38,11 +40,13 @@ class CierreScreen(Screen):
         content = ConfirmPopup(
                     text='\rSeguro deseas imprimir el \r\n ticket de cierre?')
         content.bind(on_answer=self._on_answer)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
+        self.popup = Popup(
+            title="Advertencia",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 400),
+            auto_dismiss=False
+        )
         self.popup.open()
 
     def _on_answer(self, instance, answer):
@@ -56,7 +60,8 @@ class CierreScreen(Screen):
         mes = self.ids.mes.values.index(self.ids.mes.text) + 1
         dia = int(self.ids.dia.text)
         unidad = controlador.get_maquina_ubicacion(
-                                        self.unidades[self.ids.unidad.text])
+            self.unidades[self.ids.unidad.text]
+        )
         try:
             date = datetime(year, mes, dia)
             if date <= datetime.now():
@@ -72,18 +77,30 @@ class CierreScreen(Screen):
         """ Imprime el ticket de cierre de la unidad y del día(date) dado """
         total, bills = controlador.get_total(unidad, date)
         user = user_session.get_user()
-        desc = 'Control - Cierre de la maquina %d del dia %s' % (unidad,
-                                                    date.strftime('%d/%m/%Y'))
+        desc = 'Control - Cierre de la maquina %d del dia %s' % (
+            unidad, date.strftime('%d/%m/%Y')
+        )
         id_log = controlador.insert_log(user, 'retiro', unidad, desc)
         id_ticket = controlador.get_id_ticket_cierre(unidad, date)
         if not id_ticket:
-            id_ticket = controlador.insert_ticket_cierre(id_log, total,
-                                                                    unidad)
+            id_ticket = controlador.insert_ticket_cierre(
+                id_log, total, unidad
+            )
         ticket = controlador.get_ticket_cierre(id_ticket)
         hora = controlador.get_hora_inicio(unidad, date)
-        print_thread = Thread(target=impresora.imprimir_ticket_cierre,
-                    args=(user['nombre'], id_ticket, unidad, hora, bills,
-                        total, ticket['barcode'], date.strftime('%d/%m/%Y')))
+        print_thread = Thread(
+            target=impresora.imprimir_ticket_cierre,
+            args=(
+                user['nombre'],
+                id_ticket,
+                unidad,
+                hora,
+                bills,
+                total,
+                ticket['barcode'],
+                date.strftime('%d/%m/%Y')
+            )
+        )
         print_thread.start()
 
     def cancel(self):

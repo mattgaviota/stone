@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -24,9 +24,11 @@ class GrupalesScreen(Screen):
         self.categorias = controlador.get_categorias()
         self.unidades = controlador.get_all_facultades()
         self.ids.year.values = ['2015', '2016', '2017', '2018', '2019']
-        self.ids.mes.values = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',\
-                    'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre',\
-                     'Noviembre', 'Diciembre']
+        self.ids.mes.values = [
+            'Enero', 'Febrero', 'Marzo', 'Abril',
+            'Mayo', 'Junio', 'Julio', 'Agosto',
+            'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ]
         self.ids.dia.values = [str(i) for i in range(1, 32)]
         self.ids.categorias.values = sorted(self.categorias.keys())
         self.ids.categorias.text = 'Regular'
@@ -39,11 +41,13 @@ class GrupalesScreen(Screen):
         content = ConfirmPopup(
                     text='\rSeguro deseas comprar el \r\n ticket grupal?')
         content.bind(on_answer=self._on_answer)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
+        self.popup = Popup(
+            title="Advertencia",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 400),
+            auto_dismiss=False
+        )
         self.popup.open()
 
     def _on_answer(self, instance, answer):
@@ -59,8 +63,10 @@ class GrupalesScreen(Screen):
         cant = int(self.ids.cantidad.text)
         delegacion = self.ids.delegacion.text
         recibo = self.ids.recibo.text
-        cat = (self.categorias[self.ids.categorias.text],
-                                                    self.ids.categorias.text)
+        cat = (
+            self.categorias[self.ids.categorias.text],
+            self.ids.categorias.text
+        )
         try:
             date = datetime(year, mes, dia)
             if date >= datetime.now():
@@ -79,25 +85,27 @@ class GrupalesScreen(Screen):
         """
         user = user_session.get_user()
         id_log = controlador.insert_log(user, 'comprar_grupal', UNIDAD)
-        ticket_grupal = controlador.comprar_ticket_grupal(cant, delegacion,
-                                                    cat, date, recibo, id_log)
+        ticket_grupal = controlador.comprar_ticket_grupal(
+            cant, delegacion, cat, date, recibo, id_log
+        )
         row = controlador.get_ticket_grupal_by_id(ticket_grupal)
         id_log = controlador.insert_log(user, 'imprimir_grupal', UNIDAD)
         controlador.insert_ticket_log(ticket_grupal, id_log)
-        print_thread = Thread(target=impresora.imprimir_ticket_grupal,
-                            args=(
-                                user['nombre'],
-                                user['dni'],
-                                row['id'],
-                                UNIDAD,
-                                row['fecha'].strftime('%d/%m/%Y'),
-                                row['cantidad'],
-                                row['barcode'],
-                                row['importe'],
-                                row['delegacion'],
-                                row['recibo']
-                            )
-                        )
+        print_thread = Thread(
+            target=impresora.imprimir_ticket_grupal,
+            args=(
+                user['nombre'],
+                user['dni'],
+                row['id'],
+                UNIDAD,
+                row['fecha'].strftime('%d/%m/%Y'),
+                row['cantidad'],
+                row['barcode'],
+                row['importe'],
+                row['delegacion'],
+                row['recibo']
+            )
+        )
         print_thread.start()
         Window.release_all_keyboards()
         self.cancel()

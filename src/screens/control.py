@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -36,11 +36,13 @@ class ControlScreen(Screen):
         content = ConfirmPopup(
                     text='\rSeguro deseas salir y apagar\r\n la maquina?')
         content.bind(on_answer=self._on_answer_apagar)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
+        self.popup = Popup(
+            title="Advertencia",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 400),
+            auto_dismiss=False
+        )
         self.popup.open()
 
     def _on_answer_apagar(self, instance, answer):
@@ -52,11 +54,13 @@ class ControlScreen(Screen):
         content = ConfirmPopup(
                     text='\rSeguro deseas salir y reiniciar\r\n la maquina?')
         content.bind(on_answer=self._on_answer_reiniciar)
-        self.popup = Popup(title="Advertencia",
-                                content=content,
-                                size_hint=(None, None),
-                                size=(400,400),
-                                auto_dismiss= False)
+        self.popup = Popup(
+            title="Advertencia",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 400),
+            auto_dismiss=False
+        )
         self.popup.open()
 
     def _on_answer_reiniciar(self, instance, answer):

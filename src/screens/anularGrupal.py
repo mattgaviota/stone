@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -31,7 +31,7 @@ class AnularGrupalScreen(Screen):
             else:
                 fecha = controlador.has_ticket_grupal(self.ids.id_ticket.text)
                 if fecha:
-                    return fecha.strftime('%d/%m/%Y') # anular
+                    return fecha.strftime('%d/%m/%Y')  # anular
                 else:
                     self.ids.id_ticket.text = ""
                     self.ids.id_ticket.focus = True
@@ -51,11 +51,13 @@ class AnularGrupalScreen(Screen):
                     text='\rSeguro deseas anular el ticket\r\n del día %s?' %
                     (self.fecha))
             content.bind(on_answer=self._on_answer)
-            self.popup = Popup(title="Advertencia",
-                                    content=content,
-                                    size_hint=(None, None),
-                                    size=(400,400),
-                                    auto_dismiss= False)
+            self.popup = Popup(
+                title="Advertencia",
+                content=content,
+                size_hint=(None, None),
+                size=(400, 400),
+                auto_dismiss=False
+            )
             self.popup.open()
 
     def _on_answer(self, instance, answer):

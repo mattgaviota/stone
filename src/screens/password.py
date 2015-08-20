@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -66,18 +66,19 @@ class PasswordScreen(Screen):
                 user_session.close()
                 self.manager.remove_widget(self.manager.get_screen('pass'))
             elif response == 2:
-                mensaje = u"\rEL password actual\r\n no coincide con el almacenado"
-                WarningPopup(mensaje).open()
+                msje = u"\rEL password actual\r\n no coincide con el antiguo."
+                WarningPopup(msje).open()
                 self.clear()
             elif response == 3:
-                mensaje = u"\rEl password actual\r\n no debe superar los 15 caracteres\r\n y no puede contener símbolos extraños."
+                mensaje = u"\rEl password actual\r\n no debe superar los 15"
+                mensaje += u" caracteres\r\n y no puede contener"
+                mensaje += u" símbolos extraños."
                 WarningPopup(mensaje).open()
                 self.clear()
             else:
                 mensaje = u"El password nuevo no coincide"
                 WarningPopup(mensaje).open()
                 self.clear()
-
 
     def cancel(self):
         """
@@ -103,7 +104,8 @@ class PasswordScreen(Screen):
         Chequea que los caracteres de la contraseña esten dentro del grupo y
         que la longitud no exceda los 15 caracteres.
         """
-        caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#$%&?.-_"
+        caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        caracteres += "1234567890#$%&?.-_"
         if len(new_pass) <= 64:
             for char in new_pass:
                 if char not in caracteres:
@@ -118,7 +120,7 @@ class PasswordScreen(Screen):
         del usuario."""
         old_pass = utils.md5_pass(self.ids.old_pass.text)
         pass_db = user['password']
-        pass_db = pass_db[4:-4] # control interno
+        pass_db = pass_db[4:-4]  # control interno
         new_pass = self.ids.new_pass.text
         re_new_pass = self.ids.re_new_pass.text
         if self.check_pass(new_pass):
@@ -126,7 +128,7 @@ class PasswordScreen(Screen):
                 if pass_db == old_pass:
                     tmp = utils.ofuscar_pass(new_pass)
                     controlador.update_pass(user, tmp)
-                    if user['estado'] == 1: # si no está activo se lo activa
+                    if user['estado'] == 1:  # si no está activo se lo activa
                         controlador.update_estado(user, 2)
                     return 1
                 else:

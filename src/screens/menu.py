@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -38,11 +38,11 @@ class MenuScreen(Screen):
             self.manager.current = 'compra_1'
         elif estado == 2:
             controlador.update_estado_maquina(UNIDAD, 4)
-            mensaje = u"\rLa maquina no tiene papel.\r\n Disculpe las molestias"
+            mensaje = u"\rLa maquina no tiene papel."
             WarningPopup(mensaje).open()
         else:
             controlador.update_estado_maquina(UNIDAD, 2)
-            mensaje = u"\rLa impresora está desconectada.\r\n Disculpe las molestias"
+            mensaje = u"\rLa impresora está desconectada."
             WarningPopup(mensaje).open()
 
     def logout(self):

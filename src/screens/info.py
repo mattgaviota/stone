@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -57,17 +57,17 @@ class InfoScreen(Screen):
             categoria = None
         if utils.internet_on():
             if categoria:
-                self.ids.conexion.text = u"\rBD Conectada\r\nInternet Online"
+                self.ids.conexion.text = u"\rBD On\r\nInternet On"
                 controlador.update_estado_maquina(UNIDAD, 1)
             else:
-                self.ids.conexion.text = u"\rBD No Conectada\r\nInternet Online"
+                self.ids.conexion.text = u"\rBD Off\r\nInternet On"
                 controlador.update_estado_maquina(UNIDAD, 5)
         else:
             if categoria:
-                self.ids.conexion.text = u"\rBD Conectada\r\nInternet Offline"
+                self.ids.conexion.text = u"\rBD On\r\nInternet Off"
                 controlador.update_estado_maquina(UNIDAD, 1)
             else:
-                self.ids.conexion.text = u"\rBD No Conectada\r\nInternet Offline"
+                self.ids.conexion.text = u"\rBD Off\r\nInternet On"
                 controlador.update_estado_maquina(UNIDAD, 5)
 
     def try_papel(self):
@@ -124,16 +124,26 @@ class InfoScreen(Screen):
         self.cola_billetes = Queue()
         self.faltante = 100
         self.valor = 0
-        get_bill_thread = Thread(target=self.leer_billetes,
-                                    args=(self.cola_billetes,))
+        get_bill_thread = Thread(
+            target=self.leer_billetes,
+            args=(self.cola_billetes,)
+        )
         get_bill_thread.daemon = True
         get_bill_thread.start()
         status = {'security': 0, 'enable': 0, 'communication': 0, 'inhibit': 0}
         self.cola_estado = Queue()
         self.cola_estado.put(status)
-        bill_thread = Thread(target=billetes.pool, args=(self.cola_billetes,
-                                self.cola_bool, self.cola_stop, self.faltante,
-                                self.cola_estado, 4))
+        bill_thread = Thread(
+            target=billetes.pool,
+            args=(
+                self.cola_billetes,
+                self.cola_bool,
+                self.cola_stop,
+                self.faltante,
+                self.cola_estado,
+                4
+            )
+        )
         bill_thread.daemon = True
         bill_thread.start()
 

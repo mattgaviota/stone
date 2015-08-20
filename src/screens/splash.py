@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -40,5 +40,5 @@ class SplashScreen(Screen):
         if internet_on():
             self.manager.current = "formulario"
         else:
-            mensaje = u"\rNo hay conexión a internet\r\n Intente nuevamente más tarde."
-            WarningPopup(mensaje).open()
+            msje = u"\rInternet sin conexión\r\n Intente nuevamente."
+            WarningPopup(msje).open()

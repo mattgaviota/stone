@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -31,7 +31,8 @@ class BloqueoScreen(Screen):
                 self.ids.passw.focus = True
                 WarningPopup(mensaje).open()
             elif len(self.ids.passw.text) >= 64:
-                mensaje = u"\rSu PASSWORD no puede tener\r\n más de 64 caracteres."
+                mensaje = u"\rSu PASSWORD no puede tener\r\n"
+                mensaje += u"más de 64 caracteres."
                 self.ids.passw.focus = True
                 WarningPopup(mensaje).open()
             else:
@@ -42,10 +43,16 @@ class BloqueoScreen(Screen):
                     self.clear()
                     user_session.init(controlador.get_usuario(dni), time())
                     user = user_session.get_user()
-                    controlador.insert_log(user, 'ingresar', UNIDAD,
-                                                        'control - desbloqueo')
+                    controlador.insert_log(
+                        user,
+                        'ingresar',
+                        UNIDAD,
+                        'control - desbloqueo'
+                    )
                     self.manager.current = 'menu_control'
-                    self.manager.remove_widget(self.manager.get_screen('bloqueo'))
+                    self.manager.remove_widget(
+                        self.manager.get_screen('bloqueo')
+                    )
                 else:
                     self.ids.passw.text = ""
                     mensaje = u"DNI o PASSWORD incorrecto"
@@ -66,7 +73,7 @@ class BloqueoScreen(Screen):
         user = controlador.get_usuario(dni)
         if user:
             if self.comparar_pass(password, user):
-                if user['id_perfil'] in [3, 5]: # usuario administrativo
+                if user['id_perfil'] in [3, 5]:  # usuario administrativo
                     return 1
                 else:
                     return 0
@@ -78,7 +85,7 @@ class BloqueoScreen(Screen):
     def comparar_pass(self, password, user):
         """compara el pass ingresado con el pass de la db"""
         pass_ingresado = utils.md5_pass(password)
-        pass_db = utils.aclarar_pass(user['password']) # control interno
+        pass_db = utils.aclarar_pass(user['password'])  # control interno
         if pass_ingresado == pass_db:
             return 1
         else:

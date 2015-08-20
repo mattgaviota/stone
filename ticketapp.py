@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2014
@@ -9,7 +9,8 @@ from threading import Thread
 # intra-packages imports
 from db import controlador
 from src.settings import UNIDAD
-## screens
+from lib import billetes
+# screens
 from src.screens.splash import SplashScreen
 from src.screens.menu import MenuScreen
 from src.screens.form import FormScreen

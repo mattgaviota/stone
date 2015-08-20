@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2015
@@ -63,8 +63,10 @@ class CargaScreen(Screen):
                         sleep(1)
                     else:
                         if self.user['saldo'] + self.valor > 100:
-                            Thread(target=self.stack,
-                                        args=(self.cola_bool, 2)).start()
+                            Thread(
+                                target=self.stack,
+                                args=(self.cola_bool, 2)
+                            ).start()
                             mensaje = "No puede cargar mas de $ 100"
                             WarningPopup(mensaje).open()
                         else:
@@ -85,8 +87,12 @@ class CargaScreen(Screen):
         self.stop.set()
         self.cola_stop.put(True)
         user = user_session.get_user()
-        controlador.insert_log(user, 'salir', UNIDAD,
-                                                'Billete trabado - bloqueo')
+        controlador.insert_log(
+            user,
+            'salir',
+            UNIDAD,
+            'Billete trabado - bloqueo'
+        )
         controlador.update_activo(user, 0)
         user_session.close()
         sleep(2)
@@ -139,18 +145,26 @@ class CargaScreen(Screen):
         self.cola_stop = Queue()
         self.cola_billetes = Queue()
         self.valor = 0
-        get_bill_thread = Thread(target=self.leer_billetes,
-                                    args=(self.cola_billetes,))
+        get_bill_thread = Thread(
+            target=self.leer_billetes,
+            args=(self.cola_billetes,)
+        )
         get_bill_thread.daemon = True
         get_bill_thread.start()
         saldo_maximo = controlador.get_saldo_maximo()
         status = {'security': 0, 'enable': 0, 'communication': 0, 'inhibit': 0}
         self.cola_estado = Queue()
         self.cola_estado.put(status)
-        bill_thread = Thread(target=billetes.pool, args=(self.cola_billetes,
-                                self.cola_bool, self.cola_stop,
-                                saldo_maximo - self.user['saldo'],
-                                self.cola_estado, 8))
+        bill_thread = Thread(
+            target=billetes.pool,
+            args=(
+                self.cola_billetes,
+                self.cola_bool,
+                self.cola_stop,
+                saldo_maximo - self.user['saldo'],
+                self.cola_estado, 8
+            )
+        )
         bill_thread.daemon = True
         bill_thread.start()
 
@@ -158,8 +172,12 @@ class CargaScreen(Screen):
         """Vuelve a una pantalla anterior"""
         if self.total:
             if impresora.check_status() == 1:
-                log = controlador.insert_log(self.user, 'cargar', UNIDAD,
-                                                            str(self.total))
+                log = controlador.insert_log(
+                    self.user,
+                    'cargar',
+                    UNIDAD,
+                    str(self.total)
+                )
                 log = str(log)
                 nombre = self.data['nombre'].decode('utf8')
                 dni = self.data['dni'].decode('utf8')

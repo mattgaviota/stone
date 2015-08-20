@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Autor: Matias Novoa
 # Año: 2014
@@ -12,7 +12,8 @@ import urllib2
 
 def generar_pass(longitud=10):
     """Genera un password aleatorio de longitud de caracteres"""
-    caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#$%&?.-_"
+    caracteres = "abcdefghijklmnopqrstuvywxzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    caracteres += "1234567890#$%&?.-_"
     password = ''.join(random.sample(caracteres, longitud))
     return password
 
