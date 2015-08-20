@@ -3,10 +3,11 @@
 # Autor: Matias Novoa
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
-from lib.utils import aclarar_pass, md5_pass
+from lib import utils
 from db import controlador
 from src.settings import user_session, UNIDAD
 from src.alerts import WarningPopup
+from password import PasswordScreen
 from time import time
 from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
@@ -124,8 +125,8 @@ class LoginScreen(Screen):
 
     def comparar_pass(self, password, user):
         """compara el pass ingresado con el pass de la db"""
-        pass_ingresado = md5_pass(password)
-        pass_db = aclarar_pass(user['password']) # control interno
+        pass_ingresado = utils.md5_pass(password)
+        pass_db = utils.aclarar_pass(user['password']) # control interno
         if pass_ingresado == pass_db:
             return 1
         else:

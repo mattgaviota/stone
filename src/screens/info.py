@@ -4,10 +4,11 @@
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 from threading import Thread, Event
+from Queue import Queue, Empty
 from datetime import datetime
 from time import sleep
 from db import controlador
-from lib import impresora, utils
+from lib import impresora, utils, billetes
 from src.settings import user_session, UNIDAD, VERSION
 from src.alerts import ConfirmPopup, WarningPopup
 from kivy.uix.screenmanager import Screen
