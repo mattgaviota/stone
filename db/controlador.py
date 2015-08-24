@@ -530,7 +530,7 @@ def cancelar_tickets(tickets_reservados):
 ##############
 # Tabla dias #
 ##############
-def  get_dias(user, limit):
+def  get_dias(user, limit, date=datetime.now()):
     """
     Retorna una lista de limit cantidad de dias que tengan tickets
     disponibles a partir de la fecha de hoy."""
@@ -541,12 +541,10 @@ def  get_dias(user, limit):
     if limit > cantidad:
         limit -= cantidad
         hora = get_hora_compra()
-        date = datetime.now()
         if date.hour > hora:
             date = date + relativedelta(days=1)
-
         rows = db((db.dias.tickets_vendidos < db.dias.tickets_totales) &
-                (db.dias.fecha >= date)).select(db.dias.fecha,
+                (db.dias.fecha >= date.date())).select(db.dias.fecha,
                                         orderby=db.dias.fecha)
         for row in rows:
             if ((not get_ticket(user, row.fecha)) and
@@ -563,7 +561,7 @@ def  get_dias(user, limit):
 def get_tickets_disponibles(date=datetime.now()):
     """Devuelve los tickets disponibles para cierto día. Por defecto para
     el día de hoy. """
-    row = db(db.dias.fecha == date).select(db.dias.ALL).first()
+    row = db(db.dias.fecha == date.date()).select(db.dias.ALL).first()
     if row:
         disponibles = row.tickets_totales - row.tickets_vendidos
         if disponibles > 0:
