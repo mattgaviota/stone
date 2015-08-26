@@ -9,7 +9,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.properties import StringProperty
 
 
-class ConfirmPopup(GridLayout):
+class ConfirmPopup(Popup):
     text = StringProperty()
 
     def __init__(self, **kwargs):

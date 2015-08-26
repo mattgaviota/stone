@@ -297,7 +297,7 @@ def get_tickets(user, cant=5, date=datetime.now(), state=2):
             (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
             (db.log_usuarios.dni == db.usuarios.dni))
     rows = tickets((db.usuarios.dni == user['dni']) &
-                (db.dias.fecha >= date) &
+                (db.dias.fecha >= date.date()) &
                 (db.tickets.estado == state)).select(db.dias.fecha,
                         db.tickets.importe, db.tickets.estado, db.tickets.id,
                         db.tickets.barcode, limitby=(0, cant),

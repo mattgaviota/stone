@@ -47,17 +47,11 @@ class AnularGrupalScreen(Screen):
         Window.release_all_keyboards()
         self.fecha = self.validar_anulacion()
         if self.fecha:
-            content = ConfirmPopup(
-                    text='\rSeguro deseas anular el ticket\r\n del día %s?' %
-                    (self.fecha))
-            content.bind(on_answer=self._on_answer)
-            self.popup = Popup(
-                title="Advertencia",
-                content=content,
-                size_hint=(None, None),
-                size=(400, 400),
-                auto_dismiss=False
+            self.popup = ConfirmPopup(
+                text='\rSeguro deseas anular el ticket\r\n del día %s?' %
+                    (self.fecha)
             )
+            self.popup.bind(on_answer=self._on_answer)
             self.popup.open()
 
     def _on_answer(self, instance, answer):

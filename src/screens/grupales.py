@@ -38,16 +38,10 @@ class GrupalesScreen(Screen):
         self.ids.dia.text = str(date.day)
 
     def confirmacion(self):
-        content = ConfirmPopup(
-                    text='\rSeguro deseas comprar el \r\n ticket grupal?')
-        content.bind(on_answer=self._on_answer)
-        self.popup = Popup(
-            title="Advertencia",
-            content=content,
-            size_hint=(None, None),
-            size=(400, 400),
-            auto_dismiss=False
+        self.popup = ConfirmPopup(
+            text='\rSeguro deseas comprar el \r\n ticket grupal?'
         )
+        self.popup.bind(on_answer=self._on_answer)
         self.popup.open()
 
     def _on_answer(self, instance, answer):

@@ -29,20 +29,14 @@ class ControlScreen(Screen):
     def servicios(self):
         """Crea y accede a la pantalla de servicios"""
         if not self.manager.has_screen('servicios'):
-            self.manager.add_widget(ServiceScreen(name='servicios'))  # TODO
+            self.manager.add_widget(ServiceScreen(name='servicios'))
         self.manager.current = 'servicios'
 
     def confirmacion_apagar(self):
-        content = ConfirmPopup(
-                    text='\rSeguro deseas salir y apagar\r\n la maquina?')
-        content.bind(on_answer=self._on_answer_apagar)
-        self.popup = Popup(
-            title="Advertencia",
-            content=content,
-            size_hint=(None, None),
-            size=(400, 400),
-            auto_dismiss=False
+        self.popup = ConfirmPopup(
+            text='\rSeguro deseas salir y apagar\r\n la maquina?'
         )
+        self.popup.bind(on_answer=self._on_answer_apagar)
         self.popup.open()
 
     def _on_answer_apagar(self, instance, answer):
@@ -51,16 +45,10 @@ class ControlScreen(Screen):
         self.popup.dismiss()
 
     def confirmacion_reiniciar(self):
-        content = ConfirmPopup(
-                    text='\rSeguro deseas salir y reiniciar\r\n la maquina?')
-        content.bind(on_answer=self._on_answer_reiniciar)
-        self.popup = Popup(
-            title="Advertencia",
-            content=content,
-            size_hint=(None, None),
-            size=(400, 400),
-            auto_dismiss=False
+        self.popup = ConfirmPopup(
+            text='\rSeguro deseas salir y reiniciar\r\n la maquina?'
         )
+        self.popup.bind(on_answer=self._on_answer_reiniciar)
         self.popup.open()
 
     def _on_answer_reiniciar(self, instance, answer):

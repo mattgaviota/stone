@@ -469,15 +469,8 @@ class Compra3Screen(Screen):
 
     def confirmar_tickets(self):
         """Confirma la compra y verifica que haya saldo suficiente."""
-        content = ConfirmPopup(text='Seguro deseas comprar?')
-        content.bind(on_answer=self._on_answer)
-        self.popup = Popup(
-            title="Advertencia",
-            content=content,
-            size_hint=(None, None),
-            size=(400, 400),
-            auto_dismiss=False
-        )
+        self.popup = ConfirmPopup(text='Seguro deseas comprar?')
+        self.popup.bind(on_answer=self._on_answer)
         self.popup.open()
 
     def _on_answer(self, instance, answer):

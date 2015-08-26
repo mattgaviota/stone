@@ -10,7 +10,6 @@ from time import sleep
 from db import controlador
 from lib import impresora, utils, billetes
 from src.settings import user_session, UNIDAD, VERSION
-from src.alerts import ConfirmPopup, WarningPopup
 from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 from kivy.clock import mainthread

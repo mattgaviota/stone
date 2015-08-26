@@ -19,25 +19,30 @@
     height: self.texture_size[1]
 
 <ConfirmPopup>:
-    canvas.before:
-        Color:
-            rgba: 0.98, 0.76, 0.23, 1
-        Rectangle:
-            # self here refers to the widget i.e BoxLayout
-            pos: self.pos
-            size: self.size
-    cols:1
-    LabelU:
-        font_size: '20sp'
-        text: root.text
+    title: "Advertencia"
+    size_hint: None, None
+    size: 400, 400
+    auto_dismiss: False
     GridLayout:
-        cols: 2
-        size_hint_y: None
-        height: '44sp'
-        ButtonUok:
-            on_release: root.dispatch('on_answer', True)
-        ButtonUcancel:
-            on_release: root.dispatch('on_answer', False)
+        cols:1
+        canvas.before:
+            Color:
+                rgba: 0.98, 0.76, 0.23, 1
+            Rectangle:
+                # self here refers to the widget i.e BoxLayout
+                pos: self.pos
+                size: self.size
+        LabelU:
+            font_size: '20sp'
+            text: root.text
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+            height: '44sp'
+            ButtonUok:
+                on_release: root.dispatch('on_answer', True)
+            ButtonUcancel:
+                on_release: root.dispatch('on_answer', False)
 
 <WarningPopup>:
     title: "Advertencia"
