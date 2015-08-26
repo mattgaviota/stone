@@ -39,7 +39,7 @@ class CargaScreen(Screen):
         Muestra la imagen del billete ingresado y habilita el botón de
         confirmación.
         """
-        source = "../../images/billetes/%sp.jpg" % (valor)
+        source = "images/billetes/%sp.jpg" % (valor)
         self.ids.ingresado.source = source
         self.ids.btn_confirmar.disabled = disabled
 
@@ -183,7 +183,6 @@ class CargaScreen(Screen):
                 dni = self.data['dni'].decode('utf8')
                 categoria = self.data['categoria'].decode('utf8')
                 facultad = self.data['facultad'].decode('utf8')
-                unidad = str(UNIDAD)
                 fecha = str(int(time()))
                 total = self.total
                 code = fecha + '0' * (10 - len(log)) + log
@@ -197,7 +196,7 @@ class CargaScreen(Screen):
                         facultad,
                         categoria,
                         code,
-                        unidad,
+                        UNIDAD,
                         log,
                         mensaje,
                         total,

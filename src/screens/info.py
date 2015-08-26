@@ -90,7 +90,7 @@ class InfoScreen(Screen):
         Muestra la imagen del billete ingresado y habilita el botón de
         confirmación.
         """
-        source = "../../images/billetes/%sp.jpg" % (valor)
+        source = "images/billetes/%sp.jpg" % (valor)
         self.ids.ingresado.source = source
 
     def leer_billetes(self, cola_billetes):

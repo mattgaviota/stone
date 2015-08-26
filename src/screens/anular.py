@@ -50,7 +50,7 @@ class AnularScreen(Screen):
                         self.ids.id_ticket.text = ""
                         self.ids.id_ticket.focus = True
                         mensaje = "\rNo puede anular un ticket\r\n despues"
-                        mensaje += "de la fecha\r\n de servicio.\r\n\r\n"
+                        mensaje += " de la fecha\r\n de servicio.\r\n\r\n"
                         mensaje += "Su ticket se venció."
                         WarningPopup(mensaje).open()
                         return 0  # vencer

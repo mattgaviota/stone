@@ -100,7 +100,7 @@ class FormScreen(Screen):
                 WarningPopup(msje).open()
             elif not self.mailvalidator(self.ids.mail.text):
                 mensaje = u"\rSu EMAIL está mal formado.\r\n Recuerde que este"
-                mensaje += u"mail se usará\r\n para confirmar su registro."
+                mensaje += u" mail se usará\r\n para confirmar su registro."
                 self.ids.mail.text = ""
                 self.ids.mail.focus = True
                 WarningPopup(mensaje).open()

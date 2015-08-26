@@ -80,8 +80,8 @@ class LoginScreen(Screen):
                     else:
                         self.clear()
                         mensaje = u"\rSu cuenta esta bloqueada.\r\n Dirijase"
-                        mensaje += u"a la Administración \r\n del Comedor"
-                        mensaje += u"Universitario."
+                        mensaje += u" a la Administración \r\n del Comedor"
+                        mensaje += u" Universitario."
                         WarningPopup(mensaje).open()
                 else:
                     self.ids.passw.text = ""

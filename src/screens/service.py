@@ -4,6 +4,7 @@
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 from threading import Thread
+from time import time
 from db import controlador
 from lib import impresora
 from src.settings import user_session, UNIDAD
@@ -35,13 +36,23 @@ class ServiceScreen(Screen):
             dni = user['dni']
             cat = u"control"
             fac = u"Secretaría de Bienestar"
-            unit = str(UNIDAD)
             msj = u"Ticket NO VALIDO"
             sdo = 0
             ticket = "XXX"
             print_thread = Thread(
                 target=impresora.imprimir_ticket_alumno,
-                args=(nom, dni, fac, cat, code, unit, ticket, fecha, msj, sdo)
+                args=(
+                    nom,
+                    dni,
+                    fac,
+                    cat,
+                    code,
+                    UNIDAD,
+                    ticket,
+                    fecha,
+                    msj,
+                    sdo
+                )
             )
             print_thread.start()
         elif estado == 2:

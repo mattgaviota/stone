@@ -18,7 +18,8 @@ file_path = os.path.join(
 )
 with open(file_path) as data_file:
     parametros = json.load(data_file)
-    UNIDAD = controlador.get_maquina(parametros['terminal'])
+    UNIDAD = int(controlador.get_maquina(parametros['terminal']))
+
 # Cargamos el archivo de versión
 path = os.path.join(
     os.path.split(os.path.abspath(os.path.dirname(__file__)))[0],

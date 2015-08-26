@@ -3,6 +3,7 @@
 # Autor: Matias Novoa
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
+from time import time
 from lib import utils
 from db import controlador
 from src.settings import user_session, UNIDAD

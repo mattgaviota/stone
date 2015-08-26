@@ -5,7 +5,7 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 from threading import Thread, Event
 from Queue import Queue, Empty
-from lib import utils, billetes
+from lib import utils, billetes, impresora
 from db import controlador
 from src.settings import user_session, UNIDAD
 from src.alerts import WarningPopup, ConfirmPopup
@@ -182,7 +182,7 @@ class Compra2Screen(Screen):
         Muestra la imagen del billete ingresado y habilita el botón de
         confirmación.
         """
-        source = "../../images/billetes/%sp.jpg" % (valor)
+        source = "images/billetes/%sp.jpg" % (valor)
         self.ids.ingresado.source = source
         self.ids.btn_confirmar.disabled = disabled
 
@@ -311,7 +311,7 @@ class Compra2Screen(Screen):
                 categoria = self.data['categoria'].decode('utf8')
                 ticket_data['categoria'] = categoria
                 ticket_data['facultad'] = self.data['facultad'].decode('utf8')
-                ticket_data['unidad'] = str(UNIDAD)
+                ticket_data['unidad'] = UNIDAD
                 mensaje = u"Gracias por usar el Comedor Universitario"
                 ticket_data['mensaje'] = mensaje
                 ticket_data['ticket'] = str(id_ticket)
@@ -398,7 +398,6 @@ class Compra2Screen(Screen):
                 dni = self.data['dni'].decode('utf8')
                 cat = self.data['categoria'].decode('utf8')
                 fac = self.data['facultad'].decode('utf8')
-                unit = str(UNIDAD)
                 fecha = str(int(time()))
                 pco = total
                 code = fecha + '0' * (10 - len(log)) + log
@@ -406,7 +405,7 @@ class Compra2Screen(Screen):
                 sdo = self.user['saldo']
                 print_thread = Thread(
                     target=impresora.imprimir_ticket_carga,
-                    args=(nom, dni, fac, cat, code, unit, log, msj, pco, sdo)
+                    args=(nom, dni, fac, cat, code, UNIDAD, log, msj, pco, sdo)
                 )
                 print_thread.start()
         controlador.cancelar_tickets(self.reserva)
@@ -497,7 +496,7 @@ class Compra3Screen(Screen):
                 categoria = self.data['categoria'].decode('utf8')
                 ticket_data['categoria'] = categoria
                 ticket_data['facultad'] = self.data['facultad'].decode('utf8')
-                ticket_data['unidad'] = str(UNIDAD)
+                ticket_data['unidad'] = UNIDAD
                 mensaje = u"Gracias por usar el Comedor Universitario"
                 ticket_data['mensaje'] = mensaje
                 ticket_data['ticket'] = str(id_ticket)
