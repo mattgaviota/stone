@@ -8,7 +8,7 @@ from time import time
 from db import controlador
 from lib import impresora
 from src.settings import user_session, UNIDAD
-from src.alerts import WarningPopup
+from src.alerts import WarningPopup, ConfirmPopup
 from cierre import CierreScreen
 from grupales import GrupalesScreen
 from anularGrupal import AnularGrupalScreen
