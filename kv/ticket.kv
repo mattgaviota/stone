@@ -51,8 +51,9 @@
         GridLayout:
             cols:3
             rows:1
-            padding: 200
+            padding: 120
             spacing: 10
+            size_hint: 1, 0.6
             ButtonU:
                 on_press: root.login()
                 BoxLayout:
@@ -99,7 +100,86 @@
                     LabelU:
                         text: 'Ayuda'
         LabelU:
-            id: disponibles
-            text: ''
+            text: 'Tickets Disponibles en la Semana'
             font_size: '40sp'
             size_hint: 1, 0.1
+        BoxLayout:
+            canvas.before:
+                Color:
+                    rgba: 0.92, 0.93, 0.94, 0.3
+                Rectangle:
+                    # self here refers to the widget i.e BoxLayout
+                    pos: self.pos
+                    size: self.size
+            orientation: 'vertical'
+            size_hint: 1, 0.2
+            BoxLayout:
+                size_hint: 1, 0.1
+                LabelU:
+                    text: 'Lunes'
+                    font_size: '20sp'
+                LabelU:
+                    text: 'Martes'
+                    font_size: '20sp'
+                LabelU:
+                    text: 'Miercoles'
+                    font_size: '20sp'
+                LabelU:
+                    text: 'Jueves'
+                    font_size: '20sp'
+                LabelU:
+                    text: 'Viernes'
+                    font_size: '20sp'
+            BoxLayout:
+                size_hint: 1, 0.1
+                LabelU:
+                    id: fecha_lunes
+                    text: ''
+                    font_size: '20sp'
+                LabelU:
+                    id: fecha_martes
+                    text: ''
+                    font_size: '20sp'
+                LabelU:
+                    id: fecha_miercoles
+                    text: ''
+                    font_size: '20sp'
+                LabelU:
+                    id: fecha_jueves
+                    text: ''
+                    font_size: '20sp'
+                LabelU:
+                    id: fecha_viernes
+                    text: ''
+                    font_size: '20sp'
+            BoxLayout:
+                size_hint: 1, 0.1
+            BoxLayout:
+                canvas.before:
+                    Color:
+                        rgba: 0.92, 0.93, 0.94, 0.5
+                    Rectangle:
+                        # self here refers to the widget i.e BoxLayout
+                        pos: self.pos
+                        size: self.size
+                size_hint: 1, 0.3
+                LabelU:
+                    id: cant_lunes
+                    text: ''
+                    font_size: '25sp'
+                LabelU:
+                    id: cant_martes
+                    text: ''
+                    font_size: '25sp'
+                LabelU:
+                    id: cant_miercoles
+                    text: ''
+                    font_size: '25sp'
+                LabelU:
+                    id: cant_jueves
+                    text: ''
+                    font_size: '25sp'
+                LabelU:
+                    id: cant_viernes
+                    text: ''
+                    font_size: '25sp'

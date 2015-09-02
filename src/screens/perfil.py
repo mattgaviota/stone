@@ -36,6 +36,7 @@ class ProfileScreen(Screen):
         except KeyError:
             self.user = user_session.get_user()
         self.provincias_nombre = sorted(self.provincias.keys())
+        self.data['nombre'] = self.user['nombre']
         self.data['dni'] = self.user['dni']
         self.data['saldo'] = '$ %.0f' % (self.user['saldo'])
         self.data['categoria'] = controlador.get_categoria_nombre(
@@ -51,7 +52,6 @@ class ProfileScreen(Screen):
     def update_datos(self):
         """Actualiza los datos de la pantalla para plasmar cambios"""
         self.cargar_datos()
-        self.ids.nombre.text = self.data['nombre']
         self.ids.email.text = self.data['email']
         self.ids.provincia.text = self.data['provincia']
         self.ids.saldo.text = self.data['saldo']
@@ -59,7 +59,6 @@ class ProfileScreen(Screen):
     def update_profile(self):
         """Actualiza el perfil con los cambios realizados por el usuario"""
         self.updata = {}
-        self.updata['nombre'] = self.ids.nombre.text
         self.updata['email'] = self.ids.email.text
         self.updata['id_provincia'] = self.provincias[self.ids.provincia.text]
         controlador.update_usuario(self.user, self.updata)
@@ -83,16 +82,7 @@ class ProfileScreen(Screen):
     def validar(self):
         """Valida las entradas de texto y actualiza el perfil de usuario si
          todo esta bien."""
-        if not self.ids.nombre.text:
-            mensaje = u"Su NOMBRE no puede estar vacío"
-            self.ids.nombre.focus = True
-            WarningPopup(mensaje).open()
-        elif len(self.ids.nombre.text) >= 45:
-            mensaje = u"\rSu NOMBRE no puede tener\r\n más de 45 caracteres."
-            self.ids.nombre.text = ""
-            self.ids.nombre.focus = True
-            WarningPopup(mensaje).open()
-        elif not self.ids.email.text:
+        if not self.ids.email.text:
             mensaje = u"Su EMAIL no puede estar vacío"
             self.ids.email.focus = True
             WarningPopup(mensaje).open()

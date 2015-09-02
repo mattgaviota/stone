@@ -8,7 +8,7 @@ from modelo import db
 from psycopg2 import IntegrityError
 from time import time
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 ####################
@@ -559,17 +559,31 @@ def  get_dias(user, limit, date=datetime.now()):
 
 
 def get_tickets_disponibles(date=datetime.now()):
-    """Devuelve los tickets disponibles para cierto día. Por defecto para
-    el día de hoy. """
-    row = db(db.dias.fecha == date.date()).select(db.dias.ALL).first()
-    if row:
-        disponibles = row.tickets_totales - row.tickets_vendidos
-        if disponibles > 0:
-            return disponibles
+    """Devuelve los tickets disponibles para la semana dado cierto día. Por
+    defecto para el día de hoy. """
+    anio, sem, dia_de_semana = date.isocalendar()
+    semana = {}
+    if dia_de_semana == 1:
+        semana['lunes'] = [date]
+    else:
+        semana['lunes'] = [date - timedelta(dia_de_semana - 1)]
+    semana['martes'] = [semana['lunes'][0] + timedelta(1)]
+    semana['miercoles'] = [semana['lunes'][0] + timedelta(2)]
+    semana['jueves'] = [semana['lunes'][0] + timedelta(3)]
+    semana['viernes'] = [semana['lunes'][0] + timedelta(4)]
+
+    for key, dia in semana.items():
+        row = db(db.dias.fecha == dia[0].date()).select(db.dias.ALL).first()
+        if row:
+            disponibles = row.tickets_totales - row.tickets_vendidos
+            if disponibles >= 0:
+                semana[key] = [dia[0].strftime('%d/%m/%Y')]
+                semana[key].append(str(disponibles))
+            else:
+                return 0
         else:
             return 0
-    else:
-        return 0
+    return semana
 
 
 def get_id_dia(dia):

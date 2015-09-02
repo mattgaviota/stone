@@ -24,12 +24,20 @@ class SplashScreen(Screen):
         muestra el cartel.
         """
         tickets_disponibles = controlador.get_tickets_disponibles()
-        self.update_label(tickets_disponibles)
+        self.update_labels(tickets_disponibles)
 
-    def update_label(self, tickets):
-        """Actualiza el cartel con los tickets disponibles para el día."""
-        self.disponibles = u"Tickets disponibles para hoy : %s" % (tickets)
-        self.ids.disponibles.text = self.disponibles
+    def update_labels(self, tickets):
+        """Actualiza el cartel con los tickets disponibles para la semana."""
+        self.ids.fecha_lunes.text = tickets['lunes'][0]
+        self.ids.fecha_martes.text = tickets['martes'][0]
+        self.ids.fecha_miercoles.text = tickets['miercoles'][0]
+        self.ids.fecha_jueves.text = tickets['jueves'][0]
+        self.ids.fecha_viernes.text = tickets['viernes'][0]
+        self.ids.cant_lunes.text = tickets['lunes'][1]
+        self.ids.cant_martes.text = tickets['martes'][1]
+        self.ids.cant_miercoles.text = tickets['miercoles'][1]
+        self.ids.cant_jueves.text = tickets['jueves'][1]
+        self.ids.cant_viernes.text = tickets['viernes'][1]
 
     def login(self):
         """ Ingresa a la pantalla de login """

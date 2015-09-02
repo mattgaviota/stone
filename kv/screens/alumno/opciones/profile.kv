@@ -33,10 +33,14 @@
                     size_hint: 1, 0.4
                 GridLayout:
                     cols: 2
-                    rows: 4
+                    rows: 5
                     padding: 40
                     spacing: 20
                     size_hint: 1, 0.2
+                    LabelUA:
+                        text: 'Nombre'
+                    LabelUA:
+                        text: root.data['nombre']
                     LabelUA:
                         text: 'DNI'
                     LabelUA:
@@ -70,15 +74,10 @@
                 size_hint: 0.7, 1
                 GridLayout:
                     cols: 2
-                    rows: 5
+                    rows: 3
                     padding: 20
                     spacing: 15
-                    size_hint: 1, 0.6
-                    LabelU:
-                        text: 'Nombre'
-                    Input:
-                        id: nombre
-                        text: root.data['nombre']
+                    size_hint: 1, 0.4
                     LabelU:
                         text: 'Email'
                     Input:
@@ -96,7 +95,7 @@
                         text: 'Cambiar'
                         on_press: root.cambiar_pass()
                 BoxLayout:
-                    size_hint: 1, 0.3
+                    size_hint: 1, 0.5
                 BoxLayout:
                     size_hint: 1, 0.1
                     spacing: 150
