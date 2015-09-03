@@ -592,6 +592,17 @@ def get_id_dia(dia):
     return row.id
 
 
+def nivelar_tickets(date=datetime.now()):
+    """
+    Actualiza la cantidad de tickets totales para que coincida con los
+    tickets vendidos del dia pasado por parametro.
+    """
+    dia = date.date()
+    db(db.dias.id == get_id_dia(dia)).update(
+        tickets_totales=db.dias.tickets_vendidos
+    )
+
+
 def update_totales_dia(id_dia, cantidad=1, band=1):
     """
     Actualiza la cantidad de tickets totales de acuerdo a band en cantidad
@@ -602,14 +613,16 @@ def update_totales_dia(id_dia, cantidad=1, band=1):
     """
     if band:
         db(db.dias.id == id_dia).update(
-                        tickets_totales=db.dias.tickets_totales + cantidad)
+            tickets_totales=db.dias.tickets_totales + cantidad
+        )
     else:
         db(db.dias.id == id_dia).update(
-                        tickets_totales=db.dias.tickets_totales - cantidad)
+            tickets_totales=db.dias.tickets_totales - cantidad
+        )
     db.commit()
 
 
-def update_tickets_dia(id_dia, cant=1, band=1):
+def update_tickets_dia(id_dia, cantidad=1, band=1):
     """
     Actualiza la cantidad de tickets vendidos de acuerdo a band en cant veces.
 
@@ -618,10 +631,12 @@ def update_tickets_dia(id_dia, cant=1, band=1):
     """
     if band:
         db(db.dias.id == id_dia).update(
-                            tickets_vendidos=db.dias.tickets_vendidos + cant)
+            tickets_vendidos=db.dias.tickets_vendidos + cantidad
+            )
     else:
         db(db.dias.id == id_dia).update(
-                            tickets_vendidos=db.dias.tickets_vendidos - cant)
+            tickets_vendidos=db.dias.tickets_vendidos - cantidad
+        )
     db.commit()
 
 
