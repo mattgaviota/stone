@@ -408,6 +408,7 @@ class Compra2Screen(Screen):
                     args=(nom, dni, fac, cat, code, UNIDAD, log, msj, pco, sdo)
                 )
                 print_thread.start()
+        id_log = controlador.insert_log(self.user, 'cancelar', UNIDAD)
         controlador.cancelar_tickets(self.reserva)
         self.manager.current = 'compra_1'
         self.update_ingreso("", True)
