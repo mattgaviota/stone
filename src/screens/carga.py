@@ -5,12 +5,12 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 from threading import Thread, Event
 from Queue import Queue, Empty
-from lib import billetes
+from time import time, sleep
+from lib import billetes, impresora
 from db import controlador
 from src.settings import user_session, UNIDAD
 from src.alerts import WarningPopup
 from bloqueo import BloqueoScreen
-from time import sleep
 from kivy.uix.screenmanager import Screen
 from kivy.clock import mainthread
 
