@@ -541,7 +541,7 @@ def  get_dias(user, limit, date=datetime.now()):
     if limit > cantidad:
         limit -= cantidad
         hora = get_hora_compra()
-        if date.hour > hora:
+        if date.hour >= hora:
             date = date + relativedelta(days=1)
         rows = db((db.dias.tickets_vendidos < db.dias.tickets_totales) &
                 (db.dias.fecha >= date.date())).select(db.dias.fecha,
@@ -561,7 +561,16 @@ def  get_dias(user, limit, date=datetime.now()):
 def get_tickets_disponibles(date=datetime.now()):
     """Devuelve los tickets disponibles para la semana dado cierto día. Por
     defecto para el día de hoy. """
+    hora_actual = date.hour
+    hora_compra = get_hora_compra()
     anio, sem, dia_de_semana = date.isocalendar()
+    dias_habiles = {
+        'lunes': 1,
+        'martes': 2,
+        'miercoles': 3,
+        'jueves': 4,
+        'viernes': 5
+    }
     semana = {}
     if dia_de_semana == 1:
         semana['lunes'] = [date]
@@ -575,7 +584,15 @@ def get_tickets_disponibles(date=datetime.now()):
     for key, dia in semana.items():
         row = db(db.dias.fecha == dia[0].date()).select(db.dias.ALL).first()
         if row:
-            disponibles = row.tickets_totales - row.tickets_vendidos
+            if dias_habiles[key] < dia_de_semana:
+                disponibles = 0
+            elif dias_habiles[key] == dia_de_semana:
+                if hora_compra < hora_actual:
+                    disponibles = row.tickets_totales - row.tickets_vendidos
+                else:
+                    disponibles = 0
+            else:
+                disponibles = row.tickets_totales - row.tickets_vendidos
             if disponibles >= 0:
                 semana[key] = [dia[0].strftime('%d/%m/%Y')]
                 semana[key].append(str(disponibles))
@@ -590,17 +607,6 @@ def get_id_dia(dia):
     """Retorna el id de un día de acuerdo a la fecha"""
     row = db(db.dias.fecha == dia).select(db.dias.id).first()
     return row.id
-
-
-def nivelar_tickets(date=datetime.now()):
-    """
-    Actualiza la cantidad de tickets totales para que coincida con los
-    tickets vendidos del dia pasado por parametro.
-    """
-    dia = date.date()
-    db(db.dias.id == get_id_dia(dia)).update(
-        tickets_totales=db.dias.tickets_vendidos
-    )
 
 
 def update_totales_dia(id_dia, cantidad=1, band=1):

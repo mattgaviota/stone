@@ -70,5 +70,4 @@ class ControlScreen(Screen):
         controlador.insert_log(user, 'apagar', UNIDAD, 'Control')
         user_session.close()
         controlador.update_all_activos()
-        controlador.nivelar_tickets() # TODO probar
         os.system("/sbin/shutdown -h now")
