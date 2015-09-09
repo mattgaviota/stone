@@ -576,7 +576,7 @@ def get_tickets_disponibles(date=datetime.now()):
     return semana
 
 
-def get_tickets_libres(dia=datetime.now()):
+def get_tickets_libres(date=datetime.now()):
     ''' Retorna la cantidad de tickets disponibles para el
     día pasado por parametro. por defecto el día de hoy.'''
     row = db(db.dias.fecha == date.date()).select(db.dias.ALL).first()
