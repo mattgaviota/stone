@@ -560,7 +560,7 @@ def get_tickets_disponibles(date=datetime.now()):
             if dias_habiles[key] < dia_de_semana:
                 disponibles = 0
             elif dias_habiles[key] == dia_de_semana:
-                if hora_compra < hora_actual:
+                if hora_compra >= hora_actual:
                     disponibles = row.tickets_totales - row.tickets_vendidos
                 else:
                     disponibles = 0
