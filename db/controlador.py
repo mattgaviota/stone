@@ -287,34 +287,6 @@ def insert_ticket_grupal_log(id_ticket, id_log_usuario):
 #################
 # Tabla tickets #
 #################
-def get_tickets(user, cant=5, date=datetime.now(), state=2):
-    """
-    Obtiene cant números de tickets de un usuario a partir de la fecha date
-    inclusive, siempre que estos estén tengan el estado = state
-    """
-    tickets = db((db.tickets.id_dia == db.dias.id) &
-            (db.tickets.id == db.tickets_log_usuarios.id_ticket) &
-            (db.tickets_log_usuarios.id_log_usuario == db.log_usuarios.id) &
-            (db.log_usuarios.dni == db.usuarios.dni))
-    rows = tickets((db.usuarios.dni == user['dni']) &
-                (db.dias.fecha >= date.date()) &
-                (db.tickets.estado == state)).select(db.dias.fecha,
-                        db.tickets.importe, db.tickets.estado, db.tickets.id,
-                        db.tickets.barcode, limitby=(0, cant),
-                        orderby=db.dias.fecha)
-    fila = {}
-    lista = []
-    for row in rows:
-        fila['fecha'] = row['dias']['fecha']
-        fila['importe'] = row['tickets']['importe']
-        fila['estado'] = row['tickets']['estado']
-        fila['id'] = row['tickets']['id']
-        fila['barcode'] = row['tickets']['barcode']
-        lista.append(fila)
-        fila = {}
-    return lista
-
-
 def get_count_tickets(user, state=2, accion=3):
     """Retorna la cantidad de tickets impresos de un usuario que tengan el
     estado 2(impreso) y la accion 3 (imprimir)."""
@@ -369,7 +341,8 @@ def get_ticket(user, date):
     rows = tickets((db.usuarios.dni == user['dni']) &
             (db.dias.fecha == date) &
             ((db.tickets.estado == 2) |
-            (db.tickets.estado == 1))).select(db.dias.fecha,
+            (db.tickets.estado == 1) |
+            (db.tickets.estado == 3))).select(db.dias.fecha,
                             db.tickets.importe, db.tickets.estado,
                             db.tickets.id, db.tickets.barcode)
     if rows:
@@ -480,7 +453,7 @@ def reservar_tickets(user, dias, id_log, unit):
     tickets_reservados = []
     dias_full = []
     for dia in dias:
-        disponibles = get_tickets_disponibles(dia)
+        disponibles = get_tickets_libres(dia)
         if disponibles:
             data['id_dia'] = get_id_dia(dia)
             data['importe'] = get_categoria_importe(user['id_categoria'])
@@ -601,6 +574,18 @@ def get_tickets_disponibles(date=datetime.now()):
         else:
             return 0
     return semana
+
+
+def get_tickets_libres(dia=datetime.now()):
+    ''' Retorna la cantidad de tickets disponibles para el
+    día pasado por parametro. por defecto el día de hoy.'''
+    row = db(db.dias.fecha == date.date()).select(db.dias.ALL).first()
+    if row:
+        disponibles = row.tickets_totales - row.tickets_vendidos
+        if disponibles > 0:
+            return disponibles
+        else:
+            return 0
 
 
 def get_id_dia(dia):
