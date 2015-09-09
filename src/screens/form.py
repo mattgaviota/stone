@@ -20,7 +20,6 @@ class FormScreen(Screen):
         self.facultades_nombre = sorted(self.facultades.keys())
         self.provincias_nombre = sorted(self.provincias.keys())
         self.datos = {}
-        self.datos['fondo'] = controlador.get_images('fondo')
         self.datos['aside'] = controlador.get_images('aside')
         self.datos['footer'] = controlador.get_images('footer')
 
