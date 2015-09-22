@@ -634,9 +634,10 @@ def update_tickets_dia(id_dia, cantidad=1, band=1):
 #########################
 # Tabla configuraciones #
 #########################
-def get_configuracion():
+def get_configuracion(id_conf=0):
     """Retorna la fila de configuracion"""
-    row = db().select(db.configuraciones.ALL).first()
+    row = db(db.configuraciones.id == id_conf).select(
+        db.configuraciones.ALL).first()
     return row
 
 

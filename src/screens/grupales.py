@@ -10,6 +10,7 @@ from lib import impresora
 from src.settings import user_session, UNIDAD
 from src.alerts import ConfirmPopup, WarningPopup
 from kivy.uix.screenmanager import Screen
+from kivy.core.window import Window
 
 
 class GrupalesScreen(Screen):
