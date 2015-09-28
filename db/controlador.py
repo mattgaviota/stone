@@ -742,6 +742,50 @@ def get_ubicacion(id_maquina):
         None
 
 
+def get_papel_disponible(id_maquina):
+    """ Obtiene la cantidad de tickets que se pueden imprimir una vez
+    que tiene poco papel."""
+    row = db(db.maquinas.id == id_maquina).select().first()
+    if row:
+        return row.ticket_disponibles
+    else:
+        return None
+
+
+def update_papel_disponible(id_maquina, band=0, cant=1):
+    """
+    Actualiza al cantidad de tickets que se pueden imprimir una vez
+    que tiene poco papel.
+    band:
+        0 -> tickets_disponibles -= cant
+        1 -> tickets_disponibles += cant
+        2 -> tickets_disponibles = cant
+    """
+    if band == 1:
+        db(db.maquinas.id == id_maquina).update(
+            tickets_disponibles=db.tickets_disponibles + cant
+        )
+    elif band == 2:
+        db(db.maquinas.id == id_maquina).update(tickets_disponibles=cant)
+    elif band == 0:
+        db(db.maquinas.id == id_maquina).update(
+            tickets_disponibles=db.tickets_disponibles - cant
+        )
+    else:
+        return 1
+    db.commit()
+    return 0
+
+
+def get_estado(id_maquina):
+    """Obtiene el estado actual de la maquina dado su id."""
+    row = db(db.maquinas.id == id_maquina).select().first()
+    if row:
+        return row.estado
+    else:
+        return None
+
+
 def update_estado_maquina(id_maquina, state):
     """ Actualiza el estado de una maquina."""
     db(db.maquinas.id == id_maquina).update(estado=state)

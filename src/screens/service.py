@@ -21,8 +21,11 @@ class ServiceScreen(Screen):
 
     def imprimir(self):
         """imprime un ticket de control"""
-        estado = impresora.check_status()
-        if estado == 1:
+        print_status = impresora.check_status()
+        papel_disponible = controlador.get_papel_disponible()
+        if ((print_status == 1) or
+                (print_status == 2 and papel_disponible >= 1)
+            ):
             user = user_session.get_user()
             controlador.insert_log(
                 user,
@@ -92,7 +95,7 @@ class ServiceScreen(Screen):
                 )
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(
+                print_thread = Thread(  #TODO control papel
                     target=impresora.imprimir_ticket_cierre,
                     args=(
                         user['nombre'],

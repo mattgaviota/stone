@@ -171,7 +171,11 @@ class CargaScreen(Screen):
     def cancel(self):
         """Vuelve a una pantalla anterior"""
         if self.total:
-            if impresora.check_status() == 1:
+            print_status = impresora.check_status()
+            papel_disponible = controlador.get_papel_disponible()
+            if ((print_status == 1) or
+                    (print_status == 2 and papel_disponible >= 1)
+                ):
                 log = controlador.insert_log(
                     self.user,
                     'cargar',
@@ -204,6 +208,7 @@ class CargaScreen(Screen):
                     )
                 )
                 print_thread.start()
+                controlador.update_papel_disponible(UNIDAD)
         self.stop.set()
         self.cola_stop.put(True)
         self.manager.current = 'menu'
