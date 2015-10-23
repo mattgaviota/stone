@@ -165,6 +165,7 @@ db.define_table('maquinas',
     Field('id', type='integer'),
     Field('ubicacion', type='reference facultades'),
     Field('estado', type='reference estados_maquina'),
+    Field('tickets_disponibles', type='integer'),
     primarykey=['id'],
     migrate=migrate)
 

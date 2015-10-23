@@ -318,7 +318,7 @@ class Compra2Screen(Screen):
                 ticket_data['saldo'] = self.user['saldo']
                 controlador.insert_ticket_log(id_ticket, id_log)
                 ticket_list.append(ticket_data)
-
+        controlador.update_papel_disponible(UNIDAD, 0, len(ticket_list))
         print_thread = Thread(
             target=impresora.imprimir_tickets_alumno,
             args=ticket_list
@@ -504,7 +504,7 @@ class Compra3Screen(Screen):
                 ticket_data['saldo'] = self.user['saldo']
                 controlador.insert_ticket_log(id_ticket, id_log)
                 ticket_list.append(ticket_data)
-
+        controlador.update_papel_disponible(UNIDAD, 0, len(ticket_list))
         print_thread = Thread(
             target=impresora.imprimir_tickets_alumno,
             args=ticket_list

@@ -82,20 +82,32 @@ class CierreScreen(Screen):
             )
         ticket = controlador.get_ticket_cierre(id_ticket)
         hora = controlador.get_hora_inicio(unidad, date)
-        print_thread = Thread(
-            target=impresora.imprimir_ticket_cierre,
-            args=(
-                user['nombre'],
-                id_ticket,
-                unidad,
-                hora,
-                bills,
-                total,
-                ticket['barcode'],
-                date.strftime('%d/%m/%Y')
+        print_status = impresora.check_status()
+        papel_disponible = controlador.get_papel_disponible(UNIDAD)
+        if ((print_status == 1) or
+            (print_status == 2 and papel_disponible >= 2)
+            ):
+            print_thread = Thread(
+                target=impresora.imprimir_ticket_cierre,
+                args=(
+                    user['nombre'],
+                    id_ticket,
+                    unidad,
+                    hora,
+                    bills,
+                    total,
+                    ticket['barcode'],
+                    date.strftime('%d/%m/%Y')
+                )
             )
-        )
-        print_thread.start()
+            print_thread.start()
+            controlador.update_papel_disponible(UNIDAD, 0, 2)
+        elif print_status == 2:
+            mensaje = u"No hay papel"
+            WarningPopup(mensaje).open()
+        else:
+            mensaje = u"Impresora desconectada"
+            WarningPopup(mensaje).open()
 
     def cancel(self):
         """Vuelve a la pantalla anterior"""

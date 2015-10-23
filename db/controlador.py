@@ -503,7 +503,7 @@ def cancelar_tickets(tickets_reservados):
 ##############
 # Tabla dias #
 ##############
-def  get_dias(user, limit, date=datetime.now()):
+def get_dias(user, limit, date=datetime.now()):
     """
     Retorna una lista de limit cantidad de dias que tengan tickets
     disponibles a partir de la fecha de hoy."""
@@ -747,7 +747,7 @@ def get_papel_disponible(id_maquina):
     que tiene poco papel."""
     row = db(db.maquinas.id == id_maquina).select().first()
     if row:
-        return row.ticket_disponibles
+        return row.tickets_disponibles
     else:
         return None
 
@@ -763,13 +763,13 @@ def update_papel_disponible(id_maquina, band=0, cant=1):
     """
     if band == 1:
         db(db.maquinas.id == id_maquina).update(
-            tickets_disponibles=db.tickets_disponibles + cant
+            tickets_disponibles=db.maquinas.tickets_disponibles + cant
         )
     elif band == 2:
         db(db.maquinas.id == id_maquina).update(tickets_disponibles=cant)
     elif band == 0:
         db(db.maquinas.id == id_maquina).update(
-            tickets_disponibles=db.tickets_disponibles - cant
+            tickets_disponibles=db.maquinas.tickets_disponibles - cant
         )
     else:
         return 1

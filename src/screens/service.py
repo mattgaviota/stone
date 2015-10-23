@@ -22,7 +22,7 @@ class ServiceScreen(Screen):
     def imprimir(self):
         """imprime un ticket de control"""
         print_status = impresora.check_status()
-        papel_disponible = controlador.get_papel_disponible()
+        papel_disponible = controlador.get_papel_disponible(UNIDAD)
         if ((print_status == 1) or
                 (print_status == 2 and papel_disponible >= 1)
             ):
@@ -58,7 +58,8 @@ class ServiceScreen(Screen):
                 )
             )
             print_thread.start()
-        elif estado == 2:
+            controlador.update_papel_disponible(UNIDAD, 0, 1)
+        elif print_status == 2:
             mensaje = u"No hay papel"
             WarningPopup(mensaje).open()
         else:
@@ -95,19 +96,30 @@ class ServiceScreen(Screen):
                 )
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(  #TODO control papel
-                    target=impresora.imprimir_ticket_cierre,
-                    args=(
-                        user['nombre'],
-                        id_ticket,
-                        UNIDAD,
-                        hora,
-                        bills,
-                        total,
-                        ticket['barcode']
+                print_status = impresora.check_status()
+                papel_disponible = controlador.get_papel_disponible(UNIDAD)
+                if ((print_status == 1) or
+                    (print_status == 2 and papel_disponible >= 2)
+                    ):
+                    print_thread = Thread(
+                        target=impresora.imprimir_ticket_cierre,
+                        args=(
+                            user['nombre'],
+                            id_ticket,
+                            UNIDAD,
+                            hora,
+                            bills,
+                            total,
+                            ticket['barcode']
+                        )
                     )
-                )
-                print_thread.start()
+                    print_thread.start()
+                elif print_status == 2:
+                    mensaje = u"No hay papel"
+                    WarningPopup(mensaje).open()
+                else:
+                    mensaje = u"Impresora desconectada"
+                    WarningPopup(mensaje).open()
             else:
                 mensaje = u"No hay registros para hoy"
                 WarningPopup(mensaje).open()
@@ -124,19 +136,31 @@ class ServiceScreen(Screen):
                     )
                 ticket = controlador.get_ticket_cierre(id_ticket)
                 hora = controlador.get_hora_inicio(UNIDAD)
-                print_thread = Thread(
-                    target=impresora.imprimir_ticket_cierre,
-                    args=(
-                        user['nombre'],
-                        id_ticket,
-                        UNIDAD,
-                        hora,
-                        bills,
-                        total,
-                        ticket['barcode']
+                print_status = impresora.check_status()
+                papel_disponible = controlador.get_papel_disponible(UNIDAD)
+                if ((print_status == 1) or
+                    (print_status == 2 and papel_disponible >= 2)
+                    ):
+                    print_thread = Thread(
+                        target=impresora.imprimir_ticket_cierre,
+                        args=(
+                            user['nombre'],
+                            id_ticket,
+                            UNIDAD,
+                            hora,
+                            bills,
+                            total,
+                            ticket['barcode']
+                        )
                     )
-                )
-                print_thread.start()
+                    print_thread.start()
+                    controlador.update_papel_disponible(UNIDAD, 0, 2)
+                elif print_status == 2:
+                    mensaje = u"No hay papel"
+                    WarningPopup(mensaje).open()
+                else:
+                    mensaje = u"Impresora desconectada"
+                    WarningPopup(mensaje).open()
             else:
                 mensaje = u"No hay rergistros para hoy"
                 WarningPopup(mensaje).open()
