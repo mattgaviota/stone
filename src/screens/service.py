@@ -109,7 +109,7 @@ class ServiceScreen(Screen):
                 )
                 print_thread.start()
             else:
-                mensaje = u"No hay rergistros para hoy"
+                mensaje = u"No hay registros para hoy"
                 WarningPopup(mensaje).open()
         elif retiro and hora:
             total, bills = controlador.get_total(UNIDAD)

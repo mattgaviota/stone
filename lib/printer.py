@@ -93,7 +93,6 @@ class Printer():
         self.set_style('align-center')
         self.set_style('logo')
         self.set_style('align-left')
-        dia = strftime("%d/%m/%Y", localtime())
         self.set_style('h-tab-22')
         self.tup.send(bytearray("Fecha %s" % (dia)))
         self.tup.send(bytearray(" \x09 Hora %s\r\n" % (hora)))
