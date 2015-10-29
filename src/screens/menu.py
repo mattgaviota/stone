@@ -33,7 +33,7 @@ class MenuScreen(Screen):
         estado = impresora.check_status()
         if estado == 1:
             controlador.update_estado_maquina(UNIDAD, 1)
-            controlador.update_papel_disponible(UNIDAD, 2, 50)
+            controlador.update_papel_disponible(UNIDAD, 2, 80)
             if not self.manager.has_screen('compra_1'):
                 self.manager.add_widget(Compra1Screen(name='compra_1'))
             self.manager.current = 'compra_1'
