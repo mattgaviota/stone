@@ -28,16 +28,21 @@ class SplashScreen(Screen):
 
     def update_labels(self, tickets):
         """Actualiza el cartel con los tickets disponibles para la semana."""
-        self.ids.fecha_lunes.text = tickets['lunes'][0]
-        self.ids.fecha_martes.text = tickets['martes'][0]
-        self.ids.fecha_miercoles.text = tickets['miercoles'][0]
-        self.ids.fecha_jueves.text = tickets['jueves'][0]
-        self.ids.fecha_viernes.text = tickets['viernes'][0]
-        self.ids.cant_lunes.text = tickets['lunes'][1]
-        self.ids.cant_martes.text = tickets['martes'][1]
-        self.ids.cant_miercoles.text = tickets['miercoles'][1]
-        self.ids.cant_jueves.text = tickets['jueves'][1]
-        self.ids.cant_viernes.text = tickets['viernes'][1]
+        self.ids.dia1.text = tickets['dia1'][0]
+        self.ids.dia2.text = tickets['dia2'][0]
+        self.ids.dia3.text = tickets['dia3'][0]
+        self.ids.dia4.text = tickets['dia4'][0]
+        self.ids.dia5.text = tickets['dia5'][0]
+        self.ids.fecha_dia1.text = tickets['dia1'][1]
+        self.ids.fecha_dia2.text = tickets['dia2'][1]
+        self.ids.fecha_dia3.text = tickets['dia3'][1]
+        self.ids.fecha_dia4.text = tickets['dia4'][1]
+        self.ids.fecha_dia5.text = tickets['dia5'][1]
+        self.ids.cant_dia1.text = tickets['dia1'][2]
+        self.ids.cant_dia2.text = tickets['dia2'][2]
+        self.ids.cant_dia3.text = tickets['dia3'][2]
+        self.ids.cant_dia4.text = tickets['dia4'][2]
+        self.ids.cant_dia5.text = tickets['dia5'][2]
 
     def login(self):
         """ Ingresa a la pantalla de login """

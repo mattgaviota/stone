@@ -531,48 +531,58 @@ def get_dias(user, limit, date=datetime.now()):
         return lista_dias, lista_nombres
 
 
+def get_next_day(date):
+    """ Devuelve el siguiente día hábil con sus tickets disponibles. """
+    dia = date + timedelta(1)
+    dias_habiles = {
+        1: 'Lunes',
+        2: 'Martes',
+        3: 'Miercoles',
+        4: 'Jueves',
+        5: 'Viernes'
+    }
+    anio, sem, dow = dia.isocalendar()
+    while dow > 5:
+        dia = dia + timedelta(1)
+        anio, sem, dow = dia.isocalendar()
+    row = db(db.dias.fecha == dia.date()).select(db.dias.ALL).first()
+    if row:
+        disponibles = row.tickets_totales - row.tickets_vendidos
+        disponibles = str(disponibles)
+        return [dias_habiles[dow], dia.strftime('%d/%m/%Y'), disponibles, dia]
+    else:
+        return None
+
+
 def get_tickets_disponibles(date=datetime.now()):
     """Devuelve los tickets disponibles para la semana dado cierto día. Por
     defecto para el día de hoy. """
     hora_actual = date.hour
     hora_compra = get_hora_compra()
-    anio, sem, dia_de_semana = date.isocalendar()
-    dias_habiles = {
-        'lunes': 1,
-        'martes': 2,
-        'miercoles': 3,
-        'jueves': 4,
-        'viernes': 5
+    anio, sem, dow = date.isocalendar()
+    dias_hab = {
+        1: 'Lunes',
+        2: 'Martes',
+        3: 'Miercoles',
+        4: 'Jueves',
+        5: 'Viernes',
+        6: 'Sábado',
+        7: 'Domingo'
     }
     semana = {}
-    if dia_de_semana == 1:
-        semana['lunes'] = [date]
-    else:
-        semana['lunes'] = [date - timedelta(dia_de_semana - 1)]
-    semana['martes'] = [semana['lunes'][0] + timedelta(1)]
-    semana['miercoles'] = [semana['lunes'][0] + timedelta(2)]
-    semana['jueves'] = [semana['lunes'][0] + timedelta(3)]
-    semana['viernes'] = [semana['lunes'][0] + timedelta(4)]
-
-    for key, dia in semana.items():
-        row = db(db.dias.fecha == dia[0].date()).select(db.dias.ALL).first()
+    if hora_compra >= hora_actual:
+        row = db(db.dias.fecha == date.date()).select(db.dias.ALL).first()
         if row:
-            if dias_habiles[key] < dia_de_semana:
-                disponibles = 0
-            elif dias_habiles[key] == dia_de_semana:
-                if hora_compra >= hora_actual:
-                    disponibles = row.tickets_totales - row.tickets_vendidos
-                else:
-                    disponibles = 0
-            else:
-                disponibles = row.tickets_totales - row.tickets_vendidos
-            if disponibles >= 0:
-                semana[key] = [dia[0].strftime('%d/%m/%Y')]
-                semana[key].append(str(disponibles))
-            else:
-                return 0
+            disponibles = row.tickets_totales - row.tickets_vendidos
         else:
-            return 0
+            disponibles = '0'
+    else:
+        disponibles = '0'
+    semana['dia1'] = [dias_hab[dow], date.strftime('%d/%m/%Y'), disponibles]
+    semana['dia2'] = get_next_day(date)
+    semana['dia3'] = get_next_day(semana['dia2'][3])
+    semana['dia4'] = get_next_day(semana['dia3'][3])
+    semana['dia5'] = get_next_day(semana['dia4'][3])
     return semana
 
 
