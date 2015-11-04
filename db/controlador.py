@@ -574,6 +574,7 @@ def get_tickets_disponibles(date=datetime.now()):
         row = db(db.dias.fecha == date.date()).select(db.dias.ALL).first()
         if row:
             disponibles = row.tickets_totales - row.tickets_vendidos
+            disponibles = str(disponibles)
         else:
             disponibles = '0'
     else:
