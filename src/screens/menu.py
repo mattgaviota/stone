@@ -38,8 +38,10 @@ class MenuScreen(Screen):
                 self.manager.add_widget(Compra1Screen(name='compra_1'))
             self.manager.current = 'compra_1'
         elif estado == 2:
+            user = user_session.get_user()
+            limite = controlador.get_categoria_limite(user['id_categoria'])
             controlador.update_estado_maquina(UNIDAD, 4)
-            if controlador.get_papel_disponible(UNIDAD) >= 5:
+            if controlador.get_papel_disponible(UNIDAD) >= limite:
                 if not self.manager.has_screen('compra_1'):
                     self.manager.add_widget(Compra1Screen(name='compra_1'))
                 self.manager.current = 'compra_1'
