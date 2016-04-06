@@ -1,16 +1,43 @@
 # -*- coding: utf-8 -*-
-#
+"""Modulo para registrar usuarios. Con su pantalla correspondiente"""
 # Autor: Matias Novoa
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 import re
 from threading import Thread
+from kivy.uix.screenmanager import Screen
+from kivy.core.window import Window
 from db import controlador
 from lib import mailserver, utils
 from src.alerts import WarningPopup
-from src.settings import user_session, UNIDAD
-from kivy.uix.screenmanager import Screen
-from kivy.core.window import Window
+from src.settings import UNIDAD
+
+
+def mailvalidator(email):
+    """Valida que el mail esté bien formado"""
+    if re.match(
+            "^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
+            email
+    ) is not None:
+        return 1
+    return 0
+
+
+def chequear_alumno(libu, dni):
+    """
+    Chequea los datos ingresados para ver que correspondan con un alumno.
+    Retorna 1 -> Si los datos están bien y tiene 2 o más materias.
+    Retorna 2 -> Si los datos están bien pero no tiene 2 o más materias.
+    Retorna 0 -> Si los datos no se corresponden con un alumno.
+    """
+    id_alumno = controlador.get_alumno(libu, dni)
+    if id_alumno:
+        if controlador.get_materias(id_alumno) >= 2:
+            return 1
+        else:
+            return 2
+    else:
+        return 0
 
 
 class FormScreen(Screen):
@@ -27,31 +54,6 @@ class FormScreen(Screen):
 
         super(FormScreen, self).__init__(**kwargs)
         self.ids.provincia.text = 'Salta'
-
-    def mailvalidator(self, email):
-        """Valida que el mail esté bien formado"""
-        if re.match(
-            "^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
-            email
-        ) is not None:
-            return 1
-        return 0
-
-    def chequear_alumno(self, lu, dni):
-        """
-        Chequea los datos ingresados para ver que correspondan con un alumno.
-        Retorna 1 -> Si los datos están bien y tiene 2 o más materias.
-        Retorna 2 -> Si los datos están bien pero no tiene 2 o más materias.
-        Retorna 0 -> Si los datos no se corresponden con un alumno.
-        """
-        id_alumno = controlador.get_alumno(lu, dni)
-        if id_alumno:
-            if controlador.get_materias(id_alumno) >= 2:
-                return 1
-            else:
-                return 2
-        else:
-            return 0
 
     def validar(self):
         """Valida las entradas de texto y manda a registrar al usuario
@@ -99,7 +101,7 @@ class FormScreen(Screen):
                 self.ids.mail.text = ""
                 self.ids.mail.focus = True
                 WarningPopup(msje).open()
-            elif not self.mailvalidator(self.ids.mail.text):
+            elif not mailvalidator(self.ids.mail.text):
                 mensaje = u"\rSu EMAIL está mal formado.\r\n Recuerde que este"
                 mensaje += u" mail se usará\r\n para confirmar su registro."
                 self.ids.mail.text = ""
@@ -113,7 +115,7 @@ class FormScreen(Screen):
                 WarningPopup(mensaje).open()
             else:
                 if utils.internet_on():
-                    chequeo = self.chequear_alumno(
+                    chequeo = chequear_alumno(
                         self.ids.lu.text, self.ids.dni.text
                     )
                     if chequeo == 1:

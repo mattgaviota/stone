@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+"""Modulo con los popup usados. Confimacion y warning."""
 # Autor: Matias Novoa
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
@@ -9,6 +9,7 @@ from kivy.properties import StringProperty
 
 
 class ConfirmPopup(Popup):
+    """Widget con Popup de confirmación"""
     text = StringProperty()
 
     def __init__(self, **kwargs):
@@ -16,6 +17,7 @@ class ConfirmPopup(Popup):
         super(ConfirmPopup, self).__init__(**kwargs)
 
     def on_answer(self, *args):
+        """Método genérico para enlazar con la respuesta."""
         pass
 
 
