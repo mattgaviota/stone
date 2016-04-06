@@ -4,9 +4,11 @@
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 import re
+from threading import Thread
 from db import controlador
-from lib import mailserver
+from lib import mailserver, utils
 from src.alerts import WarningPopup
+from src.settings import user_session, UNIDAD
 from kivy.uix.screenmanager import Screen
 from kivy.core.window import Window
 
@@ -31,7 +33,7 @@ class FormScreen(Screen):
         if re.match(
             "^[a-zA-Z0-9._%-+]+@[a-zA-Z0-9._%-]+.[a-zA-Z]{2,6}$",
             email
-        ) != None:
+        ) is not None:
             return 1
         return 0
 

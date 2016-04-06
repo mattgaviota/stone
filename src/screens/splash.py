@@ -5,6 +5,7 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 from lib.utils import internet_on
 from db import controlador
+from src.alerts import WarningPopup
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty
 from kivy.clock import Clock
@@ -18,7 +19,7 @@ class SplashScreen(Screen):
         super(SplashScreen, self).__init__(**kwargs)
         Clock.schedule_interval(self.update_disponibles, 60)
 
-    def update_disponibles(self, dt):
+    def update_disponibles(self):
         """
         Revisa la cantidad de tickets disponibles y llama a la función que
         muestra el cartel.

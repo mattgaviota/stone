@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-#
+"""Módulo con la screen para anular los tickets grupales."""
 # Autor: Matias Novoa
 # Año: 2015
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
-from db import controlador
-from lib import impresora
+from kivy.core.window import Window
+from kivy.uix.screenmanager import Screen
 from src.settings import user_session, UNIDAD
 from src.alerts import ConfirmPopup, WarningPopup
-from kivy.uix.screenmanager import Screen
-from kivy.core.window import Window
+from db import controlador
 
 
 class AnularGrupalScreen(Screen):
-
+    """Clase para generar la pantalla que me permite anular un ticket grupal"""
     def __init__(self, **kwargs):
         """Pantalla para anular los tickets del usuario"""
         self.data = {}
+        self.popup = None
         self.user = user_session.get_user()
         super(AnularGrupalScreen, self).__init__(**kwargs)
 
@@ -44,17 +44,19 @@ class AnularGrupalScreen(Screen):
             WarningPopup(mensaje).open()
 
     def confirmacion(self):
+        """Llamada a popup de confirmación de anulación."""
         Window.release_all_keyboards()
-        self.fecha = self.validar_anulacion()
-        if self.fecha:
+        fecha = self.validar_anulacion()
+        if fecha:
             self.popup = ConfirmPopup(
                 text='\rSeguro deseas anular el ticket\r\n del día %s?' %
-                    (self.fecha)
+                (fecha)
             )
             self.popup.bind(on_answer=self._on_answer)
             self.popup.open()
 
-    def _on_answer(self, instance, answer):
+    def _on_answer(self, answer):
+        """Función para enlazar al popup al responder."""
         if answer:
             self.anular_ticket_grupal()
         self.ids.id_ticket.text = ""

@@ -5,7 +5,6 @@
 # Licencia: GNU/GPL V3 http://www.gnu.org/copyleft/gpl.html
 
 from kivy.uix.popup import Popup
-from kivy.uix.gridlayout import GridLayout
 from kivy.properties import StringProperty
 
 
